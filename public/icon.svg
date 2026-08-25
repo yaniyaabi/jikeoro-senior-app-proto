@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="118" fill="#06336f"/>
+  <path d="M112 84h288v344H112z" fill="#fff" opacity=".08"/>
+  <circle cx="256" cy="256" r="170" fill="#b8ef58"/>
+  <text x="256" y="330" text-anchor="middle" font-family="Georgia,serif" font-size="220" font-weight="900" fill="#06336f">路</text>
+</svg>

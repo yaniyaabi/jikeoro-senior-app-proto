@@ -1,0 +1,20 @@
+{
+  "name": "지켜路 쉬운 제보",
+  "short_name": "지켜路",
+  "description": "어르신도 쉽게 사진·음성·글로 보행 위험을 제보하는 앱",
+  "lang": "ko-KR",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f3f7f8",
+  "theme_color": "#06336f",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
