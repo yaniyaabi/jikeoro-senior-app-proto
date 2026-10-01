@@ -10,6 +10,7 @@ export type StoredMedia = {
 
 export type StoredReport = {
   id: string;
+  userId: string;
   riskType: string;
   description: string;
   latitude: number | null;
@@ -43,14 +44,30 @@ function openDatabase() {
   });
 }
 
-export async function getReports(): Promise<StoredReport[]> {
+export async function getReports(userId: string): Promise<StoredReport[]> {
   const database = await openDatabase();
   return new Promise((resolve, reject) => {
     const transaction = database.transaction("reports", "readonly");
     const request = transaction.objectStore("reports").getAll();
     request.onsuccess = () => {
       database.close();
-      resolve((request.result as StoredReport[]).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+      resolve((request.result as StoredReport[]).filter((report) => report.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    };
+    request.onerror = () => {
+      database.close();
+      reject(request.error);
+    };
+  });
+}
+
+export async function getReportMedia(reportId: string): Promise<StoredMedia[]> {
+  const database = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction("media", "readonly");
+    const request = transaction.objectStore("media").index("reportId").getAll(reportId);
+    request.onsuccess = () => {
+      database.close();
+      resolve(request.result as StoredMedia[]);
     };
     request.onerror = () => {
       database.close();
@@ -77,18 +94,22 @@ export async function saveReport(report: StoredReport, files: StoredMedia[]) {
   });
 }
 
-export const seedReports: StoredReport[] = [
-  {
-    id: "demo-report-1",
-    riskType: "단차",
-    description: "횡단보도 앞 턱이 높아서 보행기가 걸려요.",
-    latitude: 36.3504,
-    longitude: 127.3845,
-    accuracy: 18,
-    place: "우리 동네 주민센터 앞",
-    createdAt: "2026-08-22T09:42:00.000Z",
-    status: "확인 중",
-    mediaCount: 1,
-    points: 100,
-  },
-];
+export async function deleteReport(reportId: string) {
+  const database = await openDatabase();
+  return new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction(["reports", "media"], "readwrite");
+    transaction.objectStore("reports").delete(reportId);
+    const mediaStore = transaction.objectStore("media");
+    const mediaIndex = mediaStore.index("reportId");
+    const mediaRequest = mediaIndex.getAllKeys(reportId);
+    mediaRequest.onsuccess = () => mediaRequest.result.forEach((key) => mediaStore.delete(key));
+    transaction.oncomplete = () => {
+      database.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error);
+    };
+  });
+}

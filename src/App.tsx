@@ -1,10 +1,13 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
-import { getReports, saveReport, seedReports, StoredMedia, StoredReport } from "./storage";
+import { loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, readPrototypeSession, registerPrototypeAccount } from "./auth";
+import { deleteReport, getReportMedia, getReports, saveReport, StoredMedia, StoredReport } from "./storage";
 
 type View = "home" | "report" | "history" | "rewards";
+type AuthMode = "login" | "signup";
 type MediaKind = "image" | "video" | "audio";
 type Attachment = { id: string; kind: MediaKind; file: File; url: string };
+type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type InstallPrompt = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
@@ -37,6 +40,28 @@ const statusHelp: Record<StoredReport["status"], string> = {
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+}
+
+function calculateParticipation(reports: StoredReport[]) {
+  const now = new Date();
+  const completedCount = reports.filter((report) => report.status === "완료").length;
+  const lightingReportsThisMonth = reports.filter((report) => {
+    if (report.riskType !== "조도") return false;
+    const createdAt = new Date(report.createdAt);
+    return createdAt.getFullYear() === now.getFullYear() && createdAt.getMonth() === now.getMonth();
+  }).length;
+  const missionProgress = Math.min(lightingReportsThisMonth, 3);
+  const missionCompleted = missionProgress >= 3;
+  return {
+    completedCount,
+    missionProgress,
+    missionCompleted,
+    points: reports.length * 100 + completedCount * 50 + (missionCompleted ? 150 : 0),
+    level: reports.length === 0 ? 0 : Math.floor((reports.length - 1) / 3) + 1,
+    firstBadge: reports.length >= 1,
+    guardianBadge: reports.length >= 3,
+    nightBadge: reports.some((report) => report.riskType === "조도"),
+  };
 }
 
 function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange: (point: LocationPoint) => void }) {
@@ -105,6 +130,15 @@ function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange
 }
 
 function App() {
+  const [currentUser, setCurrentUser] = useState<PrototypeUser | null>(() => readPrototypeSession());
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [authName, setAuthName] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authPasswordConfirm, setAuthPasswordConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
   const [view, setView] = useState<View>("home");
   const [step, setStep] = useState(1);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -114,9 +148,9 @@ function App() {
   const [locationMode, setLocationMode] = useState<LocationMode>(null);
   const [locationMessage, setLocationMessage] = useState("");
   const [place, setPlace] = useState("");
-  const [reports, setReports] = useState<StoredReport[]>(seedReports);
-  const [points, setPoints] = useState(() => Number(localStorage.getItem("jikeoro-senior-points") ?? 620));
-  const [weeklyCount, setWeeklyCount] = useState(() => Number(localStorage.getItem("jikeoro-senior-weekly") ?? 2));
+  const [reports, setReports] = useState<StoredReport[]>([]);
+  const [selectedReport, setSelectedReport] = useState<StoredReport | null>(null);
+  const [detailMedia, setDetailMedia] = useState<MediaPreview[]>([]);
   const [contrast, setContrast] = useState(() => localStorage.getItem("jikeoro-senior-contrast") === "true");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -131,9 +165,14 @@ function App() {
   const attachmentsRef = useRef<Attachment[]>([]);
 
   useEffect(() => {
-    getReports().then((stored) => {
-      if (stored.length) setReports(stored);
-    }).catch(() => undefined);
+    if (!currentUser) {
+      setReports([]);
+      return;
+    }
+    getReports(currentUser.id).then(setReports).catch(() => setReports([]));
+  }, [currentUser]);
+
+  useEffect(() => {
     const handleInstall = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallPrompt);
@@ -164,7 +203,27 @@ function App() {
     recognitionRef.current?.stop();
   }, []);
 
-  const progress = Math.min(100, (weeklyCount / 3) * 100);
+  useEffect(() => {
+    if (!selectedReport) {
+      setDetailMedia([]);
+      return;
+    }
+    let disposed = false;
+    let urls: string[] = [];
+    getReportMedia(selectedReport.id).then((media) => {
+      if (disposed) return;
+      const previews = media.map((item) => ({ ...item, url: URL.createObjectURL(item.blob) }));
+      urls = previews.map((item) => item.url);
+      setDetailMedia(previews);
+    }).catch(() => setDetailMedia([]));
+    return () => {
+      disposed = true;
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedReport]);
+
+  const participation = useMemo(() => calculateParticipation(reports), [reports]);
+  const progress = Math.min(100, (participation.missionProgress / 3) * 100);
 
   const pageTitle = useMemo(() => {
     if (view === "report") return step === 1 ? "위험 모습을 남겨주세요" : step === 2 ? "위험한 이유를 알려주세요" : step === 3 ? "위험한 장소를 확인해주세요" : step === 4 ? "제보내용을 확인해주세요" : "제보가 완료됐어요";
@@ -172,6 +231,70 @@ function App() {
     if (view === "rewards") return "참여와 마일리지";
     return "오늘도 안전하게 걸어요";
   }, [view, step]);
+
+  const changeAuthMode = (mode: AuthMode) => {
+    setAuthMode(mode);
+    setAuthError("");
+    setAuthPassword("");
+    setAuthPasswordConfirm("");
+  };
+
+  const submitAuth = async (event: FormEvent) => {
+    event.preventDefault();
+    const email = authEmail.trim().toLowerCase();
+    if (!email || !authPassword) {
+      setAuthError("이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+    if (authMode === "signup") {
+      if (authName.trim().length < 2) {
+        setAuthError("이름을 두 글자 이상 입력해주세요.");
+        return;
+      }
+      if (authPassword.length < 8) {
+        setAuthError("비밀번호는 8자 이상 입력해주세요.");
+        return;
+      }
+      if (authPassword !== authPasswordConfirm) {
+        setAuthError("비밀번호 확인이 맞지 않습니다.");
+        return;
+      }
+    }
+    setAuthLoading(true);
+    setAuthError("");
+    try {
+      const user = authMode === "signup"
+        ? await registerPrototypeAccount(authName, email, authPassword)
+        : await loginPrototypeAccount(email, authPassword);
+      setCurrentUser(user);
+      setView("home");
+      setAuthPassword("");
+      setAuthPasswordConfirm("");
+    } catch (authFailure) {
+      setAuthError(authFailure instanceof Error ? authFailure.message : "로그인하지 못했습니다.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const logout = () => {
+    logoutPrototypeAccount();
+    setCurrentUser(null);
+    setReports([]);
+    setSelectedReport(null);
+    setView("home");
+  };
+
+  const removeReport = async (report: StoredReport) => {
+    if (!window.confirm("이 기록을 삭제할까요? 삭제하면 첨부한 사진·영상·음성도 함께 지워집니다.")) return;
+    try {
+      await deleteReport(report.id);
+      setReports((current) => current.filter((item) => item.id !== report.id));
+      setSelectedReport(null);
+    } catch {
+      setError("기록을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
 
   const speakPage = () => {
     if (!("speechSynthesis" in window)) return;
@@ -348,6 +471,7 @@ function App() {
     const reportId = `report-${crypto.randomUUID()}`;
     const report: StoredReport = {
       id: reportId,
+      userId: currentUser!.id,
       riskType,
       description: description.trim() || "현장에서 발견한 위험요소입니다.",
       latitude: location?.latitude ?? null,
@@ -370,13 +494,7 @@ function App() {
     }));
     try {
       await saveReport(report, media);
-      setReports((current) => [report, ...current.filter((item) => item.id !== "demo-report-1")]);
-      const nextPoints = points + 100;
-      const nextWeekly = Math.min(3, weeklyCount + 1);
-      setPoints(nextPoints);
-      setWeeklyCount(nextWeekly);
-      localStorage.setItem("jikeoro-senior-points", String(nextPoints));
-      localStorage.setItem("jikeoro-senior-weekly", String(nextWeekly));
+      setReports((current) => [report, ...current]);
       setStep(5);
     } catch {
       setError("이 기기에 기록을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
@@ -400,6 +518,40 @@ function App() {
     }
   };
 
+  if (!currentUser) {
+    return (
+      <div className="app-stage auth-stage">
+        <div className="phone-app auth-phone">
+          <main className="app-auth-page">
+            <div className="app-auth-brand"><span>路</span><div><strong>지켜路</strong><small>우리 동네 쉬운 제보</small></div></div>
+            <section className="app-auth-intro">
+              <p>나의 기록을 한곳에서</p>
+              <h1>함께 안전한 길을<br />만들어가요.</h1>
+              <span>로그인하면 내가 남긴 제보와 처리 현황, 마일리지와 배지를 이어서 확인할 수 있습니다.</span>
+            </section>
+            <section className="app-auth-card">
+              <div className="app-auth-tabs" role="tablist" aria-label="로그인 또는 회원가입 선택">
+                <button type="button" role="tab" aria-selected={authMode === "login"} className={authMode === "login" ? "active" : ""} onClick={() => changeAuthMode("login")}>로그인</button>
+                <button type="button" role="tab" aria-selected={authMode === "signup"} className={authMode === "signup" ? "active" : ""} onClick={() => changeAuthMode("signup")}>회원가입</button>
+              </div>
+              <div className="app-auth-heading"><h2>{authMode === "login" ? "다시 만나 반가워요." : "지켜路와 함께해요."}</h2><p>{authMode === "login" ? "가입한 이메일과 비밀번호를 입력해주세요." : "간단한 정보만 입력하면 바로 시작할 수 있어요."}</p></div>
+              <form className="app-auth-form" onSubmit={submitAuth}>
+                {authMode === "signup" && <label><span>이름</span><input value={authName} onChange={(event) => setAuthName(event.target.value)} autoComplete="name" placeholder="이름 입력" /></label>}
+                <label><span>이메일</span><input type="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} autoComplete="email" placeholder="name@example.com" /></label>
+                <label><span>비밀번호</span><span className="app-password-field"><input type={showPassword ? "text" : "password"} value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} autoComplete={authMode === "signup" ? "new-password" : "current-password"} placeholder={authMode === "signup" ? "8자 이상 입력" : "비밀번호 입력"} /><button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? "숨기기" : "보기"}</button></span></label>
+                {authMode === "signup" && <label><span>비밀번호 확인</span><input type={showPassword ? "text" : "password"} value={authPasswordConfirm} onChange={(event) => setAuthPasswordConfirm(event.target.value)} autoComplete="new-password" placeholder="비밀번호를 다시 입력" /></label>}
+                {authError && <p className="app-auth-error" role="alert">{authError}</p>}
+                <button className="app-auth-submit" type="submit" disabled={authLoading}>{authLoading ? "확인하고 있습니다…" : authMode === "login" ? "로그인하기" : "회원가입하고 시작하기"}<span>→</span></button>
+              </form>
+              <p className="app-auth-switch">{authMode === "login" ? "아직 계정이 없나요?" : "이미 계정이 있나요?"} <button type="button" onClick={() => changeAuthMode(authMode === "login" ? "signup" : "login")}>{authMode === "login" ? "회원가입" : "로그인"}</button></p>
+            </section>
+            <p className="app-auth-note">현재는 화면과 사용 흐름을 확인하는 프로토타입입니다.<br />AWS 연결 후에는 홈페이지와 같은 계정·기록을 사용합니다.</p>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-stage">
       <div className="phone-app">
@@ -418,8 +570,8 @@ function App() {
           {view === "home" && (
             <>
               <section className="hello-card">
-                <div><p>안녕하세요, 김지킴님</p><h1>오늘도 안전하게<br />걸어요.</h1></div>
-                <div className="points-pill"><span>나의 마일리지</span><strong>{points.toLocaleString()}P</strong></div>
+                <div><p>안녕하세요, {currentUser.name}님</p><h1>오늘도 안전하게<br />걸어요.</h1><button className="logout-link" type="button" onClick={logout}>로그아웃</button></div>
+                <div className="points-pill"><span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><small>동네지킴이 Lv.{participation.level}</small></div>
               </section>
 
               <section className="report-hero">
@@ -429,11 +581,11 @@ function App() {
               </section>
 
               <section className="mission-card">
-                <div className="mission-top"><span>이번 주 동네 미션</span><strong>+200P</strong></div>
-                <h2>우리 동네 위험요소를<br />한 번 더 살펴봐요</h2>
-                <p>이번 주 제보 {weeklyCount}/3건</p>
-                <div className="progress-track" aria-label={`미션 ${weeklyCount}/3 완료`}><span style={{ width: `${progress}%` }} /></div>
-                <button onClick={openReport}>{weeklyCount >= 3 ? "미션 완료! 새 기록 남기기" : "한 곳 더 기록하기"} <span>→</span></button>
+                <div className="mission-top"><span>이번 달 동네 미션</span><strong>+150P</strong></div>
+                <h2>우리 동네 밤길을<br />한 번 더 살펴봐요</h2>
+                <p>조명이 부족한 길 {participation.missionProgress}/3곳 기록</p>
+                <div className="progress-track" aria-label={`미션 ${participation.missionProgress}/3 완료`}><span style={{ width: `${progress}%` }} /></div>
+                <button onClick={openReport}>{participation.missionCompleted ? "미션 완료! 새 기록 남기기" : participation.missionProgress ? "한 곳 더 기록하기" : "첫 조명 기록하기"} <span>→</span></button>
               </section>
 
             </>
@@ -581,15 +733,17 @@ function App() {
               <div className="plain-heading"><p>MY REPORTS</p><h1>내가 남긴 기록</h1><span>제보가 어떻게 처리되고 있는지 확인할 수 있습니다.</span></div>
               <div className="history-list">
                 {reports.map((report) => (
-                  <article key={report.id}>
+                  <article className="history-card-button" key={report.id} role="button" tabIndex={0} onClick={() => setSelectedReport(report)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedReport(report); }}>
                     <div className="history-top"><span className="report-type">{report.riskType}</span><time>{formatDate(report.createdAt)}</time></div>
                     <h2>{report.description}</h2>
                     <p>◎ {report.place}</p>
                     <div className="history-status"><span>{report.status}</span><strong>{statusHelp[report.status]}</strong></div>
                     <div className="status-line"><i className="done">✓</i><span /><i className={report.status !== "접수" ? "done" : ""}>2</i><span /><i className={report.status === "조치 중" || report.status === "완료" ? "done" : ""}>3</i><span /><i className={report.status === "완료" ? "done" : ""}>4</i></div>
                     <small>접수　　현장 확인　　조치 진행　　개선 완료</small>
+                    <b className="history-detail-hint">사진·내용 자세히 보기 →</b>
                   </article>
                 ))}
+                {!reports.length && <div className="empty-history"><span>＋</span><h2>아직 남긴 기록이 없습니다.</h2><p>첫 위험요소를 발견하면 사진이나 말로 간단히 알려주세요.</p></div>}
               </div>
               <button className="next-button" onClick={openReport}><span>＋</span>새로운 위험 제보하기</button>
             </section>
@@ -598,20 +752,41 @@ function App() {
           {view === "rewards" && (
             <section className="plain-page rewards-page">
               <div className="plain-heading"><p>TOGETHER</p><h1>참여와 마일리지</h1><span>작은 기록이 안전한 동네를 만듭니다.</span></div>
-              <div className="total-points"><span>나의 마일리지</span><strong>{points.toLocaleString()}P</strong><p>이번 주 제보 {weeklyCount}건</p></div>
+              <div className="total-points"><span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><p>전체 제보 {reports.length}건 · 개선 완료 {participation.completedCount}건</p></div>
               <article className="large-mission">
-                <div><span>이번 주 미션</span><strong>{weeklyCount}/3 완료</strong></div>
-                <h2>우리 동네 위험요소<br />3곳을 기록해요</h2>
+                <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
+                <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
                 <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
-                <p>{weeklyCount >= 3 ? "축하합니다! 200P 적립 준비가 완료됐어요." : `${3 - weeklyCount}곳을 더 기록하면 200P를 받을 수 있어요.`}</p>
+                <p>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</p>
               </article>
-              <section className="badge-section"><h2>내가 모은 배지</h2><div><span className="earned">1<small>첫 발견</small></span><span className="earned">路<small>동네지킴이</small></span><span>☾<small>밤길 관찰자</small></span></div></section>
+              <section className="badge-section"><h2>내가 모은 배지</h2><div><span className={participation.firstBadge ? "earned" : ""}>1<small>첫 발견</small></span><span className={participation.guardianBadge ? "earned" : ""}>路<small>동네지킴이</small></span><span className={participation.nightBadge ? "earned" : ""}>☾<small>밤길 관찰자</small></span></div><p>{reports.length ? "기록을 이어가면 새로운 배지가 열립니다." : "첫 위험 기록을 남기면 ‘첫 발견’ 배지를 받습니다."}</p></section>
               <section className="why-card"><span>♥</span><div><h2>마일리지는 참여를 응원해요</h2><p>경쟁보다 꾸준한 참여를 돕기 위한 기능입니다. 실제 보상 방식은 주민과 함께 결정합니다.</p></div></section>
               {installPrompt && <button className="install-banner" onClick={installApp}><span>↓</span><div><strong>휴대전화에 지켜路 설치하기</strong><small>홈 화면에서 바로 열 수 있어요.</small></div></button>}
               <p className="prototype-note">현재 버전은 기능 시연용입니다. 제보와 파일은 이 기기의 브라우저에만 저장됩니다.</p>
             </section>
           )}
         </main>
+
+        {selectedReport && (
+          <div className="app-detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedReport(null)}>
+            <section className="app-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="app-detail-title">
+              <button className="app-detail-close" type="button" onClick={() => setSelectedReport(null)} aria-label="상세 내용 닫기">×</button>
+              <div className="app-detail-heading"><span className="report-type">{selectedReport.riskType}</span><time>{formatDate(selectedReport.createdAt)}</time><h2 id="app-detail-title">{selectedReport.description}</h2><p>◎ {selectedReport.place}</p></div>
+              <section className="app-detail-status"><span>{selectedReport.status}</span><strong>{statusHelp[selectedReport.status]}</strong></section>
+              <section className="app-detail-media"><h3>첨부한 사진·영상·음성 <b>{selectedReport.mediaCount}</b></h3>
+                {detailMedia.length ? <div>{detailMedia.map((item) => <figure key={item.id}>
+                  {item.kind === "image" && <img src={item.url} alt="첨부한 위험 현장" />}
+                  {item.kind === "video" && <video src={item.url} controls />}
+                  {item.kind === "audio" && <audio src={item.url} controls />}
+                  <figcaption>{item.kind === "image" ? "현장 사진" : item.kind === "video" ? "현장 영상" : "현장음"}</figcaption>
+                </figure>)}</div> : <p>이 기록에는 첨부된 자료가 없습니다.</p>}
+              </section>
+              <dl className="app-detail-facts"><div><dt>위치</dt><dd>{selectedReport.place}</dd></div><div><dt>위치좌표</dt><dd>{selectedReport.latitude != null && selectedReport.longitude != null ? `${selectedReport.latitude.toFixed(5)}, ${selectedReport.longitude.toFixed(5)}` : "직접 입력한 장소"}</dd></div><div><dt>참여 포인트</dt><dd>100P</dd></div></dl>
+              <button className="next-button" type="button" onClick={() => setSelectedReport(null)}>확인했습니다</button>
+              <button className="app-detail-delete" type="button" onClick={() => removeReport(selectedReport)}>이 기록 삭제하기</button>
+            </section>
+          </div>
+        )}
 
         <nav className="bottom-nav" aria-label="앱 주요 메뉴">
           <button className={view === "home" ? "active" : ""} onClick={() => navigate("home")}><span>⌂</span><strong>홈</strong></button>
