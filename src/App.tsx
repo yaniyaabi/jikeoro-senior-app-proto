@@ -31,6 +31,8 @@ const riskTypes = [
   { name: "기타", icon: "+", help: "그 밖의 위험" },
 ];
 
+const REWARD_EXCHANGE_MINIMUM = 10_000;
+
 const statusHelp: Record<StoredReport["status"], string> = {
   접수: "기록이 안전하게 접수됐어요.",
   "확인 중": "연구원이 위치와 내용을 살펴보고 있어요.",
@@ -224,6 +226,9 @@ function App() {
 
   const participation = useMemo(() => calculateParticipation(reports), [reports]);
   const progress = Math.min(100, (participation.missionProgress / 3) * 100);
+  const rewardExchangeRemaining = Math.max(0, REWARD_EXCHANGE_MINIMUM - participation.points);
+  const rewardExchangeProgress = Math.min(100, (participation.points / REWARD_EXCHANGE_MINIMUM) * 100);
+  const canExchangeReward = participation.points >= REWARD_EXCHANGE_MINIMUM;
 
   const pageTitle = useMemo(() => {
     if (view === "report") return step === 1 ? "위험 모습을 남겨주세요" : step === 2 ? "위험한 이유를 알려주세요" : step === 3 ? "위험한 장소를 확인해주세요" : step === 4 ? "제보내용을 확인해주세요" : "제보가 완료됐어요";
@@ -753,6 +758,16 @@ function App() {
             <section className="plain-page rewards-page">
               <div className="plain-heading"><p>TOGETHER</p><h1>참여와 마일리지</h1><span>작은 기록이 안전한 동네를 만듭니다.</span></div>
               <div className="total-points"><span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><p>전체 제보 {reports.length}건 · 개선 완료 {participation.completedCount}건</p></div>
+              <article className="app-reward-exchange" aria-labelledby="app-reward-title">
+                <div className="app-reward-label"><span>마일리지 사용</span><b>교환 준비 중</b></div>
+                <h2 id="app-reward-title">모은 마일리지를<br />상품권으로 바꿔요.</h2>
+                <p>10,000P부터 온누리상품권 등 지역상품권으로 교환할 수 있도록 준비하고 있어요.</p>
+                <div className="app-voucher-preview"><i>路</i><div><small>온누리상품권</small><strong>10,000P부터</strong></div></div>
+                <div className="app-reward-progress" aria-label={`상품권 교환까지 ${Math.round(rewardExchangeProgress)}%`}><span style={{ width: `${rewardExchangeProgress}%` }} /></div>
+                <div className="app-reward-status"><span>현재 {participation.points.toLocaleString()}P</span><strong>{canExchangeReward ? "교환 가능" : `${rewardExchangeRemaining.toLocaleString()}P 남음`}</strong></div>
+                <button type="button" disabled={!canExchangeReward}>{canExchangeReward ? "상품권 교환 신청하기" : "10,000P부터 신청할 수 있어요"}</button>
+                <small>실제 상품권 종류·교환 비율·발급 방식은 운영 전 제휴 정책에 따라 확정됩니다.</small>
+              </article>
               <article className="large-mission">
                 <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
                 <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
