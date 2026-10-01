@@ -755,7 +755,7 @@ function App() {
                     <p>◎ {report.place}</p>
                     <div className="history-status"><span>{report.status}</span><strong>{statusHelp[report.status]}</strong></div>
                     <div className="status-line"><i className="done">✓</i><span /><i className={report.status !== "접수" ? "done" : ""}>2</i><span /><i className={report.status === "조치 중" || report.status === "완료" ? "done" : ""}>3</i><span /><i className={report.status === "완료" ? "done" : ""}>4</i></div>
-                    <small>접수　　현장 확인　　조치 진행　　개선 완료</small>
+                    <div className="status-labels" aria-label="처리 단계"><span>접수</span><span>현장 확인</span><span>조치 진행</span><span>개선 완료</span></div>
                     <b className="history-detail-hint">사진·내용 자세히 보기 →</b>
                   </article>
                 ))}

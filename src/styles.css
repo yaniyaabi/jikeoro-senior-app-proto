@@ -255,7 +255,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .status-line i { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #dbe3e5; color: #6e8086; font-style: normal; font-size: 13px; font-weight: 900; }
 .status-line i.done { background: var(--lime); color: var(--navy); }
 .status-line span { height: 3px; background: #dbe3e5; }
-.history-list article>small { margin-top: 8px; display: block; color: #6b7f85; font-size: 10px; text-align: center; word-spacing: 3px; }
+.status-labels { margin-top: 8px; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); color: #536d65; font-size: 12px; line-height: 1.25; font-weight: 800; text-align: center; }
+.status-labels span { min-width: 0; white-space: nowrap; }
 .history-card-button { cursor: pointer; transition: transform .18s,box-shadow .18s; }
 .history-card-button:hover,.history-card-button:focus-visible { transform: translateY(-2px); box-shadow: 0 13px 30px rgba(18,59,68,.12); outline: 3px solid var(--yellow); }
 .history-detail-hint { display: block; margin-top: 14px; border-top: 1px solid #e1e8e9; padding-top: 12px; color: var(--blue); font-size: 13px; text-align: right; }
