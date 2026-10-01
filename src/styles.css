@@ -251,10 +251,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .history-status { margin-top: 17px; border-radius: 14px; background: var(--sky); padding: 13px; display: flex; flex-direction: column; gap: 5px; }
 .history-status span { color: var(--blue); font-size: 13px; font-weight: 950; }
 .history-status strong { font-size: 15px; line-height: 1.45; }
-.status-line { margin-top: 20px; display: grid; grid-template-columns: 32px 1fr 32px 1fr 32px 1fr 32px; align-items: center; }
-.status-line i { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #dbe3e5; color: #536a63; font-style: normal; font-size: 14px; font-weight: 950; }
+.status-line { position: relative; margin-top: 20px; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); align-items: center; }
+.status-line::before { content: ""; position: absolute; z-index: 0; left: 12.5%; right: 12.5%; top: 14px; height: 4px; background: #dbe3e5; }
+.status-line i { position: relative; z-index: 1; justify-self: center; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: #dbe3e5; color: #536a63; font-style: normal; font-size: 14px; font-weight: 950; }
 .status-line i.done { background: var(--lime); color: var(--navy); }
-.status-line span { height: 4px; background: #dbe3e5; }
+.status-line span { display: none; }
 .status-labels { margin-top: 10px; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); color: var(--ink); font-size: 14px; line-height: 1.25; font-weight: 950; letter-spacing: -.035em; text-align: center; }
 .status-labels span { min-width: 0; white-space: nowrap; }
 .history-card-button { cursor: pointer; transition: transform .18s,box-shadow .18s; }
