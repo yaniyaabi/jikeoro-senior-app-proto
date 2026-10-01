@@ -1,10 +1,12 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import type { Map as MapLibreMap } from "maplibre-gl";
 import { getReports, saveReport, seedReports, StoredMedia, StoredReport } from "./storage";
 
 type View = "home" | "report" | "history" | "rewards";
 type MediaKind = "image" | "video" | "audio";
 type Attachment = { id: string; kind: MediaKind; file: File; url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
+type LocationMode = "gps" | "manual" | null;
 type InstallPrompt = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
 type SpeechRecognitionLike = {
@@ -37,6 +39,71 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }
 
+function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange: (point: LocationPoint) => void }) {
+  const mapElementRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
+  const pointRef = useRef(point);
+  const onChangeRef = useRef(onChange);
+  const [mapError, setMapError] = useState("");
+
+  useEffect(() => { pointRef.current = point; }, [point]);
+  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+
+  useEffect(() => {
+    if (!mapElementRef.current || mapRef.current) return;
+    let disposed = false;
+    import("maplibre-gl").then((maplibregl) => {
+      if (disposed || !mapElementRef.current) return;
+      try {
+        const map = new maplibregl.Map({
+          container: mapElementRef.current,
+          style: {
+            version: 8,
+            sources: {
+              openStreetMap: {
+                type: "raster",
+                tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                tileSize: 256,
+                maxzoom: 19,
+                attribution: "© OpenStreetMap contributors",
+              },
+            },
+            layers: [{ id: "openStreetMap", type: "raster", source: "openStreetMap" }],
+          },
+          center: [pointRef.current.longitude, pointRef.current.latitude],
+          zoom: 17,
+          minZoom: 7,
+          maxZoom: 19,
+          attributionControl: {},
+        });
+        map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+        map.on("load", () => { setMapError(""); map.resize(); });
+        map.on("moveend", () => {
+          const center = map.getCenter();
+          onChangeRef.current({ ...pointRef.current, latitude: center.lat, longitude: center.lng });
+        });
+        mapRef.current = map;
+      } catch {
+        setMapError("지도를 불러오지 못했습니다. 장소를 직접 적어주세요.");
+      }
+    }).catch(() => setMapError("지도를 불러오지 못했습니다. 장소를 직접 적어주세요."));
+
+    return () => {
+      disposed = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  return (
+    <div className="location-picker-map" aria-label="위험 장소 선택 지도">
+      <div ref={mapElementRef} className="location-map-canvas" />
+      {!mapError && <><span className="location-center-pin" aria-hidden="true">●</span><p className="location-map-guide">지도를 움직여 핀을 위험한 곳에 맞춰주세요.</p></>}
+      {mapError && <p className="location-map-error" role="alert">{mapError}</p>}
+    </div>
+  );
+}
+
 function App() {
   const [view, setView] = useState<View>("home");
   const [step, setStep] = useState(1);
@@ -44,6 +111,7 @@ function App() {
   const [riskType, setRiskType] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState<LocationPoint | null>(null);
+  const [locationMode, setLocationMode] = useState<LocationMode>(null);
   const [locationMessage, setLocationMessage] = useState("");
   const [place, setPlace] = useState("");
   const [reports, setReports] = useState<StoredReport[]>(seedReports);
@@ -99,7 +167,7 @@ function App() {
   const progress = Math.min(100, (weeklyCount / 3) * 100);
 
   const pageTitle = useMemo(() => {
-    if (view === "report") return step === 1 ? "위험 모습을 남겨주세요" : step === 2 ? "어떤 위험인지 알려주세요" : step === 3 ? "내용을 확인해주세요" : "제보가 완료됐어요";
+    if (view === "report") return step === 1 ? "위험 모습을 남겨주세요" : step === 2 ? "위험한 이유를 알려주세요" : step === 3 ? "위험한 장소를 확인해주세요" : step === 4 ? "제보내용을 확인해주세요" : "제보가 완료됐어요";
     if (view === "history") return "내가 남긴 기록";
     if (view === "rewards") return "참여와 마일리지";
     return "오늘도 안전하게 걸어요";
@@ -120,6 +188,7 @@ function App() {
     setRiskType("");
     setDescription("");
     setLocation(null);
+    setLocationMode(null);
     setLocationMessage("");
     setPlace("");
     setError("");
@@ -162,6 +231,7 @@ function App() {
   };
 
   const requestLocation = () => {
+    setLocationMode("gps");
     setLocationMessage("현재 위치를 확인하고 있습니다.");
     if (!("geolocation" in navigator)) {
       setLocationMessage("위치 기능을 사용할 수 없습니다. 장소를 직접 적어주세요.");
@@ -260,11 +330,13 @@ function App() {
         setError("위험의 종류를 하나 선택해주세요.");
         return;
       }
+      setStep(3);
+    } else if (step === 3) {
       if (!location && !place.trim()) {
         setError("현재 위치를 확인하거나 장소를 직접 적어주세요.");
         return;
       }
-      setStep(3);
+      setStep(4);
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -305,7 +377,7 @@ function App() {
       setWeeklyCount(nextWeekly);
       localStorage.setItem("jikeoro-senior-points", String(nextPoints));
       localStorage.setItem("jikeoro-senior-weekly", String(nextWeekly));
-      setStep(4);
+      setStep(5);
     } catch {
       setError("이 기기에 기록을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
@@ -370,22 +442,22 @@ function App() {
           {view === "report" && (
             <section className="report-flow">
               <div className="flow-heading">
-                <button className="back-button" onClick={() => step > 1 && step < 4 ? setStep((value) => value - 1) : navigate("home")} aria-label="이전 화면">←</button>
-                <div><p>{step < 4 ? `${step} / 3 단계` : "제보 완료"}</p><h1>{pageTitle}</h1></div>
+                <button className="back-button" onClick={() => step > 1 && step < 5 ? setStep((value) => value - 1) : navigate("home")} aria-label="이전 화면">←</button>
+                <div><p>{step < 5 ? `${step} / 4 단계` : "제보 완료"}</p><h1>{pageTitle}</h1></div>
               </div>
-              {step < 4 && <div className="step-progress"><span style={{ width: `${(step / 3) * 100}%` }} /></div>}
+              {step < 5 && <div className="step-progress"><span style={{ width: `${(step / 4) * 100}%` }} /></div>}
 
               {step === 1 && (
                 <div className="flow-card">
                   <p className="lead-text">사진이나 영상이 없어도 제보할 수 있습니다.</p>
                   <div className="capture-grid">
                     <label className="capture-button primary-capture">
-                      <input type="file" accept="image/*" capture="environment" onChange={addFiles} />
-                      <span>📷</span><strong>지금 사진 찍기</strong><small>카메라가 열립니다</small>
+                      <input type="file" accept="image/*" capture="environment" multiple onChange={addFiles} />
+                      <span>📷</span><strong>사진 촬영·선택</strong><small>카메라 또는 사진첩</small>
                     </label>
                     <label className="capture-button">
-                      <input type="file" accept="image/*,video/*" multiple onChange={addFiles} />
-                      <span>🖼</span><strong>사진·영상 고르기</strong><small>기기에 있는 파일 선택</small>
+                      <input type="file" accept="video/*" capture="environment" multiple onChange={addFiles} />
+                      <span>▶</span><strong>영상 촬영·선택</strong><small>카메라 또는 보관함</small>
                     </label>
                   </div>
                   {attachments.length > 0 && (
@@ -400,14 +472,15 @@ function App() {
                       ))}
                     </div>
                   )}
-                  <button className="next-button" onClick={goNext}>{attachments.length ? "다음 단계" : "사진 없이 계속하기"}<span>→</span></button>
+                  <p className="media-privacy">얼굴과 차량번호가 보이면 제출 전에 확인해주세요. 첨부자료는 이 기기에 저장됩니다.</p>
+                  <button className="next-button" onClick={goNext}>{attachments.length ? "선택한 자료와 계속하기" : "자료 없이 계속하기"}<span>→</span></button>
                 </div>
               )}
 
               {step === 2 && (
                 <div className="flow-card">
                   <fieldset className="risk-fieldset">
-                    <legend>위험의 종류를 선택해주세요</legend>
+                    <legend>위험요소 유형</legend>
                     <div className="risk-grid">
                       {riskTypes.map((item) => (
                         <button type="button" className={riskType === item.name ? "selected" : ""} onClick={() => setRiskType(item.name)} key={item.name}>
@@ -416,44 +489,79 @@ function App() {
                       ))}
                     </div>
                   </fieldset>
-                  <div className="location-box">
-                    <h2>위험한 곳은 어디인가요?</h2>
-                    <p>위치정보는 제보 장소를 확인할 때만 사용합니다.</p>
-                    <button className={location ? "location-button success" : "location-button"} onClick={requestLocation}>
-                      <span>{location ? "✓" : "◎"}</span>{location ? "현재 위치 저장됨" : "현재 위치 자동으로 찾기"}
-                    </button>
-                    {locationMessage && <p className="location-message">{locationMessage}</p>}
-                    <label className="place-field"><span>또는 장소를 직접 적어주세요</span><input value={place} onChange={(event) => setPlace(event.target.value)} placeholder="예: 성수역 2번 출구 앞" /></label>
-                  </div>
-                  <button className="next-button" onClick={goNext}>다음 단계<span>→</span></button>
-                </div>
-              )}
-
-              {step === 3 && (
-                <form className="flow-card" onSubmit={submitReport}>
-                  <label className="description-field">
-                    <span>무엇이 위험했나요?</span>
+                  <label className="description-field separated-description">
+                    <span>설명</span>
                     <textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="예: 보도 턱이 높아서 보행기가 걸려요." rows={5} />
                   </label>
                   <div className="voice-actions">
                     <button type="button" className={listening ? "active" : ""} onClick={startSpeechInput}><span>🎤</span><strong>{listening ? "듣고 있어요…" : "말로 글쓰기"}</strong><small>말한 내용이 글로 적혀요</small></button>
-                    <button type="button" className={recording ? "recording" : ""} onClick={recording ? stopAudioRecording : startAudioRecording}><span>●</span><strong>{recording ? `${recordingSeconds}초 · 녹음 끝내기` : "현장음 녹음"}</strong><small>목소리를 파일로 남겨요</small></button>
+                    <button type="button" className={recording ? "recording" : ""} onClick={recording ? stopAudioRecording : startAudioRecording}><span>●</span><strong>{recording ? `${recordingSeconds}초 · 녹음 끝내기` : "현장음 녹음"}</strong><small>현장의 소리를 파일로 남겨요</small></button>
                   </div>
+                  {attachments.some((item) => item.kind === "audio") && (
+                    <div className="audio-attachment-list" aria-label="녹음한 현장음">
+                      {attachments.filter((item) => item.kind === "audio").map((item) => (
+                        <article key={item.id}><span>♪</span><audio src={item.url} controls /><button type="button" onClick={() => removeAttachment(item.id)} aria-label="현장음 삭제">×</button></article>
+                      ))}
+                    </div>
+                  )}
                   <div className="quick-phrases">
                     <span>자주 쓰는 말</span>
                     <button type="button" onClick={() => setDescription("보행기 바퀴가 걸릴 만큼 높이 차이가 커요.")}>보행기가 걸려요</button>
                     <button type="button" onClick={() => setDescription("길이 어두워서 바닥이 잘 보이지 않아요.")}>길이 너무 어두워요</button>
                   </div>
-                  <div className="review-card">
-                    <h2>제보 내용 확인</h2>
-                    <dl><div><dt>위험유형</dt><dd>{riskType}</dd></div><div><dt>위치</dt><dd>{place || "GPS로 저장한 위치"}</dd></div><div><dt>첨부</dt><dd>{attachments.length}개</dd></div></dl>
+                  <button className="next-button" onClick={goNext}>위치 입력하기<span>→</span></button>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="flow-card">
+                  <fieldset className="location-fieldset">
+                    <legend>위치</legend>
+                    <p className="location-guide">GPS 지도의 핀을 맞추거나 알고 있는 장소를 직접 적어주세요.</p>
+                    <div className="location-methods">
+                      <button type="button" className={locationMode === "gps" ? "selected" : ""} onClick={requestLocation}><span>⌖</span><strong>현재 위치 사용</strong></button>
+                      <button type="button" className={locationMode === "manual" ? "selected" : ""} onClick={() => { setLocationMode("manual"); setLocation(null); setLocationMessage(""); }}><span>⌨</span><strong>직접 입력</strong></button>
+                    </div>
+                    {locationMode === "gps" && !location && locationMessage && <p className="location-message">{locationMessage}</p>}
+                    {locationMode === "gps" && location && (
+                      <div className="gps-map-block">
+                        <LocationPickerMap point={location} onChange={setLocation} />
+                        <div className="gps-map-meta">
+                          <strong><span>●</span> 선택한 위치</strong>
+                          <small>위도 {location.latitude.toFixed(5)} · 경도 {location.longitude.toFixed(5)}</small>
+                          <button type="button" onClick={requestLocation}>현재 위치로 돌아가기</button>
+                        </div>
+                      </div>
+                    )}
+                    {locationMode === "manual" && (
+                      <label className="place-field"><span>어디 앞인지 알려주세요</span><input value={place} onChange={(event) => setPlace(event.target.value)} placeholder="예: 우리 동네 주민센터 앞 횡단보도" /></label>
+                    )}
+                    <p className="location-privacy">위치정보는 이 위험 기록의 장소를 확인하는 용도로만 사용됩니다.</p>
+                  </fieldset>
+                  <button className="next-button" onClick={goNext}>제보내용 확인하기<span>→</span></button>
+                </div>
+              )}
+
+              {step === 4 && (
+                <form className="flow-card" onSubmit={submitReport}>
+                  <div className="review-card standalone-review">
+                    <h2>제보내용 확인</h2>
+                    <dl>
+                      <div><dt>위험유형</dt><dd>{riskType}</dd></div>
+                      <div><dt>위치</dt><dd>{locationMode === "gps" && location ? `지도에서 선택한 위치 (${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)})` : place}</dd></div>
+                      <div><dt>첨부</dt><dd>사진 {attachments.filter((item) => item.kind === "image").length} · 영상 {attachments.filter((item) => item.kind === "video").length} · 음성 {attachments.filter((item) => item.kind === "audio").length}</dd></div>
+                    </dl>
                   </div>
-                  <label className="consent-check"><input required type="checkbox" /><span>위치와 제보 내용을 연구 목적으로 수집하는 것에 동의합니다.</span></label>
+                  <div className="auto-save-info">
+                    <span>날짜·시간 자동저장</span>
+                    <strong>{new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date())}</strong>
+                  </div>
+                  <label className="consent-check"><input required type="checkbox" /><span>위치와 제보내용을 연구목적으로 수집하는 것에 동의합니다.</span></label>
                   <button className="next-button" disabled={saving} type="submit">{saving ? "저장하고 있습니다…" : "제보 완료하기"}<span>→</span></button>
                 </form>
               )}
 
-              {step === 4 && (
+              {step === 5 && (
                 <div className="success-card">
                   <span className="success-icon">✓</span>
                   <p>안전한 동네를 만드는 기록</p>

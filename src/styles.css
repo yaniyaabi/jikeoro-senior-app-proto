@@ -116,6 +116,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .media-list article>button { position: absolute; right: 7px; top: 7px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgba(2,30,38,.86); color: white; font-size: 25px; cursor: pointer; }
 .audio-preview { min-height: 140px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; font-size: 30px; }
 .audio-preview audio { width: 100%; height: 38px; }
+.media-privacy { margin: 14px 2px 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
 .flow-card>.next-button, .success-card>.next-button, .plain-page>.next-button { margin-top: 18px; }
 .next-button span { font-size: 26px; }
 .next-button:disabled { opacity: .65; cursor: wait; }
@@ -140,6 +141,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .place-field input, .description-field textarea { width: 100%; border: 2px solid #bfcfd4; border-radius: 14px; background: white; color: var(--ink); padding: 15px; font-size: 18px; line-height: 1.5; }
 
 .description-field { display: block; }
+.separated-description { margin-top: 21px; padding-top: 20px; border-top: 2px solid #e3eaec; }
 .description-field textarea { min-height: 145px; resize: vertical; }
 .voice-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
 .voice-actions button { min-height: 122px; border: 2px solid #c8d7dc; border-radius: 17px; background: #f7fafb; color: var(--ink); padding: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; }
@@ -147,9 +149,39 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .voice-actions button>span { font-size: 27px; color: var(--coral); margin-bottom: 7px; }
 .voice-actions button strong { font-size: 17px; }
 .voice-actions button small { margin-top: 5px; color: var(--muted); font-size: 12px; }
+.audio-attachment-list { margin-top: 12px; }
+.audio-attachment-list article { position: relative; min-height: 88px; border: 2px solid #d2dfe2; border-radius: 15px; background: #f4f8f8; padding: 13px 47px 13px 13px; display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 8px; }
+.audio-attachment-list article>span { width: 38px; height: 38px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; font-size: 20px; font-weight: 900; }
+.audio-attachment-list audio { width: 100%; min-width: 0; height: 38px; }
+.audio-attachment-list button { position: absolute; right: 8px; top: 23px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #dce6e7; color: var(--navy); font-size: 22px; cursor: pointer; }
 .quick-phrases { margin-top: 17px; display: flex; flex-wrap: wrap; gap: 7px; }
 .quick-phrases>span { width: 100%; font-size: 14px; font-weight: 900; }
 .quick-phrases button { border: 1px solid #b9cbd0; border-radius: 999px; background: white; color: var(--navy); padding: 9px 11px; font-size: 13px; font-weight: 850; cursor: pointer; }
+.location-fieldset { border: 0; padding: 0; margin: 0; }
+.location-fieldset legend { margin-bottom: 8px; font-size: 21px; font-weight: 950; }
+.location-guide { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.location-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.location-methods button { min-height: 82px; border: 2px solid #c8d7dc; border-radius: 16px; background: #f8fbfb; color: var(--ink); padding: 11px 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
+.location-methods button.selected { border-color: var(--navy); background: var(--navy); color: white; }
+.location-methods button>span { color: var(--blue); font-size: 25px; font-weight: 950; }
+.location-methods button.selected>span { color: var(--lime); }
+.location-methods button strong { font-size: 16px; }
+.gps-map-block { margin-top: 13px; }
+.location-picker-map { position: relative; height: 280px; border: 2px solid #c4d3d6; border-radius: 17px; overflow: hidden; background: #dfe8e8; isolation: isolate; }
+.location-map-canvas { position: absolute; inset: 0; }
+.location-center-pin { position: absolute; z-index: 5; left: 50%; top: 50%; width: 44px; height: 44px; border: 4px solid white; border-radius: 50% 50% 50% 8px; background: var(--coral); color: white; display: grid; place-items: center; font-size: 14px; transform: translate(-50%,-100%) rotate(-45deg); box-shadow: 0 8px 18px rgba(16,47,55,.32); pointer-events: none; }
+.location-map-guide { position: absolute; z-index: 5; left: 50%; bottom: 12px; width: max-content; max-width: calc(100% - 28px); margin: 0; transform: translateX(-50%); border-radius: 999px; background: rgba(255,255,255,.94); color: var(--ink); padding: 8px 12px; box-shadow: 0 5px 18px rgba(16,47,55,.16); font-size: 12px; line-height: 1.35; font-weight: 900; text-align: center; pointer-events: none; }
+.location-map-error { position: absolute; inset: 0; margin: 0; padding: 24px; display: grid; place-items: center; color: #9d3025; font-size: 15px; line-height: 1.55; font-weight: 900; text-align: center; }
+.gps-map-meta { border: 2px solid #d3e0d2; border-top: 0; border-radius: 0 0 15px 15px; background: #f1f7e9; padding: 12px 13px; display: grid; grid-template-columns: 1fr auto; gap: 5px 10px; }
+.gps-map-meta strong { font-size: 15px; }
+.gps-map-meta strong span { color: #4f9d55; }
+.gps-map-meta small { grid-column: 1; color: var(--muted); font-size: 12px; }
+.gps-map-meta button { grid-column: 2; grid-row: 1/3; align-self: center; border: 1px solid #acc1b0; border-radius: 999px; background: white; color: var(--navy); padding: 8px 10px; font-size: 12px; font-weight: 900; cursor: pointer; }
+.location-privacy { margin: 13px 3px 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.standalone-review { margin-top: 0; }
+.auto-save-info { margin-top: 13px; border-radius: 14px; background: #f2f6f7; padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.auto-save-info span { color: var(--muted); font-size: 13px; font-weight: 850; }
+.auto-save-info strong { font-size: 14px; }
 .review-card { margin-top: 17px; border-radius: 16px; background: #eef4f5; padding: 15px; }
 .review-card h2 { margin: 0 0 10px; font-size: 18px; }
 .review-card dl { margin: 0; display: grid; gap: 8px; }
