@@ -40,6 +40,17 @@ const statusHelp: Record<StoredReport["status"], string> = {
   완료: "현장 개선이 완료됐어요.",
 };
 
+function NavIcon({ name }: { name: "home" | "report" | "history" | "reward" }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      {name === "home" && <><path d="M4 10.5 12 4l8 6.5" /><path d="M6.5 9.5V20h11V9.5" /><path d="M10 20v-5.5h4V20" /></>}
+      {name === "report" && <><circle cx="12" cy="12" r="8.25" /><path d="M12 8v8M8 12h8" /></>}
+      {name === "history" && <><rect x="5" y="4" width="14" height="16" rx="2" /><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h5" /></>}
+      {name === "reward" && <path d="m12 3 2.5 5.1 5.6.8-4.1 4 .9 5.6-4.9-2.6-4.9 2.6.9-5.6-4.1-4 5.6-.8L12 3Z" />}
+    </svg>
+  );
+}
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }
@@ -804,10 +815,10 @@ function App() {
         )}
 
         <nav className="bottom-nav" aria-label="앱 주요 메뉴">
-          <button className={view === "home" ? "active" : ""} onClick={() => navigate("home")}><span>⌂</span><strong>홈</strong></button>
-          <button className={view === "report" ? "active report-nav" : "report-nav"} onClick={() => navigate("report")}><span>＋</span><strong>제보</strong></button>
-          <button className={view === "history" ? "active" : ""} onClick={() => navigate("history")}><span>▤</span><strong>내 기록</strong></button>
-          <button className={view === "rewards" ? "active" : ""} onClick={() => navigate("rewards")}><span>★</span><strong>참여</strong></button>
+          <button className={view === "home" ? "active" : ""} onClick={() => navigate("home")}><span><NavIcon name="home" /></span><strong>홈</strong></button>
+          <button className={view === "report" ? "active report-nav" : "report-nav"} onClick={() => navigate("report")}><span><NavIcon name="report" /></span><strong>제보</strong></button>
+          <button className={view === "history" ? "active" : ""} onClick={() => navigate("history")}><span><NavIcon name="history" /></span><strong>내 기록</strong></button>
+          <button className={view === "rewards" ? "active" : ""} onClick={() => navigate("rewards")}><span><NavIcon name="reward" /></span><strong>참여</strong></button>
         </nav>
       </div>
     </div>
