@@ -807,9 +807,14 @@ function App() {
                   <figcaption>{item.kind === "image" ? "현장 사진" : item.kind === "video" ? "현장 영상" : "현장음"}</figcaption>
                 </figure>)}</div> : <p>이 기록에는 첨부된 자료가 없습니다.</p>}
               </section>
-              <dl className="app-detail-facts"><div><dt>위치</dt><dd>{selectedReport.place}</dd></div><div><dt>위치좌표</dt><dd>{selectedReport.latitude != null && selectedReport.longitude != null ? `${selectedReport.latitude.toFixed(5)}, ${selectedReport.longitude.toFixed(5)}` : "직접 입력한 장소"}</dd></div><div><dt>참여 포인트</dt><dd>100P</dd></div></dl>
-              <button className="next-button" type="button" onClick={() => setSelectedReport(null)}>확인했습니다</button>
-              <button className="app-detail-delete" type="button" onClick={() => removeReport(selectedReport)}>이 기록 삭제하기</button>
+              <dl className="app-detail-facts">
+                <div><dt>위치</dt><dd>{selectedReport.place}<small>{selectedReport.latitude != null && selectedReport.longitude != null ? `${selectedReport.latitude.toFixed(5)}, ${selectedReport.longitude.toFixed(5)}` : "직접 입력한 장소"}</small></dd></div>
+                <div><dt>참여 포인트</dt><dd>100P</dd></div>
+              </dl>
+              <div className="app-detail-actions">
+                <button className="app-detail-delete" type="button" onClick={() => removeReport(selectedReport)}>삭제하기</button>
+                <button className="next-button" type="button" onClick={() => setSelectedReport(null)}>확인했습니다</button>
+              </div>
             </section>
           </div>
         )}
