@@ -32,14 +32,25 @@ function readAccounts(): PrototypeAccount[] {
 }
 
 function saveSession(user: PrototypeUser) {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  sessionStorage.removeItem(SESSION_KEY);
   return user;
 }
 
 export function readPrototypeSession(): PrototypeUser | null {
   try {
-    return JSON.parse(sessionStorage.getItem(SESSION_KEY) ?? "null") as PrototypeUser | null;
+    const persistedSession = localStorage.getItem(SESSION_KEY);
+    const legacySession = sessionStorage.getItem(SESSION_KEY);
+    const savedSession = persistedSession ?? legacySession;
+    if (!savedSession) return null;
+    const user = JSON.parse(savedSession) as PrototypeUser;
+    if (!user?.id || !user.name || !user.email) throw new Error("invalid session");
+    if (!persistedSession) localStorage.setItem(SESSION_KEY, savedSession);
+    if (legacySession) sessionStorage.removeItem(SESSION_KEY);
+    return user;
   } catch {
+    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
     return null;
   }
 }
@@ -69,5 +80,6 @@ export async function loginPrototypeAccount(email: string, password: string) {
 }
 
 export function logoutPrototypeAccount() {
+  localStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(SESSION_KEY);
 }
