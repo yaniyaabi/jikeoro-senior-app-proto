@@ -882,6 +882,12 @@ function App() {
             <section className="plain-page rewards-page">
               <div className="plain-heading"><p>TOGETHER</p><h1>참여와 마일리지</h1><span>작은 기록이 안전한 동네를 만듭니다.</span></div>
               <div className="total-points"><span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><p>전체 제보 {reports.length}건 · 개선 완료 {participation.completedCount}건</p></div>
+              <article className="large-mission">
+                <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
+                <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
+                <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
+                <p>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</p>
+              </article>
               <article className="app-reward-exchange" aria-labelledby="app-reward-title">
                 <div className="app-reward-label"><span>마일리지 사용</span><b>교환 준비 중</b></div>
                 <h2 id="app-reward-title">모은 마일리지를<br />상품권으로 바꿔요.</h2>
@@ -891,12 +897,6 @@ function App() {
                 <div className="app-reward-status"><span>현재 {participation.points.toLocaleString()}P</span><strong>{canExchangeReward ? "교환 가능" : `${rewardExchangeRemaining.toLocaleString()}P 남음`}</strong></div>
                 <button type="button" disabled={!canExchangeReward} onClick={openRewardForm}>{canExchangeReward ? "상품권 교환 신청하기" : "10,000P부터 신청할 수 있어요"}</button>
                 <small>신청서를 보내면 담당자가 확인한 뒤 입력한 휴대전화로 상품권을 발송합니다.</small>
-              </article>
-              <article className="large-mission">
-                <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
-                <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
-                <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
-                <p>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</p>
               </article>
               <p className="prototype-note">현재 버전은 기능 시연용입니다. 제보와 파일은 이 기기의 브라우저에만 저장됩니다.</p>
             </section>
