@@ -61,10 +61,10 @@ const statusHelp: Record<StoredReport["status"], string> = {
 function NavIcon({ name }: { name: "home" | "report" | "history" | "reward" }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      {name === "home" && <><path d="M4 10.5 12 4l8 6.5" /><path d="M6.5 9.5V20h11V9.5" /><path d="M10 20v-5.5h4V20" /></>}
-      {name === "report" && <><path d="M12 6.5v11M6.5 12h11" /><path className="report-spark" d="m18.8 4 .55 1.15 1.15.55-1.15.55-.55 1.15-.55-1.15-1.15-.55 1.15-.55L18.8 4ZM5.2 16.6l.45.95.95.45-.95.45-.45.95-.45-.95-.95-.45.95-.45.45-.95Z" /></>}
-      {name === "history" && <><rect x="5" y="4" width="14" height="16" rx="2" /><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h5" /></>}
-      {name === "reward" && <path d="m12 3 2.5 5.1 5.6.8-4.1 4 .9 5.6-4.9-2.6-4.9 2.6.9-5.6-4.1-4 5.6-.8L12 3Z" />}
+      {name === "home" && <><path d="M3.75 10.25 12 3.75l8.25 6.5" /><path d="M5.75 9.25v10a1.5 1.5 0 0 0 1.5 1.5h9.5a1.5 1.5 0 0 0 1.5-1.5v-10" /><path d="M9.5 20.75v-6.5h5v6.5" /></>}
+      {name === "report" && <><path d="M5.25 4.25h13.5a2 2 0 0 1 2 2v8.25a2 2 0 0 1-2 2H11l-4.5 3v-3H5.25a2 2 0 0 1-2-2V6.25a2 2 0 0 1 2-2Z" /><path d="M12 7.75v5.5M9.25 10.5h5.5" /></>}
+      {name === "history" && <><rect x="4.5" y="3.5" width="15" height="17" rx="2.5" /><path d="m8 9 1.3 1.3L12 7.7M13.8 9h2.4M8 15l1.3 1.3 2.7-2.6M13.8 15h2.4" /></>}
+      {name === "reward" && <><path d="M12 20.5S4.25 16.15 4.25 9.75A4.25 4.25 0 0 1 12 7.3a4.25 4.25 0 0 1 7.75 2.45c0 6.4-7.75 10.75-7.75 10.75Z" /><path d="M12 7.3V4.5M8.4 5.55 7 3.55M15.6 5.55l1.4-2" /></>}
     </svg>
   );
 }

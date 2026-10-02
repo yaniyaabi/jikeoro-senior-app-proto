@@ -44,7 +44,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 @keyframes launch-exit { 0%, 82% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; } }
 
 .app-stage { min-height: 100vh; padding: 28px; display: flex; align-items: flex-start; justify-content: center; }
-.phone-app { width: min(100%, 480px); min-height: calc(100vh - 56px); position: relative; background: var(--canvas); border-radius: 34px; overflow: hidden; box-shadow: 0 30px 90px rgba(16,45,42,.18); padding-bottom: 96px; }
+.phone-app { width: min(100%, 480px); min-height: calc(100vh - 56px); position: relative; background: var(--canvas); border-radius: 34px; overflow: hidden; box-shadow: 0 30px 90px rgba(16,45,42,.18); padding-bottom: 106px; }
 .auth-phone { padding-bottom: 0; background: radial-gradient(circle at 92% 7%,rgba(183,240,107,.34),transparent 26%),radial-gradient(circle at 7% 48%,rgba(255,102,84,.09),transparent 25%),var(--canvas); }
 .app-auth-page { min-height: calc(100vh - 56px); padding: 27px 20px 35px; }
 .app-auth-brand { display: flex; align-items: center; gap: 11px; color: var(--ink); }
@@ -367,24 +367,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .large-mission h2 { margin: 17px 0 14px; font-size: 27px; line-height: 1.25; }
 .large-mission>p { margin: 13px 0 0; color: #48642d; font-size: 14px; line-height: 1.5; font-weight: 800; }
 
-.bottom-nav { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; width: 100%; max-width: 480px; min-height: 88px; margin: 0 auto; padding: 11px 13px max(9px, env(safe-area-inset-bottom)); background: rgba(250,251,247,.97); border-top: 1px solid #d9e1d7; display: grid; grid-template-columns: repeat(4,1fr); box-shadow: 0 -12px 32px rgba(16,45,42,.09); backdrop-filter: blur(14px); }
-.bottom-nav button { position: relative; min-height: 64px; border: 0; border-radius: 16px; background: transparent; color: #758780; padding: 5px 3px 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: background .18s,color .18s,transform .18s; }
-.bottom-nav button>span { width: 38px; height: 36px; border-radius: 12px; display: grid; place-items: center; transition: background .18s,color .18s,transform .18s,box-shadow .18s; }
-.bottom-nav button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.bottom-nav button>strong { font-size: 12px; font-weight: 850; letter-spacing: -.02em; }
-.bottom-nav button.active { color: var(--ink); }
-.bottom-nav button.active>span { background: #e3efd8; color: var(--ink); }
-.bottom-nav .report-nav { z-index: 1; color: var(--ink); transform: translateY(-7px); }
-.bottom-nav .report-nav>span { position: relative; width: 58px; height: 58px; border: 4px solid #fff; border-radius: 21px; background: linear-gradient(145deg,#d8ff7a 0%,#b7f06b 58%,#8fdc45 100%); color: var(--ink); box-shadow: 0 10px 21px rgba(76,139,43,.3),0 3px 0 #79bd3b; transform: rotate(-3deg); }
-.bottom-nav .report-nav>span::before { content:""; position:absolute; inset:-9px; z-index:-1; border-radius:27px; background:rgba(183,240,107,.2); transform:rotate(3deg); }
-.bottom-nav .report-nav svg { width: 31px; height: 31px; stroke-width: 2.35; transform: rotate(3deg); }
-.bottom-nav .report-nav .report-spark { fill: currentColor; stroke: none; }
-.bottom-nav .report-nav>strong { margin-top: 1px; border-radius: 999px; background: #effbdc; color: #21472b; padding: 3px 9px; font-size: 12.5px; box-shadow: 0 3px 8px rgba(55,102,37,.1); }
-.bottom-nav .report-nav:hover>span,.bottom-nav .report-nav:focus-visible>span { transform: rotate(2deg) translateY(-3px) scale(1.06); box-shadow: 0 14px 24px rgba(76,139,43,.34),0 3px 0 #79bd3b; }
-.bottom-nav .report-nav:active>span { transform: rotate(0) translateY(1px) scale(.94); box-shadow: 0 5px 12px rgba(76,139,43,.24),0 1px 0 #79bd3b; }
-.bottom-nav .report-nav.active>span { background: linear-gradient(145deg,#c8ff66,#a7ed51); animation: report-nav-pop .46s cubic-bezier(.2,1.65,.45,1) both; }
-@keyframes report-nav-pop { 0%{transform:rotate(-3deg) scale(.82)} 65%{transform:rotate(3deg) scale(1.1)} 100%{transform:rotate(-3deg) scale(1)} }
-@media (prefers-reduced-motion:reduce){.bottom-nav .report-nav.active>span{animation:none}.bottom-nav .report-nav>span{transition:none}}
+.bottom-nav { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; width: 100%; max-width: 480px; min-height: 94px; margin: 0 auto; padding: 9px 10px max(9px, env(safe-area-inset-bottom)); background: rgba(253,254,250,.98); border-top: 1px solid #d9e1d7; display: grid; grid-template-columns: repeat(4,1fr); box-shadow: 0 -9px 25px rgba(16,45,42,.07); backdrop-filter: blur(14px); }
+.bottom-nav button { position: relative; min-width:0; min-height: 74px; border: 0; border-radius: 20px; background: transparent; color: #6d8179; padding: 7px 3px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: background .16s,color .16s; }
+.bottom-nav button>span { width: 46px; height: 42px; border-radius: 15px; background:#eef3ed; display: grid; place-items: center; transition: background .16s,color .16s; }
+.bottom-nav button svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2.15; stroke-linecap: round; stroke-linejoin: round; }
+.bottom-nav button>strong { font-size: 14px; line-height:1; font-weight: 900; letter-spacing: -.035em; }
+.bottom-nav button.active { background:#edf6e3; color: var(--ink); }
+.bottom-nav button.active>span { background: #dceec8; color: var(--ink); }
+.bottom-nav .report-nav { color:#21472b; }
+.bottom-nav .report-nav>span { background:#dff5bd; color:#173d2d; }
+.bottom-nav .report-nav.active { background:var(--lime); color:var(--ink); }
+.bottom-nav .report-nav.active>span { background:rgba(255,255,255,.58); color:var(--ink); }
+.bottom-nav button:active { background:#e4efd9; }
 
 .app-detail-backdrop { position: fixed; z-index: 50; inset: 0; background: rgba(2,30,38,.72); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom)); }
 .app-detail-sheet { position: relative; width: min(100%,448px); max-height: calc(100svh - 32px); overflow: hidden; border-radius: 25px; background: var(--canvas); padding: 20px 18px 17px; box-shadow: 0 30px 70px rgba(0,0,0,.3); }
