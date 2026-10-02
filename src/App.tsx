@@ -636,7 +636,10 @@ function App() {
           {view === "home" && (
             <>
               <section className="hello-card">
-                <div><p>안녕하세요, {currentUser.name}님</p><h1>오늘도 안전하게<br />걸어요.</h1><button className="logout-link" type="button" onClick={logout}>로그아웃</button></div>
+                <div>
+                  <div className="hello-greeting"><p>안녕하세요, {currentUser.name}님</p><button className="logout-link" type="button" onClick={logout}>로그아웃</button></div>
+                  <h1>오늘도 안전하게<br />걸어요.</h1>
+                </div>
                 <div className="points-pill"><span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><small>동네지킴이 Lv.{participation.level}</small></div>
               </section>
 

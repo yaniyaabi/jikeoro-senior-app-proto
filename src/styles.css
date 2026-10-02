@@ -104,12 +104,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 
 .hello-card { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 6px 3px 18px; }
 .hello-card p { margin: 0 0 7px; color: var(--muted); font-size: 17px; font-weight: 800; }
+.hello-greeting { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.hello-greeting p { min-width: 0; margin: 0!important; }
 .hello-card h1 { margin: 0; font-size: 33px; line-height: 1.14; letter-spacing: -.055em; }
 .points-pill { min-width: 116px; border-radius: 18px; background: white; border: 1px solid var(--line); padding: 13px; display: flex; flex-direction: column; box-shadow: 0 8px 24px rgba(23, 64, 73, .08); }
 .points-pill span { color: var(--muted); font-size: 12px; font-weight: 800; }
 .points-pill strong { margin-top: 4px; color: var(--navy); font-size: 23px; }
 .points-pill small { margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 850; }
-.logout-link { border: 0; background: transparent; color: var(--muted); margin: 5px 0 0; padding: 0; font-size: 12px; font-weight: 850; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.logout-link { flex: 0 0 auto; border: 0; background: transparent; color: var(--muted); margin: 0; padding: 1px 0; font-size: 11px; font-weight: 850; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
 .report-hero { position: relative; overflow: hidden; background: var(--navy); color: white; border-radius: 24px; padding: 24px; box-shadow: 0 16px 35px rgba(16,45,42,.18); }
 .report-hero::after { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; right: -88px; top: -90px; border: 1px solid rgba(184,239,88,.35); }
