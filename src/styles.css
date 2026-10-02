@@ -326,24 +326,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .total-points span { color: #d7e7f6; font-size: 15px; font-weight: 850; }
 .total-points strong { grid-row: 1/3; grid-column: 2; font-size: 37px; color: var(--lime); }
 .total-points p { margin: 0; font-size: 14px; }
-.app-reward-exchange { position: relative; margin-top: 14px; border-radius: 23px; background: linear-gradient(145deg,#fff9f1,#ffe4bd); border: 2px solid #efb66d; padding: 22px; overflow: hidden; }
-.app-reward-exchange::after { content: ""; position: absolute; width: 180px; height: 180px; border: 1px solid rgba(205,92,24,.18); border-radius: 50%; right: -92px; top: -100px; }
+.app-reward-exchange { position: relative; margin-top: 14px; border-radius: 23px; background: linear-gradient(145deg,#fffaf6,#ffd9c2); border: 2px solid #ffb28c; padding: 22px; overflow: hidden; }
+.app-reward-exchange::after { content: ""; position: absolute; width: 180px; height: 180px; border: 1px solid rgba(255,91,31,.22); border-radius: 50%; right: -92px; top: -100px; }
 .app-reward-label { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.app-reward-label span { color: #a44119; font-size: 14px; font-weight: 950; }
-.app-reward-label b { border-radius: 999px; background: #fff0d8; color: #a33b16; border: 1px solid #e8ad69; padding: 7px 10px; font-size: 11px; }
+.app-reward-label span { color: #df4613; font-size: 14px; font-weight: 950; }
+.app-reward-label b { border-radius: 999px; background: white; color: #df4613; border: 1px solid #ffad83; padding: 7px 10px; font-size: 11px; }
 .app-reward-exchange h2 { position: relative; z-index: 1; margin: 20px 0 10px; font-size: 28px; line-height: 1.2; letter-spacing: -.045em; }
-.app-reward-exchange>p { position: relative; z-index: 1; margin: 0; color: #76543f; font-size: 14px; line-height: 1.55; }
-.app-voucher-preview { position: relative; z-index: 1; margin-top: 19px; border-radius: 17px; background: linear-gradient(135deg,#d84a1b,#ef7120 58%,#f29a2e); color: white; padding: 17px; display: flex; align-items: center; gap: 13px; box-shadow: 0 14px 28px rgba(190,73,18,.24); }
-.app-voucher-preview>i { width: 48px; height: 48px; flex: 0 0 auto; border-radius: 14px; background: #fff0c6; color: #a63813; display: grid; place-items: center; font: 900 23px Georgia,serif; }
+.app-reward-exchange>p { position: relative; z-index: 1; margin: 0; color: #765043; font-size: 14px; line-height: 1.55; }
+.app-voucher-preview { position: relative; z-index: 1; margin-top: 19px; border-radius: 17px; background: linear-gradient(145deg,#ff6b29,#ff5a1f 58%,#f34a12); color: white; padding: 17px; display: flex; align-items: center; gap: 13px; box-shadow: 0 14px 28px rgba(225,70,15,.27); }
+.app-voucher-preview>i { width: 48px; height: 48px; flex: 0 0 auto; border-radius: 14px; background: white; color: #ff551a; display: grid; place-items: center; font: 900 20px/1 sans-serif; }
 .app-voucher-preview>div { display: flex; flex-direction: column; gap: 4px; }
-.app-voucher-preview small { color: #ffe0ca; font-size: 12px; }
+.app-voucher-preview small { color: #ffe5d8; font-size: 12px; }
 .app-voucher-preview strong { font-size: 20px; }
-.app-reward-progress { position: relative; z-index: 1; height: 10px; margin-top: 18px; border-radius: 999px; background: #efc795; overflow: hidden; }
-.app-reward-progress>span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#d64a1c,#f08b24); }
-.app-reward-status { position: relative; z-index: 1; margin-top: 8px; display: flex; justify-content: space-between; gap: 10px; color: #805335; font-size: 12px; }
-.app-reward-status strong { color: #a63813; }
-.app-reward-exchange>button { position: relative; z-index: 1; width: 100%; min-height: 56px; margin-top: 17px; border: 0; border-radius: 14px; background: #b84418; color: white; font-size: 16px; font-weight: 950; cursor: pointer; }
-.app-reward-exchange>button:disabled { background: #d6a875; color: #fff7ee; cursor: not-allowed; }
+.app-reward-progress { position: relative; z-index: 1; height: 10px; margin-top: 18px; border-radius: 999px; background: #f2c1a8; overflow: hidden; }
+.app-reward-progress>span { display: block; height: 100%; border-radius: inherit; background: #ff5a1f; }
+.app-reward-status { position: relative; z-index: 1; margin-top: 8px; display: flex; justify-content: space-between; gap: 10px; color: #805345; font-size: 12px; }
+.app-reward-status strong { color: #df4613; }
+.app-reward-exchange>button { position: relative; z-index: 1; width: 100%; min-height: 56px; margin-top: 17px; border: 0; border-radius: 14px; background: #ef4e16; color: white; font-size: 16px; font-weight: 950; cursor: pointer; }
+.app-reward-exchange>button:disabled { background: #dfa382; color: #fff8f4; cursor: not-allowed; }
 .app-reward-exchange>small { position: relative; z-index: 1; display: block; margin-top: 12px; color: #7b5a43; font-size: 11px; line-height: 1.5; }
 .large-mission { margin-top: 14px; border-radius: 22px; background: #eef9d8; border: 2px solid #cbe89b; padding: 21px; }
 .large-mission>div:first-child { display: flex; justify-content: space-between; color: #4f702d; font-size: 14px; font-weight: 950; }

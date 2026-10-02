@@ -856,7 +856,7 @@ function App() {
                 <div className="app-reward-label"><span>마일리지 사용</span><b>교환 준비 중</b></div>
                 <h2 id="app-reward-title">모은 마일리지를<br />상품권으로 바꿔요.</h2>
                 <p>10,000P부터 온누리상품권 등 지역상품권으로 교환할 수 있도록 준비하고 있어요.</p>
-                <div className="app-voucher-preview"><i>路</i><div><small>온누리상품권</small><strong>10,000P부터</strong></div></div>
+                <div className="app-voucher-preview"><i>온</i><div><small>디지털 온누리상품권</small><strong>10,000P부터</strong></div></div>
                 <div className="app-reward-progress" aria-label={`상품권 교환까지 ${Math.round(rewardExchangeProgress)}%`}><span style={{ width: `${rewardExchangeProgress}%` }} /></div>
                 <div className="app-reward-status"><span>현재 {participation.points.toLocaleString()}P</span><strong>{canExchangeReward ? "교환 가능" : `${rewardExchangeRemaining.toLocaleString()}P 남음`}</strong></div>
                 <button type="button" disabled={!canExchangeReward}>{canExchangeReward ? "상품권 교환 신청하기" : "10,000P부터 신청할 수 있어요"}</button>
