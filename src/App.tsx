@@ -83,9 +83,6 @@ function calculateParticipation(reports: StoredReport[]) {
     missionCompleted,
     points: reports.length * 100 + completedCount * 50 + (missionCompleted ? 150 : 0),
     level: reports.length === 0 ? 0 : Math.floor((reports.length - 1) / 3) + 1,
-    firstBadge: reports.length >= 1,
-    guardianBadge: reports.length >= 3,
-    nightBadge: reports.some((report) => report.riskType === "조도"),
   };
 }
 
@@ -594,7 +591,7 @@ function App() {
             <section className="app-auth-intro">
               <p>나의 기록을 한곳에서</p>
               <h1>함께 안전한 길을<br />만들어가요.</h1>
-              <span>로그인하면 내가 남긴 제보와 처리 현황, 마일리지와 배지를 이어서 확인할 수 있습니다.</span>
+              <span>로그인하면 내가 남긴 제보와 처리 현황, 마일리지를 이어서 확인할 수 있습니다.</span>
             </section>
             <section className="app-auth-card">
               <div className="app-auth-tabs" role="tablist" aria-label="로그인 또는 회원가입 선택">
@@ -871,7 +868,6 @@ function App() {
                 <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
                 <p>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</p>
               </article>
-              <section className="badge-section"><h2>내가 모은 배지</h2><div><span className={participation.firstBadge ? "earned" : ""}>1<small>첫 발견</small></span><span className={participation.guardianBadge ? "earned" : ""}>路<small>동네지킴이</small></span><span className={participation.nightBadge ? "earned" : ""}>☾<small>밤길 관찰자</small></span></div><p>{reports.length ? "기록을 이어가면 새로운 배지가 열립니다." : "첫 위험 기록을 남기면 ‘첫 발견’ 배지를 받습니다."}</p></section>
               <section className="why-card"><span>♥</span><div><h2>마일리지는 참여를 응원해요</h2><p>경쟁보다 꾸준한 참여를 돕기 위한 기능입니다. 실제 보상 방식은 주민과 함께 결정합니다.</p></div></section>
               {installPrompt && <button className="install-banner" onClick={installApp}><span>↓</span><div><strong>휴대전화에 지켜路 설치하기</strong><small>홈 화면에서 바로 열 수 있어요.</small></div></button>}
               <p className="prototype-note">현재 버전은 기능 시연용입니다. 제보와 파일은 이 기기의 브라우저에만 저장됩니다.</p>

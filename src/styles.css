@@ -349,13 +349,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .large-mission>div:first-child { display: flex; justify-content: space-between; color: #4f702d; font-size: 14px; font-weight: 950; }
 .large-mission h2 { margin: 17px 0 14px; font-size: 27px; line-height: 1.25; }
 .large-mission>p { margin: 13px 0 0; color: #48642d; font-size: 14px; line-height: 1.5; font-weight: 800; }
-.badge-section { margin-top: 14px; border-radius: 22px; background: white; border: 1px solid var(--line); padding: 20px; }
-.badge-section h2 { margin: 0 0 16px; font-size: 21px; }
-.badge-section>div { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-.badge-section>div>span { aspect-ratio: 1; border-radius: 19px; border: 2px solid #d7e0e2; background: #eef2f2; color: #879599; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; font-size: 27px; font-weight: 950; }
-.badge-section>div>span.earned { border-color: var(--navy); background: var(--lime); color: var(--navy); }
-.badge-section small { font-size: 11px; }
-.badge-section>p { margin: 15px 2px 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .why-card { margin-top: 14px; border-radius: 22px; background: #fff3d1; border: 2px solid #f2d477; padding: 18px; display: grid; grid-template-columns: 48px 1fr; gap: 13px; }
 .why-card>span { width: 48px; height: 48px; border-radius: 15px; background: var(--yellow); display: grid; place-items: center; color: #633e00; font-size: 24px; }
 .why-card h2 { margin: 0 0 7px; font-size: 18px; }
@@ -404,8 +397,7 @@ html[data-contrast="high"] {
 html[data-contrast="high"] .phone-app { box-shadow: 0 0 0 3px #001e27; }
 html[data-contrast="high"] .section-block,
 html[data-contrast="high"] .flow-card,
-html[data-contrast="high"] .history-list article,
-html[data-contrast="high"] .badge-section { border-width: 2px; }
+html[data-contrast="high"] .history-list article { border-width: 2px; }
 
 @media (max-width: 560px) {
   .app-stage { padding: 0; }
