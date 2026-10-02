@@ -153,6 +153,7 @@ function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange
 }
 
 function App() {
+  const [showLaunch, setShowLaunch] = useState(true);
   const [currentUser, setCurrentUser] = useState<PrototypeUser | null>(() => readPrototypeSession());
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [authName, setAuthName] = useState("");
@@ -191,6 +192,12 @@ function App() {
   const imageLibraryRef = useRef<HTMLInputElement>(null);
   const videoCameraRef = useRef<HTMLInputElement>(null);
   const videoLibraryRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const timer = window.setTimeout(() => setShowLaunch(false), reducedMotion ? 500 : 2300);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (!currentUser) {
@@ -563,9 +570,22 @@ function App() {
     }
   };
 
+  const launchScreen = showLaunch ? (
+    <div className="launch-screen" role="status" aria-label="지켜로 앱을 시작합니다">
+      <div className="launch-brand">
+        <span className="launch-symbol" aria-hidden="true">路</span>
+        <div className="launch-name"><strong>지켜路</strong><span>JIKEORO</span></div>
+        <i aria-hidden="true" />
+        <p>우리 동네 보행안전 지도</p>
+      </div>
+      <small>함께 발견하고, 함께 바꾸는 길</small>
+    </div>
+  ) : null;
+
   if (!currentUser) {
     return (
       <div className="app-stage auth-stage">
+        {launchScreen}
         <div className="phone-app auth-phone">
           <main className="app-auth-page">
             <div className="app-auth-brand"><span>路</span><div><strong>지켜路</strong><small>우리 동네 쉬운 제보</small></div></div>
@@ -599,6 +619,7 @@ function App() {
 
   return (
     <div className="app-stage">
+      {launchScreen}
       <div className="phone-app">
         <header className="app-header">
           <button className="brand-button" onClick={() => navigate("home")} aria-label="지켜로 홈">
