@@ -10,6 +10,7 @@ type Attachment = { id: string; kind: MediaKind; file: File; url: string };
 type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
+type MediaPickerKind = "image" | "video" | null;
 type InstallPrompt = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
 type SpeechRecognitionLike = {
@@ -179,12 +180,17 @@ function App() {
   const [recording, setRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [listening, setListening] = useState(false);
+  const [mediaPickerKind, setMediaPickerKind] = useState<MediaPickerKind>(null);
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const attachmentsRef = useRef<Attachment[]>([]);
+  const imageCameraRef = useRef<HTMLInputElement>(null);
+  const imageLibraryRef = useRef<HTMLInputElement>(null);
+  const videoCameraRef = useRef<HTMLInputElement>(null);
+  const videoLibraryRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!currentUser) {
@@ -340,6 +346,7 @@ function App() {
     setLocationMessage("");
     setPlace("");
     setError("");
+    setMediaPickerKind(null);
     setStep(1);
   };
 
@@ -350,6 +357,7 @@ function App() {
   };
 
   const addFiles = (event: ChangeEvent<HTMLInputElement>) => {
+    setMediaPickerKind(null);
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
     if (!files.length) return;
@@ -369,6 +377,17 @@ function App() {
         url: URL.createObjectURL(file),
       }))];
     });
+  };
+
+  const openNativeMediaPicker = (source: "image-camera" | "image-library" | "video-camera" | "video-library") => {
+    const input = {
+      "image-camera": imageCameraRef,
+      "image-library": imageLibraryRef,
+      "video-camera": videoCameraRef,
+      "video-library": videoLibraryRef,
+    }[source];
+    setMediaPickerKind(null);
+    input.current?.click();
   };
 
   const removeAttachment = (id: string) => {
@@ -636,15 +655,40 @@ function App() {
                 <div className="flow-card">
                   <p className="lead-text">사진이나 영상이 없어도 제보할 수 있습니다.</p>
                   <div className="capture-grid">
-                    <label className="capture-button primary-capture">
-                      <input type="file" accept="image/*" multiple onChange={addFiles} />
+                    <button type="button" className="capture-button primary-capture" onClick={() => setMediaPickerKind("image")}>
                       <span>＋</span><strong>사진 촬영·선택</strong><small>카메라 또는 사진첩</small>
-                    </label>
-                    <label className="capture-button">
-                      <input type="file" accept="video/*" multiple onChange={addFiles} />
+                    </button>
+                    <button type="button" className="capture-button" onClick={() => setMediaPickerKind("video")}>
                       <span>▶</span><strong>영상 촬영·선택</strong><small>카메라 또는 보관함</small>
-                    </label>
+                    </button>
                   </div>
+                  <input ref={imageCameraRef} className="capture-file-input" type="file" accept="image/*" capture="environment" onChange={addFiles} />
+                  <input ref={imageLibraryRef} className="capture-file-input" type="file" accept="image/*" multiple onChange={addFiles} />
+                  <input ref={videoCameraRef} className="capture-file-input" type="file" accept="video/*" capture="environment" onChange={addFiles} />
+                  <input ref={videoLibraryRef} className="capture-file-input" type="file" accept="video/*" multiple onChange={addFiles} />
+                  {mediaPickerKind && (
+                    <div className="media-source-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setMediaPickerKind(null)}>
+                      <section className="media-source-sheet" role="dialog" aria-modal="true" aria-labelledby="media-source-title">
+                        <button type="button" className="media-source-close" onClick={() => setMediaPickerKind(null)} aria-label="닫기">×</button>
+                        <span className="media-source-icon" aria-hidden="true">{mediaPickerKind === "image" ? "📷" : "▶"}</span>
+                        <h2 id="media-source-title">{mediaPickerKind === "image" ? "사진" : "영상"}을 어떻게 추가할까요?</h2>
+                        <p>원하는 방법을 하나 골라주세요.</p>
+                        <div className="media-source-actions">
+                          <button type="button" onClick={() => openNativeMediaPicker(mediaPickerKind === "image" ? "image-camera" : "video-camera")}>
+                            <span aria-hidden="true">{mediaPickerKind === "image" ? "📷" : "●"}</span>
+                            <strong>지금 촬영</strong>
+                            <small>카메라 열기</small>
+                          </button>
+                          <button type="button" onClick={() => openNativeMediaPicker(mediaPickerKind === "image" ? "image-library" : "video-library")}>
+                            <span aria-hidden="true">▧</span>
+                            <strong>{mediaPickerKind === "image" ? "사진첩에서 선택" : "보관함에서 선택"}</strong>
+                            <small>저장된 {mediaPickerKind === "image" ? "사진" : "영상"} 가져오기</small>
+                          </button>
+                        </div>
+                        <button type="button" className="media-source-cancel" onClick={() => setMediaPickerKind(null)}>취소</button>
+                      </section>
+                    </div>
+                  )}
                   {attachments.length > 0 && (
                     <div className="media-list">
                       {attachments.map((item) => (

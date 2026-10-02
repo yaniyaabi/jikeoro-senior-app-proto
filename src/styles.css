@@ -149,12 +149,25 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .flow-card { background: white; border: 1px solid var(--line); border-radius: 23px; padding: 19px; box-shadow: 0 12px 35px rgba(22, 61, 70, .07); }
 .lead-text { margin: 0 0 16px; color: var(--muted); font-size: 16px; line-height: 1.55; font-weight: 750; }
 .capture-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
-.capture-button { min-height: 180px; border: 2px solid #c8d7dc; border-radius: 19px; background: #f7fafb; padding: 19px 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; }
+.capture-button { width: 100%; min-height: 180px; border: 2px solid #c8d7dc; border-radius: 19px; background: #f7fafb; color: var(--ink); padding: 19px 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; }
 .capture-button.primary-capture { border-color: var(--blue); background: var(--sky); }
-.capture-button input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.capture-file-input { position: fixed; left: -9999px; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 .capture-button>span { width: 57px; height: 57px; border-radius: 50%; display: grid; place-items: center; background: var(--navy); color: white; font-size: 27px; margin-bottom: 14px; }
 .capture-button strong { font-size: 18px; }
 .capture-button small { margin-top: 7px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.media-source-backdrop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; padding: 18px; background: rgba(3,29,26,.58); }
+.media-source-sheet { position: relative; width: min(100%, 444px); border-radius: 25px; background: var(--surface); padding: 25px 20px 18px; box-shadow: 0 24px 70px rgba(3,29,26,.32); text-align: center; }
+.media-source-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #eaf0eb; color: var(--ink); font-size: 27px; line-height: 1; cursor: pointer; }
+.media-source-icon { width: 58px; height: 58px; margin: 0 auto 12px; border-radius: 18px; display: grid; place-items: center; background: var(--navy); color: white; font-size: 26px; }
+.media-source-sheet h2 { margin: 0; padding: 0 34px; font-size: 23px; line-height: 1.25; letter-spacing: -.035em; }
+.media-source-sheet>p { margin: 8px 0 17px; color: var(--muted); font-size: 14px; font-weight: 750; }
+.media-source-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.media-source-actions button { min-height: 132px; border: 2px solid #c8d7dc; border-radius: 18px; background: #f7faf8; color: var(--ink); padding: 14px 9px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+.media-source-actions button:first-child { border-color: var(--blue); background: var(--sky); }
+.media-source-actions span { width: 46px; height: 46px; margin-bottom: 10px; border-radius: 50%; display: grid; place-items: center; background: var(--navy); color: white; font-size: 21px; }
+.media-source-actions strong { font-size: 16px; line-height: 1.25; }
+.media-source-actions small { margin-top: 5px; color: var(--muted); font-size: 11px; font-weight: 750; }
+.media-source-cancel { width: 100%; min-height: 48px; margin-top: 11px; border: 1px solid var(--line); border-radius: 13px; background: white; color: var(--ink); font-size: 15px; font-weight: 900; cursor: pointer; }
 .media-list { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 13px; }
 .media-list article { position: relative; min-height: 130px; border-radius: 15px; overflow: hidden; background: #d9e4e6; }
 .media-list img, .media-list video { width: 100%; height: 140px; display: block; object-fit: cover; }
@@ -389,7 +402,11 @@ html[data-contrast="high"] .badge-section { border-width: 2px; }
   .report-guide-steps li { padding: 9px 8px; gap: 7px; }
   .report-guide-steps strong { font-size: 13px; }
   .report-guide-steps small { font-size: 10px; }
-  .header-tools button:first-child { display: none; }
+  .app-header { gap: 7px; padding-left: 10px; padding-right: 8px; }
+  .brand-button { gap: 7px; }
+  .brand-button small { display: none; }
+  .header-tools { gap: 4px; }
+  .header-tools button { min-width: 47px; padding: 4px 3px; font-size: 9px; }
   .capture-grid { grid-template-columns: 1fr 1fr; }
   .capture-button { min-height: 136px; padding: 14px 9px; }
   .capture-button>span { width: 50px; height: 50px; margin-bottom: 10px; font-size: 23px; }
