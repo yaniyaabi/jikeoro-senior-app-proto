@@ -31,6 +31,15 @@ const riskTypes = [
   { name: "기타", icon: "+", help: "그 밖의 위험" },
 ];
 
+const quickPhrases = [
+  { label: "보도 턱이 높아요", text: "보도 턱이 높아서 보행기 바퀴가 걸려요." },
+  { label: "길을 막고 있어요", text: "물건이 놓여 있어 지나가기 어려워요." },
+  { label: "신호가 너무 짧아요", text: "보행 신호가 짧아서 건너기 어려워요." },
+  { label: "길이 너무 어두워요", text: "길이 어두워서 바닥이 잘 보이지 않아요." },
+  { label: "길이 미끄러워요", text: "비나 눈 때문에 길이 미끄러워요." },
+  { label: "물이 고여 있어요", text: "길에 물이 고여 있어 지나가기 어려워요." },
+];
+
 const REWARD_EXCHANGE_MINIMUM = 10_000;
 
 const statusHelp: Record<StoredReport["status"], string> = {
@@ -681,8 +690,7 @@ function App() {
                   )}
                   <div className="quick-phrases">
                     <span>자주 쓰는 말</span>
-                    <button type="button" onClick={() => setDescription("보행기 바퀴가 걸릴 만큼 높이 차이가 커요.")}>보행기가 걸려요</button>
-                    <button type="button" onClick={() => setDescription("길이 어두워서 바닥이 잘 보이지 않아요.")}>길이 너무 어두워요</button>
+                    {quickPhrases.map((phrase) => <button type="button" onClick={() => setDescription(phrase.text)} key={phrase.label}>{phrase.label}</button>)}
                   </div>
                   <button className="next-button" onClick={goNext}>위치 입력하기<span>→</span></button>
                 </div>
