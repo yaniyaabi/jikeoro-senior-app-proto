@@ -176,10 +176,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .capture-button>span { width: 57px; height: 57px; border-radius: 50%; display: grid; place-items: center; background: var(--navy); color: white; font-size: 27px; margin-bottom: 14px; }
 .capture-button strong { font-size: 18px; }
 .capture-button small { margin-top: 7px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.provided-media-icon { width: 72px; height: 72px; display: block; object-fit: contain; margin-bottom: 13px; }
 .media-source-backdrop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; padding: 18px; background: rgba(3,29,26,.58); }
 .media-source-sheet { position: relative; width: min(100%, 444px); border-radius: 25px; background: var(--surface); padding: 25px 20px 18px; box-shadow: 0 24px 70px rgba(3,29,26,.32); text-align: center; }
 .media-source-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #eaf0eb; color: var(--ink); font-size: 27px; line-height: 1; cursor: pointer; }
 .media-source-icon { width: 58px; height: 58px; margin: 0 auto 12px; border-radius: 18px; display: grid; place-items: center; background: var(--navy); color: white; font-size: 26px; }
+.media-source-icon.provided-source-icon { display: block; object-fit: contain; border-radius: 50%; background: transparent; }
 .media-source-sheet h2 { margin: 0; padding: 0 34px; font-size: 23px; line-height: 1.25; letter-spacing: -.035em; }
 .media-source-sheet>p { margin: 8px 0 17px; color: var(--muted); font-size: 14px; font-weight: 750; }
 .media-source-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -203,10 +205,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .risk-fieldset { border: 0; padding: 0; margin: 0; }
 .risk-fieldset legend, .location-box h2, .description-field>span { display: block; margin: 0 0 13px; font-size: 21px; font-weight: 950; }
 .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-.risk-grid button { min-height: 117px; border: 2px solid #d0dde0; border-radius: 17px; background: #f8fbfb; color: var(--ink); padding: 12px; display: grid; grid-template-columns: 43px 1fr; grid-template-rows: auto auto; align-items: center; column-gap: 9px; text-align: left; cursor: pointer; }
+.risk-grid button { min-height: 117px; border: 2px solid #d0dde0; border-radius: 17px; background: #f8fbfb; color: var(--ink); padding: 12px; display: grid; grid-template-columns: 52px 1fr; grid-template-rows: auto auto; align-items: center; column-gap: 9px; text-align: left; cursor: pointer; }
 .risk-grid button:last-child { grid-column: 1/3; min-height: 84px; }
 .risk-grid button.selected { border: 4px solid var(--blue); background: var(--sky); padding: 10px; }
 .risk-grid button>span { grid-row: 1/3; width: 43px; height: 43px; border-radius: 13px; display: grid; place-items: center; background: var(--navy); color: white; font-size: 21px; font-weight: 950; }
+.risk-type-icon { grid-row: 1/3; width: 48px; height: 67px; display: block; object-fit: contain; }
 .risk-grid button strong { align-self: end; font-size: 19px; }
 .risk-grid button:nth-child(4) strong { font-size: 17px; line-height: 1.15; }
 .risk-grid button small { align-self: start; color: var(--muted); font-size: 12px; line-height: 1.35; }
@@ -229,9 +232,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .voice-actions button>span { font-size: 27px; color: var(--coral); margin-bottom: 7px; }
 .voice-actions button strong { font-size: 17px; }
 .voice-actions button small { margin-top: 5px; color: var(--muted); font-size: 12px; }
+.voice-actions button.provided-control-button { position: relative; min-height: 0; border: 0; border-radius: 0; background: transparent; padding: 0; overflow: visible; }
+.voice-actions button.provided-control-button.active, .voice-actions button.provided-control-button.recording { border: 0; background: transparent; }
+.provided-control-button>img { display: block; width: 100%; height: auto; object-fit: contain; }
+.voice-actions .recording-time { position: absolute; left: 50%; bottom: -18px; translate: -50% 0; width: max-content; margin: 0; color: var(--coral); font-size: 12px; font-weight: 900; }
 .audio-attachment-list { margin-top: 12px; }
-.audio-attachment-list article { position: relative; min-height: 88px; border: 2px solid #d2dfe2; border-radius: 15px; background: #f4f8f8; padding: 13px 47px 13px 13px; display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 8px; }
+.audio-attachment-list article { position: relative; min-height: 88px; border: 2px solid #d2dfe2; border-radius: 15px; background: #f4f8f8; padding: 13px 47px 13px 13px; display: grid; grid-template-columns: 62px 1fr; align-items: center; gap: 8px; }
 .audio-attachment-list article>span { width: 38px; height: 38px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; font-size: 20px; font-weight: 900; }
+.audio-preview-label { width: 58px; height: auto; display: block; object-fit: contain; }
 .audio-attachment-list audio { width: 100%; min-width: 0; height: 38px; }
 .audio-attachment-list button { position: absolute; right: 8px; top: 23px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #dce6e7; color: var(--navy); font-size: 22px; cursor: pointer; }
 .quick-phrases { margin-top: 17px; display: flex; flex-wrap: wrap; gap: 7px; }
@@ -246,6 +254,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .location-methods button>span { color: var(--blue); font-size: 25px; font-weight: 950; }
 .location-methods button.selected>span { color: var(--lime); }
 .location-methods button strong { font-size: 16px; }
+.location-methods button.provided-control-button { min-height: 0; border: 0; border-radius: 0; background: transparent; padding: 0; overflow: hidden; }
+.location-methods button.provided-control-button.selected { border: 0; background: transparent; }
 .gps-map-block { margin-top: 13px; }
 .location-picker-map { position: relative; height: 280px; border: 2px solid #c4d3d6; border-radius: 17px; overflow: hidden; background: #dfe8e8; isolation: isolate; }
 .location-map-canvas { position: absolute; inset: 0; }

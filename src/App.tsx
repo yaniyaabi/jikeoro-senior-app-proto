@@ -25,12 +25,14 @@ type SpeechRecognitionLike = {
 };
 
 const riskTypes = [
-  { name: "인도", icon: "▰", help: "턱·파손·적치물" },
-  { name: "횡단보도", icon: "▥", help: "신호·노면·진입부" },
-  { name: "조도", icon: "☾", help: "어둡고 잘 안 보임" },
-  { name: "날씨 관련 위험", icon: "☂", help: "비·눈·결빙·침수" },
-  { name: "기타", icon: "+", help: "그 밖의 위험" },
+  { name: "인도", icon: "category-sidewalk.png", help: "턱·파손·적치물" },
+  { name: "횡단보도", icon: "category-crosswalk.png", help: "신호·노면·진입부" },
+  { name: "조도", icon: "category-lighting.png", help: "어둡고 잘 안 보임" },
+  { name: "날씨 관련 위험", icon: "category-weather.png", help: "비·눈·결빙·침수" },
+  { name: "기타", icon: "category-other.png", help: "그 밖의 위험" },
 ];
+
+const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
 
 const quickPhrases = [
   { label: "보도 턱이 높아요", text: "보도 턱이 높아서 보행기 바퀴가 걸려요." },
@@ -680,10 +682,10 @@ function App() {
                   <p className="lead-text">사진이나 영상이 없어도 제보할 수 있습니다.</p>
                   <div className="capture-grid">
                     <button type="button" className="capture-button primary-capture" onClick={() => setMediaPickerKind("image")}>
-                      <span>＋</span><strong>사진 촬영·선택</strong><small>카메라 또는 사진첩</small>
+                      <img className="provided-media-icon" src={iconPath("camera.png")} alt="" /><strong>사진 촬영·선택</strong><small>카메라 또는 사진첩</small>
                     </button>
                     <button type="button" className="capture-button" onClick={() => setMediaPickerKind("video")}>
-                      <span>▶</span><strong>영상 촬영·선택</strong><small>카메라 또는 보관함</small>
+                      <img className="provided-media-icon" src={iconPath("video.png")} alt="" /><strong>영상 촬영·선택</strong><small>카메라 또는 보관함</small>
                     </button>
                   </div>
                   <input ref={imageCameraRef} className="capture-file-input" type="file" accept="image/*" capture="environment" onChange={addFiles} />
@@ -694,7 +696,7 @@ function App() {
                     <div className="media-source-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setMediaPickerKind(null)}>
                       <section className="media-source-sheet" role="dialog" aria-modal="true" aria-labelledby="media-source-title">
                         <button type="button" className="media-source-close" onClick={() => setMediaPickerKind(null)} aria-label="닫기">×</button>
-                        <span className="media-source-icon" aria-hidden="true">{mediaPickerKind === "image" ? "📷" : "▶"}</span>
+                        <img className="media-source-icon provided-source-icon" src={iconPath(mediaPickerKind === "image" ? "camera.png" : "video.png")} alt="" />
                         <h2 id="media-source-title">{mediaPickerKind === "image" ? "사진" : "영상"}을 어떻게 추가할까요?</h2>
                         <p>원하는 방법을 하나 골라주세요.</p>
                         <div className="media-source-actions">
@@ -737,7 +739,7 @@ function App() {
                     <div className="risk-grid">
                       {riskTypes.map((item) => (
                         <button type="button" className={riskType === item.name ? "selected" : ""} onClick={() => setRiskType(item.name)} key={item.name}>
-                          <span>{item.icon}</span><strong>{item.name}</strong><small>{item.help}</small>
+                          <img className="risk-type-icon" src={iconPath(item.icon)} alt="" /><strong>{item.name}</strong><small>{item.help}</small>
                         </button>
                       ))}
                     </div>
@@ -747,13 +749,13 @@ function App() {
                     <textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="예: 보도 턱이 높아서 보행기가 걸려요." rows={5} />
                   </label>
                   <div className="voice-actions">
-                    <button type="button" className={listening ? "active" : ""} onClick={startSpeechInput}><span>🎤</span><strong>{listening ? "듣고 있어요…" : "말로 글쓰기"}</strong><small>말한 내용이 글로 적혀요</small></button>
-                    <button type="button" className={recording ? "recording" : ""} onClick={recording ? stopAudioRecording : startAudioRecording}><span>●</span><strong>{recording ? `${recordingSeconds}초 · 녹음 끝내기` : "현장음 녹음"}</strong><small>현장의 소리를 파일로 남겨요</small></button>
+                    <button type="button" className={`provided-control-button${listening ? " active" : ""}`} onClick={startSpeechInput} aria-label={listening ? "말을 듣고 있어요" : "말로 글쓰기"}><img src={iconPath(listening ? "speech-dark.png" : "speech-light.png")} alt="" /></button>
+                    <button type="button" className={`provided-control-button${recording ? " recording" : ""}`} onClick={recording ? stopAudioRecording : startAudioRecording} aria-label={recording ? "녹음 끝내기" : "현장음 녹음"}><img src={iconPath(recording ? "record-stop.png" : "ambient-record.png")} alt="" />{recording && <small className="recording-time">{recordingSeconds}초 녹음 중</small>}</button>
                   </div>
                   {attachments.some((item) => item.kind === "audio") && (
                     <div className="audio-attachment-list" aria-label="녹음한 현장음">
                       {attachments.filter((item) => item.kind === "audio").map((item) => (
-                        <article key={item.id}><span>♪</span><audio src={item.url} controls /><button type="button" onClick={() => removeAttachment(item.id)} aria-label="현장음 삭제">×</button></article>
+                        <article key={item.id}><img className="audio-preview-label" src={iconPath("record-play.png")} alt="녹음내용 듣기" /><audio src={item.url} controls /><button type="button" onClick={() => removeAttachment(item.id)} aria-label="현장음 삭제">×</button></article>
                       ))}
                     </div>
                   )}
@@ -771,8 +773,8 @@ function App() {
                     <legend>위치</legend>
                     <p className="location-guide">GPS 지도의 핀을 맞추거나 알고 있는 장소를 직접 적어주세요.</p>
                     <div className="location-methods">
-                      <button type="button" className={locationMode === "gps" ? "selected" : ""} onClick={requestLocation}><span>⌖</span><strong>현재 위치 사용</strong></button>
-                      <button type="button" className={locationMode === "manual" ? "selected" : ""} onClick={() => { setLocationMode("manual"); setLocation(null); setLocationMessage(""); }}><span>⌨</span><strong>직접 입력</strong></button>
+                      <button type="button" className={`provided-control-button${locationMode === "gps" ? " selected" : ""}`} onClick={requestLocation} aria-label="현재 위치 사용"><img src={iconPath(locationMode === "gps" ? "location-current-dark.png" : "location-current-light.png")} alt="" /></button>
+                      <button type="button" className={`provided-control-button${locationMode === "manual" ? " selected" : ""}`} onClick={() => { setLocationMode("manual"); setLocation(null); setLocationMessage(""); }} aria-label="직접 입력"><img src={iconPath(locationMode === "manual" ? "location-manual-dark.png" : "location-manual-light.png")} alt="" /></button>
                     </div>
                     {locationMode === "gps" && !location && locationMessage && <p className="location-message">{locationMessage}</p>}
                     {locationMode === "gps" && location && (
