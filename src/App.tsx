@@ -358,6 +358,7 @@ function App() {
       setError("파일 한 개는 80MB보다 작아야 합니다.");
       return;
     }
+    setError("");
     setAttachments((current) => {
       const available = Math.max(0, 5 - current.length);
       if (files.length > available) setError("사진·영상·음성은 모두 합쳐 5개까지 넣을 수 있습니다.");
@@ -636,12 +637,20 @@ function App() {
                   <p className="lead-text">사진이나 영상이 없어도 제보할 수 있습니다.</p>
                   <div className="capture-grid">
                     <label className="capture-button primary-capture">
-                      <input type="file" accept="image/*" capture="environment" multiple onChange={addFiles} />
-                      <span>📷</span><strong>사진 촬영·선택</strong><small>카메라 또는 사진첩</small>
+                      <input type="file" accept="image/*" capture="environment" onChange={addFiles} />
+                      <span>📷</span><strong>사진 촬영</strong><small>카메라로 바로 찍기</small>
                     </label>
-                    <label className="capture-button">
-                      <input type="file" accept="video/*" capture="environment" multiple onChange={addFiles} />
-                      <span>▶</span><strong>영상 촬영·선택</strong><small>카메라 또는 보관함</small>
+                    <label className="capture-button gallery-capture">
+                      <input type="file" accept="image/*" multiple onChange={addFiles} />
+                      <span>▧</span><strong>사진첩 선택</strong><small>저장된 사진 가져오기</small>
+                    </label>
+                    <label className="capture-button video-capture">
+                      <input type="file" accept="video/*" capture="environment" onChange={addFiles} />
+                      <span>●</span><strong>영상 촬영</strong><small>카메라로 바로 찍기</small>
+                    </label>
+                    <label className="capture-button video-library">
+                      <input type="file" accept="video/*" multiple onChange={addFiles} />
+                      <span>▶</span><strong>영상 선택</strong><small>저장된 영상 가져오기</small>
                     </label>
                   </div>
                   {attachments.length > 0 && (
