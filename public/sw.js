@@ -1,4 +1,4 @@
-const CACHE = "jikeoro-senior-v3";
+const CACHE = "jikeoro-senior-v4";
 const APP_SHELL = new URL("./", self.registration.scope).href;
 
 self.addEventListener("install", () => self.skipWaiting());
