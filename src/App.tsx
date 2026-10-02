@@ -596,12 +596,19 @@ function App() {
                 <button onClick={openReport}><span>＋</span> 위험요소 제보하기</button>
               </section>
 
-              <section className="mission-card">
-                <div className="mission-top"><span>이번 달 동네 미션</span><strong>+150P</strong></div>
-                <h2>우리 동네 밤길을<br />한 번 더 살펴봐요</h2>
-                <p>조명이 부족한 길 {participation.missionProgress}/3곳 기록</p>
-                <div className="progress-track" aria-label={`미션 ${participation.missionProgress}/3 완료`}><span style={{ width: `${progress}%` }} /></div>
-                <button onClick={openReport}>{participation.missionCompleted ? "미션 완료! 새 기록 남기기" : participation.missionProgress ? "한 곳 더 기록하기" : "첫 조명 기록하기"} <span>→</span></button>
+              <section className="report-guide-card" aria-labelledby="report-guide-title">
+                <div className="report-guide-heading">
+                  <span>처음이어도 괜찮아요</span>
+                  <h2 id="report-guide-title">위험요소 제보 방법</h2>
+                  <p>화면의 큰 버튼을 순서대로 누르면 됩니다.</p>
+                </div>
+                <ol className="report-guide-steps">
+                  <li><b>1</b><span><strong>사진·영상</strong><small>찍거나 선택해요</small></span></li>
+                  <li><b>2</b><span><strong>위험한 이유</strong><small>말하거나 골라요</small></span></li>
+                  <li><b>3</b><span><strong>위치 확인</strong><small>지도를 확인해요</small></span></li>
+                  <li><b>4</b><span><strong>내용 보내기</strong><small>확인하고 제출해요</small></span></li>
+                </ol>
+                <button onClick={openReport}>1단계부터 시작하기 <span>→</span></button>
               </section>
 
             </>
