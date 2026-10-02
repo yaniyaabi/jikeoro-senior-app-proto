@@ -26,6 +26,13 @@ export type StoredReport = {
 const DB_NAME = "jikeoro-senior-prototype";
 const DB_VERSION = 1;
 
+function normalizeRiskType(value: string) {
+  if (value === "단차" || value === "적치물") return "인도";
+  if (value === "포트홀") return "횡단보도";
+  if (["인도", "횡단보도", "조도", "날씨 관련 위험", "기타"].includes(value)) return value;
+  return "기타";
+}
+
 function openDatabase() {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -51,7 +58,10 @@ export async function getReports(userId: string): Promise<StoredReport[]> {
     const request = transaction.objectStore("reports").getAll();
     request.onsuccess = () => {
       database.close();
-      resolve((request.result as StoredReport[]).filter((report) => report.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+      resolve((request.result as StoredReport[])
+        .filter((report) => report.userId === userId)
+        .map((report) => ({ ...report, riskType: normalizeRiskType(report.riskType) }))
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
     };
     request.onerror = () => {
       database.close();

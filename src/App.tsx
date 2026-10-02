@@ -24,10 +24,10 @@ type SpeechRecognitionLike = {
 };
 
 const riskTypes = [
-  { name: "단차", icon: "▰", help: "보도 턱·높이 차이" },
-  { name: "포트홀", icon: "◉", help: "도로·보도의 구멍" },
+  { name: "인도", icon: "▰", help: "턱·파손·적치물" },
+  { name: "횡단보도", icon: "▥", help: "신호·노면·진입부" },
   { name: "조도", icon: "☾", help: "어둡고 잘 안 보임" },
-  { name: "적치물", icon: "▦", help: "통행을 막는 물건" },
+  { name: "날씨 관련 위험", icon: "☂", help: "비·눈·결빙·침수" },
   { name: "기타", icon: "+", help: "그 밖의 위험" },
 ];
 
