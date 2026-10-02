@@ -226,7 +226,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .description-field { display: block; }
 .separated-description { margin-top: 21px; padding-top: 20px; border-top: 2px solid #e3eaec; }
 .description-field textarea { min-height: 145px; resize: vertical; }
-.voice-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.voice-actions { width: min(100%,320px); display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px auto 0; }
 .voice-actions button { min-height: 122px; border: 2px solid #c8d7dc; border-radius: 17px; background: #f7fafb; color: var(--ink); padding: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; }
 .voice-actions button.active, .voice-actions button.recording { border-color: var(--coral); background: #fff0ed; }
 .voice-actions button>span { font-size: 27px; color: var(--coral); margin-bottom: 7px; }
@@ -435,7 +435,6 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .capture-button>span { width: 50px; height: 50px; margin-bottom: 10px; font-size: 23px; }
   .capture-button strong { font-size: 16px; }
   .capture-button small { font-size: 11px; }
-  .voice-actions { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 320px) {
