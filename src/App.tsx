@@ -83,12 +83,13 @@ function calculateParticipation(reports: StoredReport[]) {
   }).length;
   const missionProgress = Math.min(lightingReportsThisMonth, 3);
   const missionCompleted = missionProgress >= 3;
+  const points = reports.length * 100 + completedCount * 50 + (missionCompleted ? 150 : 0);
   return {
     completedCount,
     missionProgress,
     missionCompleted,
-    points: reports.length * 100 + completedCount * 50 + (missionCompleted ? 150 : 0),
-    level: reports.length === 0 ? 0 : Math.floor((reports.length - 1) / 3) + 1,
+    points,
+    level: Math.floor(points / 1_000),
   };
 }
 
