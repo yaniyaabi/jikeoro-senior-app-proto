@@ -327,19 +327,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .app-reward-label b { border-radius: 999px; background: white; color: #df4613; border: 1px solid #ffad83; padding: 7px 10px; font-size: 11px; }
 .app-reward-exchange h2 { position: relative; z-index: 1; margin: 20px 0 10px; font-size: 28px; line-height: 1.2; letter-spacing: -.045em; }
 .app-reward-exchange>p { position: relative; z-index: 1; margin: 0; color: #765043; font-size: 14px; line-height: 1.55; }
-.app-voucher-preview { position: relative; z-index: 1; margin-top: 19px; border-radius: 17px; background: linear-gradient(145deg,#ff6b29,#ff5a1f 58%,#f34a12); color: white; padding: 17px; display: flex; align-items: center; gap: 13px; box-shadow: 0 14px 28px rgba(225,70,15,.27); }
-.app-voucher-preview>i { width: 82px; height: 82px; flex: 0 0 auto; border-radius: 18px; background: transparent; overflow: visible; }
-.app-voucher-preview>i img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 13px rgba(132,33,2,.24)); }
-.app-voucher-preview>div { display: flex; flex-direction: column; gap: 4px; }
-.app-voucher-preview small { color: #ffe5d8; font-size: 12px; }
-.app-voucher-preview strong { font-size: 20px; }
-.app-reward-progress { position: relative; z-index: 1; height: 10px; margin-top: 18px; border-radius: 999px; background: #f2c1a8; overflow: hidden; }
-.app-reward-progress>span { display: block; height: 100%; border-radius: inherit; background: #ff5a1f; }
-.app-reward-status { position: relative; z-index: 1; margin-top: 8px; display: flex; justify-content: space-between; gap: 10px; color: #805345; font-size: 12px; }
-.app-reward-status strong { color: #df4613; }
+.app-voucher-preview { position: relative; z-index: 1; min-height: 134px; margin-top: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,.4); border-radius: 22px; background: radial-gradient(circle at 88% 2%,rgba(255,224,192,.28),transparent 34%),linear-gradient(145deg,#ff7434,#ff551f 55%,#ec3f0d); color: white; padding: 17px 19px; display: flex; align-items: center; gap: 14px; box-shadow: 0 17px 32px rgba(202,58,10,.32),inset 0 1px 0 rgba(255,255,255,.46),inset 0 -4px 10px rgba(144,31,0,.12); }
+.app-voucher-preview::after { content:""; position:absolute; right:-44px; top:-64px; width:130px; height:130px; border:22px solid rgba(255,255,255,.08); border-radius:50%; }
+.app-voucher-preview>i { position:relative; z-index:1; width:105px; height:105px; flex: 0 0 auto; border-radius: 22px; background: rgba(255,255,255,.1); box-shadow: inset 0 1px 0 rgba(255,255,255,.22); overflow: visible; }
+.app-voucher-preview>i img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(121,27,0,.3)); }
+.app-voucher-preview>div { position:relative; z-index:1; min-width:0; display: flex; flex-direction: column; gap: 7px; }
+.app-voucher-preview small { color: #fff0e7; font-size: 14px; font-weight:850; }
+.app-voucher-preview strong { font-size: 25px; line-height:1.08; text-shadow:0 3px 10px rgba(126,27,0,.24); }
+.app-reward-progress { position: relative; z-index: 1; height: 13px; margin-top: 20px; padding:2px; border-radius: 999px; background: #e8aa8a; box-shadow:inset 0 2px 4px rgba(132,43,10,.18); overflow: hidden; }
+.app-reward-progress>span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#ff6d2f,#ef4613); box-shadow:0 1px 4px rgba(146,38,4,.24); }
+.app-reward-status { position: relative; z-index: 1; margin-top: 10px; display: flex; justify-content: space-between; gap: 10px; color: #805345; font-size: 14px; font-weight:800; }
+.app-reward-status strong { color: #df4613; font-size:15px; }
 .app-reward-exchange>button { position: relative; z-index: 1; width: 100%; min-height: 56px; margin-top: 17px; border: 0; border-radius: 14px; background: #ef4e16; color: white; font-size: 16px; font-weight: 950; cursor: pointer; }
 .app-reward-exchange>button:disabled { background: #dfa382; color: #fff8f4; cursor: not-allowed; }
-.app-reward-exchange>small { position: relative; z-index: 1; display: block; margin-top: 12px; color: #7b5a43; font-size: 11px; line-height: 1.5; }
+.app-reward-exchange>small { position: relative; z-index: 1; display: block; margin-top: 14px; color: #7b5a43; font-size: 13px; line-height: 1.55; font-weight:700; }
 .app-reward-form-backdrop { position: fixed; z-index: 60; inset: 0; background: rgba(4,28,33,.72); backdrop-filter: blur(7px); display: flex; align-items: center; justify-content: center; padding: max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom)); }
 .app-reward-form-sheet { position: relative; width: min(100%,448px); max-height: calc(100dvh - 24px); overflow: auto; border-radius: 24px; background: #fffaf6; border-top: 6px solid #ff5a1f; padding: 24px 19px 20px; box-shadow: 0 28px 70px rgba(0,0,0,.34); }
 .app-reward-form-close { position: absolute; top: 12px; right: 13px; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #ffe6d8; color: #9f3916; font-size: 25px; cursor: pointer; }
@@ -360,7 +361,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .app-reward-form-sheet form>button { min-height: 57px; border: 0; border-radius: 14px; background: #f0521c; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; font-weight: 950; cursor: pointer; }
 .app-reward-form-sheet form>button b { font-size: 22px; }
 .app-reward-form-sheet>small { display: block; margin-top: 13px; color: #866b61; font-size: 11px; line-height: 1.5; text-align: center; }
-@media(max-width:360px){.app-reward-applicant{grid-template-columns:1fr}.app-voucher-preview>i{width:72px;height:72px}}
+@media(max-width:360px){.app-reward-applicant{grid-template-columns:1fr}.app-voucher-preview{padding:14px 13px}.app-voucher-preview>i{width:92px;height:92px}.app-voucher-preview small{font-size:13px}.app-voucher-preview strong{font-size:22px}}
 .large-mission { margin-top: 14px; border-radius: 22px; background: #eef9d8; border: 2px solid #cbe89b; padding: 21px; }
 .large-mission>div:first-child { display: flex; justify-content: space-between; color: #4f702d; font-size: 14px; font-weight: 950; }
 .large-mission h2 { margin: 17px 0 14px; font-size: 27px; line-height: 1.25; }
