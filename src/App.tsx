@@ -11,7 +11,6 @@ type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
-type InstallPrompt = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -44,6 +43,13 @@ const quickPhrases = [
 ];
 
 const REWARD_EXCHANGE_MINIMUM = 10_000;
+const REWARD_FORM_URL = "https://docs.google.com/forms/d/e/FORM_ID/viewform";
+const REWARD_FORM_ENTRIES = {
+  name: "entry.NAME",
+  email: "entry.EMAIL",
+  phone: "entry.PHONE",
+  points: "entry.POINTS",
+};
 
 const statusHelp: Record<StoredReport["status"], string> = {
   접수: "기록이 안전하게 접수됐어요.",
@@ -181,7 +187,9 @@ function App() {
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [listening, setListening] = useState(false);
   const [mediaPickerKind, setMediaPickerKind] = useState<MediaPickerKind>(null);
-  const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
+  const [rewardFormOpen, setRewardFormOpen] = useState(false);
+  const [rewardPhone, setRewardPhone] = useState("");
+  const [rewardFormError, setRewardFormError] = useState("");
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -205,15 +213,6 @@ function App() {
     }
     getReports(currentUser.id).then(setReports).catch(() => setReports([]));
   }, [currentUser]);
-
-  useEffect(() => {
-    const handleInstall = (event: Event) => {
-      event.preventDefault();
-      setInstallPrompt(event as InstallPrompt);
-    };
-    window.addEventListener("beforeinstallprompt", handleInstall);
-    return () => window.removeEventListener("beforeinstallprompt", handleInstall);
-  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.contrast = contrast ? "high" : "normal";
@@ -255,6 +254,15 @@ function App() {
       urls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [selectedReport]);
+
+  useEffect(() => {
+    if (!rewardFormOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setRewardFormOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [rewardFormOpen]);
 
   const participation = useMemo(() => calculateParticipation(reports), [reports]);
   const progress = Math.min(100, (participation.missionProgress / 3) * 100);
@@ -320,6 +328,35 @@ function App() {
     setReports([]);
     setSelectedReport(null);
     setView("home");
+  };
+
+  const openRewardForm = () => {
+    setRewardPhone(localStorage.getItem("jikeoro-reward-phone") ?? "");
+    setRewardFormError("");
+    setRewardFormOpen(true);
+  };
+
+  const submitRewardForm = (event: FormEvent) => {
+    event.preventDefault();
+    if (!currentUser) return;
+    const normalizedPhone = rewardPhone.replace(/\D/g, "");
+    if (normalizedPhone.length < 10 || normalizedPhone.length > 11) {
+      setRewardFormError("휴대전화 번호를 정확히 입력해주세요.");
+      return;
+    }
+    if (REWARD_FORM_URL.includes("FORM_ID")) {
+      setRewardFormError("신청 양식을 연결하는 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+    localStorage.setItem("jikeoro-reward-phone", rewardPhone.trim());
+    const formUrl = new URL(REWARD_FORM_URL);
+    formUrl.searchParams.set("usp", "pp_url");
+    formUrl.searchParams.set(REWARD_FORM_ENTRIES.name, currentUser.name);
+    formUrl.searchParams.set(REWARD_FORM_ENTRIES.email, currentUser.email);
+    formUrl.searchParams.set(REWARD_FORM_ENTRIES.phone, rewardPhone.trim());
+    formUrl.searchParams.set(REWARD_FORM_ENTRIES.points, `${participation.points}P`);
+    window.open(formUrl.toString(), "_blank", "noopener,noreferrer");
+    setRewardFormOpen(false);
   };
 
   const removeReport = async (report: StoredReport) => {
@@ -552,13 +589,6 @@ function App() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const installApp = async () => {
-    if (!installPrompt) return;
-    await installPrompt.prompt();
-    await installPrompt.userChoice;
-    setInstallPrompt(null);
   };
 
   const navigate = (next: View) => {
@@ -856,11 +886,11 @@ function App() {
                 <div className="app-reward-label"><span>마일리지 사용</span><b>교환 준비 중</b></div>
                 <h2 id="app-reward-title">모은 마일리지를<br />상품권으로 바꿔요.</h2>
                 <p>10,000P부터 온누리상품권 등 지역상품권으로 교환할 수 있도록 준비하고 있어요.</p>
-                <div className="app-voucher-preview"><i>온</i><div><small>디지털 온누리상품권</small><strong>10,000P부터</strong></div></div>
+                <div className="app-voucher-preview"><i><img src={`${import.meta.env.BASE_URL}onnuri-logo.svg`} alt="온누리상품권" /></i><div><small>디지털 온누리상품권</small><strong>10,000P부터</strong></div></div>
                 <div className="app-reward-progress" aria-label={`상품권 교환까지 ${Math.round(rewardExchangeProgress)}%`}><span style={{ width: `${rewardExchangeProgress}%` }} /></div>
                 <div className="app-reward-status"><span>현재 {participation.points.toLocaleString()}P</span><strong>{canExchangeReward ? "교환 가능" : `${rewardExchangeRemaining.toLocaleString()}P 남음`}</strong></div>
-                <button type="button" disabled={!canExchangeReward}>{canExchangeReward ? "상품권 교환 신청하기" : "10,000P부터 신청할 수 있어요"}</button>
-                <small>실제 상품권 종류·교환 비율·발급 방식은 운영 전 제휴 정책에 따라 확정됩니다.</small>
+                <button type="button" disabled={!canExchangeReward} onClick={openRewardForm}>{canExchangeReward ? "상품권 교환 신청하기" : "10,000P부터 신청할 수 있어요"}</button>
+                <small>신청서를 보내면 담당자가 확인한 뒤 입력한 휴대전화로 상품권을 발송합니다.</small>
               </article>
               <article className="large-mission">
                 <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
@@ -868,12 +898,29 @@ function App() {
                 <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
                 <p>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</p>
               </article>
-              <section className="why-card"><span>♥</span><div><h2>마일리지는 참여를 응원해요</h2><p>경쟁보다 꾸준한 참여를 돕기 위한 기능입니다. 실제 보상 방식은 주민과 함께 결정합니다.</p></div></section>
-              {installPrompt && <button className="install-banner" onClick={installApp}><span>↓</span><div><strong>휴대전화에 지켜路 설치하기</strong><small>홈 화면에서 바로 열 수 있어요.</small></div></button>}
               <p className="prototype-note">현재 버전은 기능 시연용입니다. 제보와 파일은 이 기기의 브라우저에만 저장됩니다.</p>
             </section>
           )}
         </main>
+
+        {rewardFormOpen && currentUser && (
+          <div className="app-reward-form-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setRewardFormOpen(false)}>
+            <section className="app-reward-form-sheet" role="dialog" aria-modal="true" aria-labelledby="app-reward-form-title">
+              <button className="app-reward-form-close" type="button" onClick={() => setRewardFormOpen(false)} aria-label="교환 신청 닫기">×</button>
+              <img className="app-reward-form-logo" src={`${import.meta.env.BASE_URL}onnuri-logo.svg`} alt="디지털 온누리상품권" />
+              <p>10,000P REWARD</p>
+              <h2 id="app-reward-form-title">상품권 교환을 신청할까요?</h2>
+              <span>회원 정보와 연락처가 입력된 Google Form이 열립니다. 내용을 확인해 제출하면 담당자가 확인 후 휴대전화로 보내드려요.</span>
+              <form onSubmit={submitRewardForm}>
+                <div className="app-reward-applicant"><span><small>이름</small><strong>{currentUser.name}</strong></span><span><small>이메일</small><strong>{currentUser.email}</strong></span></div>
+                <label><span>상품권 받을 휴대전화 번호</span><input type="tel" inputMode="tel" autoComplete="tel" value={rewardPhone} onChange={(event) => { setRewardPhone(event.target.value); setRewardFormError(""); }} placeholder="010-1234-5678" /></label>
+                {rewardFormError && <p className="app-reward-form-error" role="alert">{rewardFormError}</p>}
+                <button type="submit">Google Form에서 신청 계속하기 <b>→</b></button>
+              </form>
+              <small>Google Form 제출 전까지 포인트는 차감되지 않습니다.</small>
+            </section>
+          </div>
+        )}
 
         {selectedReport && (
           <div className="app-detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedReport(null)}>

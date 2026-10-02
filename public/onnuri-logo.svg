@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 96" role="img" aria-labelledby="title desc">
+  <title id="title">디지털 온누리상품권</title>
+  <desc id="desc">주황색 온누리상품권 로고</desc>
+  <rect width="240" height="96" rx="22" fill="#fff7ef"/>
+  <g fill="#ff5a1f">
+    <circle cx="43" cy="42" r="9"/>
+    <ellipse cx="43" cy="20" rx="8" ry="13"/>
+    <ellipse cx="43" cy="64" rx="8" ry="13"/>
+    <ellipse cx="21" cy="42" rx="13" ry="8"/>
+    <ellipse cx="65" cy="42" rx="13" ry="8"/>
+  </g>
+  <text x="84" y="43" fill="#f4511e" font-family="Arial, 'Noto Sans KR', sans-serif" font-size="27" font-weight="900" letter-spacing="-2">온누리</text>
+  <text x="85" y="67" fill="#f4511e" font-family="Arial, 'Noto Sans KR', sans-serif" font-size="17" font-weight="800" letter-spacing="-1">상품권</text>
+</svg>
