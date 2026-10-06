@@ -236,26 +236,26 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .description-field { display: block; }
 .separated-description { margin-top: 21px; padding-top: 20px; border-top: 2px solid #e3eaec; }
 .description-field textarea { min-height: 145px; resize: vertical; }
-.description-field-heading { min-height: 50px; display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
-.description-field-heading>label { flex: 0 0 auto; font-size: 17px; font-weight: 950; }
-.description-field-heading>label small { display: inline-block; margin-left: 3px; border-radius: 999px; background: #e4ece1; color: #61766d; padding: 3px 6px; font-size: 10px; font-weight: 900; vertical-align: middle; }
-.description-field-heading>p { min-width: 0; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
-.report-audio-action { height: 50px; min-height: 50px; box-sizing: border-box; border: 1px solid #c7d3c8; border-radius: 11px; background: #eef4ea; color: var(--ink); padding: 9px 12px; font: inherit; font-size: 14px; font-weight: 950; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; cursor: pointer; }
-.description-field-heading>.report-audio-action { flex: 0 0 142px; width: 142px; }
+.description-field-heading { min-height: 50px; display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 8px 10px; margin-bottom: 11px; }
+.description-field-heading>label { font-size: 18px; font-weight: 950; }
+.description-field-heading>label small { display: inline-block; margin-left: 3px; border-radius: 999px; background: #e4ece1; color: #61766d; padding: 4px 7px; font-size: 11px; font-weight: 900; vertical-align: middle; }
+.description-field-heading>p { grid-column: 1/-1; min-width: 0; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.report-audio-action { height: 60px; min-height: 60px; box-sizing: border-box; border: 1px solid #c7d3c8; border-radius: 13px; background: #eef4ea; color: var(--ink); padding: 11px 14px; font: inherit; font-size: 17px; font-weight: 950; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; }
+.description-field-heading>.report-audio-action { justify-self: start; width: 172px; }
 .report-audio-action.active { background: var(--navy); border-color: var(--navy); color: white; }
-.speech-write-icon { width: 24px; height: 20px; display: grid; place-items: center; flex: 0 0 auto; }
+.speech-write-icon { width: 28px; height: 23px; display: grid; place-items: center; flex: 0 0 auto; }
 .speech-write-icon svg { width: 100%; height: 100%; overflow: visible; }
 .speech-write-icon svg path:first-child { fill: var(--navy); stroke: var(--navy); stroke-width: 1.5; }
 .speech-write-icon svg path:last-child { fill: none; stroke: #eef4ea; stroke-width: 1.6; stroke-linecap: round; }
 .report-audio-action.active .speech-write-icon svg path:first-child { fill: var(--lime); stroke: var(--lime); }
 .report-audio-action.active .speech-write-icon svg path:last-child { stroke: var(--navy); }
-.voice-recorder { margin-top: 12px; border: 1px solid #d2dbd2; border-radius: 14px; background: white; padding: 13px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 9px; }
+.voice-recorder { margin-top: 14px; border: 1px solid #d2dbd2; border-radius: 16px; background: white; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 10px; }
 .voice-recorder>div { grid-column: 1/-1; display: flex; flex-direction: column; gap: 4px; }
-.voice-recorder>div strong { font-size: 17px; }
-.voice-recorder>div small { color: var(--muted); font-size: 13px; }
+.voice-recorder>div strong { font-size: 19px; }
+.voice-recorder>div small { color: var(--muted); font-size: 14px; line-height: 1.45; }
 .voice-recorder>.report-audio-action { width: 100%; min-width: 0; }
 .voice-recorder button.recording { background: var(--coral); border-color: var(--coral); color: white; }
-.record-action-icon { width: 18px; color: var(--coral); display: inline-grid; place-items: center; flex: 0 0 auto; font-size: 13px; }
+.record-action-icon { width: 21px; color: var(--coral); display: inline-grid; place-items: center; flex: 0 0 auto; font-size: 15px; }
 .voice-recorder button.recording .record-action-icon { color: white; }
 .audio-file-button { position: relative; }
 .audio-file-button input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; }
