@@ -220,6 +220,7 @@ function App() {
   const [recording, setRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [listening, setListening] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const [mediaPickerKind, setMediaPickerKind] = useState<MediaPickerKind>(null);
   const [rewardFormOpen, setRewardFormOpen] = useState(false);
   const [rewardPhone, setRewardPhone] = useState("");
@@ -234,6 +235,8 @@ function App() {
   const videoCameraRef = useRef<HTMLInputElement>(null);
   const videoLibraryRef = useRef<HTMLInputElement>(null);
   const riskDetailPanelRef = useRef<HTMLDivElement>(null);
+  const mainContentRef = useRef<HTMLElement>(null);
+  const speechRunRef = useRef(0);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -253,6 +256,12 @@ function App() {
     document.documentElement.dataset.contrast = contrast ? "high" : "normal";
     localStorage.setItem("jikeoro-senior-contrast", String(contrast));
   }, [contrast]);
+
+  useEffect(() => {
+    speechRunRef.current += 1;
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+  }, [view, step]);
 
   useEffect(() => {
     if (!recording) return;
@@ -280,6 +289,8 @@ function App() {
     recorderRef.current?.stop();
     streamRef.current?.getTracks().forEach((track) => track.stop());
     recognitionRef.current?.stop();
+    speechRunRef.current += 1;
+    window.speechSynthesis?.cancel();
   }, []);
 
   useEffect(() => {
@@ -418,11 +429,54 @@ function App() {
 
   const speakPage = () => {
     if (!("speechSynthesis" in window)) return;
+
+    if (speaking) {
+      speechRunRef.current += 1;
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+
+    const openDialog = document.querySelector<HTMLElement>('.phone-app [role="dialog"]');
+    const readingTarget = openDialog ?? mainContentRef.current;
+    if (!readingTarget) return;
+
+    const fieldValues = Array.from(readingTarget.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>("input, textarea, select"))
+      .filter((field) => field.type !== "file" && field.type !== "password" && field.value.trim())
+      .map((field) => {
+        const label = field.getAttribute("aria-label") || field.closest("label")?.querySelector("span")?.textContent || "입력 내용";
+        return `${label}, ${field.value.trim()}`;
+      });
+    const navigationText = openDialog ? "" : document.querySelector<HTMLElement>(".bottom-nav")?.innerText ?? "";
+    const readableText = [readingTarget.innerText, ...fieldValues, navigationText]
+      .join(". ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!readableText) return;
+
+    const chunks = readableText.match(/.{1,150}(?:\s+|$)/g)?.map((chunk) => chunk.trim()).filter(Boolean) ?? [readableText];
+    const runId = speechRunRef.current + 1;
+    speechRunRef.current = runId;
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(pageTitle);
-    utterance.lang = "ko-KR";
-    utterance.rate = 0.86;
-    window.speechSynthesis.speak(utterance);
+    setSpeaking(true);
+
+    const speakChunk = (index: number) => {
+      if (speechRunRef.current !== runId) return;
+      if (index >= chunks.length) {
+        setSpeaking(false);
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(chunks[index]);
+      utterance.lang = "ko-KR";
+      utterance.rate = 0.86;
+      utterance.onend = () => speakChunk(index + 1);
+      utterance.onerror = () => {
+        if (speechRunRef.current === runId) setSpeaking(false);
+      };
+      window.speechSynthesis.speak(utterance);
+    };
+
+    speakChunk(0);
   };
 
   const resetReport = () => {
@@ -708,12 +762,12 @@ function App() {
             <span><strong>지켜路</strong><small>쉬운 제보</small></span>
           </button>
           <div className="header-tools">
-            <button onClick={speakPage} aria-label="현재 화면 제목 읽어주기"><span>♬</span> 읽어주기</button>
+            <button onClick={speakPage} aria-label={speaking ? "읽어주기 중지" : "현재 화면 전체 읽어주기"}><span>{speaking ? "■" : "♬"}</span> {speaking ? "읽기 중지" : "읽어주기"}</button>
             <button onClick={() => setContrast((value) => !value)} aria-label="고대비 화면 전환"><span>◐</span> 고대비</button>
           </div>
         </header>
 
-        <main className={`app-main ${view === "home" ? "home-main" : ""}`}>
+        <main ref={mainContentRef} className={`app-main ${view === "home" ? "home-main" : ""}`}>
           {view === "home" && (
             <>
               <section className="hello-card">
