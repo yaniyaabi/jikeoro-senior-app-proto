@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, readPrototypeSession, registerPrototypeAccount } from "./auth";
-import { deleteReport, getReportMedia, getReports, saveReport, StoredMedia, StoredReport } from "./storage";
+import { deleteReport, getReportMedia, getReports, ReportStatus, saveReport, StoredMedia, StoredReport } from "./storage";
 
 type View = "home" | "report" | "history" | "rewards";
 type AuthMode = "login" | "signup";
@@ -83,12 +83,36 @@ const REWARD_FORM_ENTRIES = {
   points: "entry.103413830",
 };
 
-const statusHelp: Record<StoredReport["status"], string> = {
-  접수: "기록이 안전하게 접수됐어요.",
-  "확인 중": "연구원이 위치와 내용을 살펴보고 있어요.",
-  "조치 중": "담당 기관에서 개선을 진행하고 있어요.",
-  완료: "현장 개선이 완료됐어요.",
+const reportStatus: Record<ReportStatus, { label: string; defaultResponse: string }> = {
+  received: {
+    label: "접수 완료",
+    defaultResponse: "기록이 안전하게 접수됐어요. 위치와 내용을 확인한 뒤 담당 기관을 연결할게요.",
+  },
+  review: {
+    label: "현장 검토 중",
+    defaultResponse: "담당자가 제보 내용을 검토하고 현장 확인 일정을 준비하고 있어요.",
+  },
+  action: {
+    label: "조치 요청",
+    defaultResponse: "현장 확인을 마치고 담당 기관에 개선 조치를 요청했어요.",
+  },
+  completed: {
+    label: "개선 완료",
+    defaultResponse: "담당 기관의 개선 조치가 완료됐어요.",
+  },
 };
+
+function reportResponse(report: StoredReport) {
+  return report.response?.trim() || reportStatus[report.status].defaultResponse;
+}
+
+function reportDepartment(report: StoredReport) {
+  return report.department?.trim() || "담당 기관 배정 중";
+}
+
+function reportResponseSource(report: StoredReport) {
+  return report.department?.trim() ? `${report.department.trim()} 답변` : "지켜路 접수 안내";
+}
 
 function NavIcon({ name }: { name: "home" | "report" | "history" | "reward" }) {
   return (
@@ -107,7 +131,7 @@ function formatDate(value: string) {
 
 function calculateParticipation(reports: StoredReport[]) {
   const now = new Date();
-  const completedCount = reports.filter((report) => report.status === "완료").length;
+  const completedCount = reports.filter((report) => report.status === "completed").length;
   const lightingReportsThisMonth = reports.filter((report) => {
     if (report.riskType !== "조도") return false;
     const createdAt = new Date(report.createdAt);
@@ -662,6 +686,8 @@ function App() {
     setSaving(true);
     setError("");
     const reportId = `report-${crypto.randomUUID()}`;
+    const createdAt = new Date().toISOString();
+    const initialResponse = reportStatus.received.defaultResponse;
     const report: StoredReport = {
       id: reportId,
       userId: currentUser!.id,
@@ -672,8 +698,12 @@ function App() {
       longitude: location?.longitude ?? null,
       accuracy: location?.accuracy ?? null,
       place: place.trim() || "GPS로 저장한 위치",
-      createdAt: new Date().toISOString(),
-      status: "접수",
+      createdAt,
+      updatedAt: createdAt,
+      status: "received",
+      department: null,
+      response: initialResponse,
+      statusHistory: [{ status: "received", note: initialResponse, createdAt, department: null }],
       mediaCount: attachments.length,
       points: 100,
     };
@@ -985,10 +1015,12 @@ function App() {
                     <div className="history-top"><span className="report-type">{report.riskType}{report.riskDetail ? ` · ${report.riskDetail}` : ""}</span><time>{formatDate(report.createdAt)}</time></div>
                     <h2>{report.description}</h2>
                     <p>◎ {report.place}</p>
-                    <div className="history-status"><span>{report.status}</span><strong>{statusHelp[report.status]}</strong></div>
-                    <div className="status-line"><i className="done">✓</i><span /><i className={report.status !== "접수" ? "done" : ""}>2</i><span /><i className={report.status === "조치 중" || report.status === "완료" ? "done" : ""}>3</i><span /><i className={report.status === "완료" ? "done" : ""}>4</i></div>
-                    <div className="status-labels" aria-label="처리 단계"><span>접수</span><span>현장 확인</span><span>조치 진행</span><span>개선 완료</span></div>
-                    <b className="history-detail-hint">사진·내용 자세히 보기 →</b>
+                    <section className={`history-response status-${report.status}`} aria-label="현재 처리 현황">
+                      <div className="history-response-heading"><span>{reportStatus[report.status].label}</span><time>최근 업데이트 {formatDate(report.updatedAt)}</time></div>
+                      <strong>{reportDepartment(report)}</strong>
+                      <p>{reportResponse(report)}</p>
+                    </section>
+                    <b className="history-detail-hint">처리 이력·사진 자세히 보기 →</b>
                   </article>
                 ))}
                 {!reports.length && <div className="empty-history"><span>＋</span><h2>아직 남긴 기록이 없습니다.</h2><p>첫 위험요소를 발견하면 사진이나 말로 간단히 알려주세요.</p></div>}
@@ -1046,7 +1078,18 @@ function App() {
             <section className="app-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="app-detail-title">
               <button className="app-detail-close" type="button" onClick={() => setSelectedReport(null)} aria-label="상세 내용 닫기">×</button>
               <div className="app-detail-heading"><span className="report-type">{selectedReport.riskType}{selectedReport.riskDetail ? ` · ${selectedReport.riskDetail}` : ""}</span><time>{formatDate(selectedReport.createdAt)}</time><h2 id="app-detail-title">{selectedReport.description}</h2><p>◎ {selectedReport.place}</p></div>
-              <section className="app-detail-status"><span>{selectedReport.status}</span><strong>{statusHelp[selectedReport.status]}</strong></section>
+              <section className={`app-detail-process status-${selectedReport.status}`} aria-labelledby="app-detail-process-title">
+                <div className="app-detail-process-heading"><div><small>현재 처리 현황</small><h3 id="app-detail-process-title">{reportStatus[selectedReport.status].label}</h3></div><time>{formatDate(selectedReport.updatedAt)} 업데이트</time></div>
+                <div className="app-detail-response"><small>{reportResponseSource(selectedReport)}</small><p>{reportResponse(selectedReport)}</p></div>
+                <ol className="app-detail-timeline" aria-label="처리 업데이트 이력">
+                  {[...selectedReport.statusHistory].reverse().map((update, index) => (
+                    <li key={`${update.createdAt}-${index}`}>
+                      <i aria-hidden="true" />
+                      <div><span>{reportStatus[update.status].label}</span><time>{formatDate(update.createdAt)}</time><p>{update.note}</p>{update.department && <small>{update.department}</small>}</div>
+                    </li>
+                  ))}
+                </ol>
+              </section>
               <section className="app-detail-media"><h3>첨부한 사진·영상·음성 <b>{selectedReport.mediaCount}</b></h3>
                 {detailMedia.length ? <div>{detailMedia.map((item) => <figure key={item.id}>
                   {item.kind === "image" && <img src={item.url} alt="첨부한 위험 현장" />}

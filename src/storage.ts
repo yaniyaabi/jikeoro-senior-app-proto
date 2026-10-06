@@ -8,6 +8,15 @@ export type StoredMedia = {
   blob: Blob;
 };
 
+export type ReportStatus = "received" | "review" | "action" | "completed";
+
+export type ReportStatusUpdate = {
+  status: ReportStatus;
+  note: string;
+  createdAt: string;
+  department?: string | null;
+};
+
 export type StoredReport = {
   id: string;
   userId: string;
@@ -19,7 +28,11 @@ export type StoredReport = {
   accuracy: number | null;
   place: string;
   createdAt: string;
-  status: "접수" | "확인 중" | "조치 중" | "완료";
+  updatedAt: string;
+  status: ReportStatus;
+  department: string | null;
+  response: string;
+  statusHistory: ReportStatusUpdate[];
   mediaCount: number;
   points: number;
 };
@@ -32,6 +45,49 @@ function normalizeRiskType(value: string) {
   if (value === "포트홀") return "횡단보도";
   if (["인도", "횡단보도", "조도", "날씨 관련 위험", "기타"].includes(value)) return value;
   return "기타";
+}
+
+function normalizeStatus(value: unknown): ReportStatus {
+  if (value === "review" || value === "확인 중") return "review";
+  if (value === "action" || value === "조치 중") return "action";
+  if (value === "completed" || value === "완료") return "completed";
+  return "received";
+}
+
+function defaultResponse(status: ReportStatus) {
+  if (status === "review") return "담당자가 제보 내용을 검토하고 현장 확인 일정을 준비하고 있어요.";
+  if (status === "action") return "현장 확인을 마치고 담당 기관에 개선 조치를 요청했어요.";
+  if (status === "completed") return "담당 기관의 개선 조치가 완료됐어요.";
+  return "기록이 안전하게 접수됐어요. 위치와 내용을 확인한 뒤 담당 기관을 연결할게요.";
+}
+
+function normalizeReport(report: StoredReport & Record<string, unknown>): StoredReport {
+  const status = normalizeStatus(report.status);
+  const updatedAt = typeof report.updatedAt === "string" ? report.updatedAt : report.createdAt;
+  const department = typeof report.department === "string" && report.department.trim() ? report.department : null;
+  const response = typeof report.response === "string" && report.response.trim() ? report.response : defaultResponse(status);
+  const storedHistory = Array.isArray(report.statusHistory) ? report.statusHistory : [];
+  const statusHistory = storedHistory.length
+    ? storedHistory.map((item) => {
+      const update = item as Partial<ReportStatusUpdate>;
+      return {
+        status: normalizeStatus(update.status),
+        note: typeof update.note === "string" && update.note.trim() ? update.note : defaultResponse(normalizeStatus(update.status)),
+        createdAt: typeof update.createdAt === "string" ? update.createdAt : updatedAt,
+        department: typeof update.department === "string" && update.department.trim() ? update.department : null,
+      };
+    })
+    : [{ status, note: response, createdAt: updatedAt, department }];
+
+  return {
+    ...report,
+    riskType: normalizeRiskType(report.riskType),
+    status,
+    updatedAt,
+    department,
+    response,
+    statusHistory,
+  };
 }
 
 function openDatabase() {
@@ -61,7 +117,7 @@ export async function getReports(userId: string): Promise<StoredReport[]> {
       database.close();
       resolve((request.result as StoredReport[])
         .filter((report) => report.userId === userId)
-        .map((report) => ({ ...report, riskType: normalizeRiskType(report.riskType) }))
+        .map((report) => normalizeReport(report as StoredReport & Record<string, unknown>))
         .sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
     };
     request.onerror = () => {
