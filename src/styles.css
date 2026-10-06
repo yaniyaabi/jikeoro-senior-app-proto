@@ -212,8 +212,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .risk-grid button small { align-self: start; color: var(--muted); font-size: 12px; line-height: 1.35; }
 .risk-detail-panel { margin-top: 16px; scroll-margin-top: 118px; border: 2px solid #c9d9d0; border-radius: 19px; background: linear-gradient(145deg,#f7fbf3,#edf5e8); padding: 16px 13px 14px; animation: risk-detail-reveal .24s ease-out both; }
 .risk-detail-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin: 0 2px 13px; }
-.risk-detail-heading>div { display: flex; align-items: center; gap: 8px; }
-.risk-detail-heading span { border-radius: 999px; background: var(--navy); color: var(--lime); padding: 5px 9px; font-size: 12px; font-weight: 950; }
 .risk-detail-heading strong { font-size: 18px; letter-spacing: -.03em; }
 .risk-detail-heading p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.35; text-align: right; }
 .risk-detail-grid { display: grid; grid-template-columns: 1fr; gap: 9px; }
@@ -242,7 +240,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .description-field-heading { min-height: 50px; display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 8px 10px; margin-bottom: 11px; }
 .description-field-heading>label { font-size: 18px; font-weight: 950; }
 .description-field-heading>label small { display: inline-block; margin-left: 3px; border-radius: 999px; background: #e4ece1; color: #61766d; padding: 4px 7px; font-size: 11px; font-weight: 900; vertical-align: middle; }
-.description-field-heading>p { grid-column: 1/-1; min-width: 0; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .report-audio-action { height: 60px; min-height: 60px; box-sizing: border-box; border: 1px solid #c7d3c8; border-radius: 13px; background: #eef4ea; color: var(--ink); padding: 11px 14px; font: inherit; font-size: 17px; font-weight: 950; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; cursor: pointer; }
 .description-field-heading>.report-audio-action { justify-self: start; width: 172px; }
 .report-audio-action.active { background: var(--navy); border-color: var(--navy); color: white; }

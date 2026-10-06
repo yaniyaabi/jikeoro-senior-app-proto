@@ -930,7 +930,7 @@ function App() {
                     {riskType && (
                       <div className="risk-detail-panel" aria-live="polite" ref={riskDetailPanelRef}>
                         <div className="risk-detail-heading">
-                          <div><span>{riskType}</span><strong>세부 유형</strong></div>
+                          <strong>세부 유형</strong>
                           <p>가장 가까운 항목 하나를 골라주세요.</p>
                         </div>
                         <div className="risk-detail-grid">
@@ -953,7 +953,6 @@ function App() {
                         </span>
                         {listening ? "말하기 끝내기" : "말로 글쓰기"}
                       </button>
-                      <p>{listening ? "말씀하시면 설명 칸에 바로 입력됩니다." : "말한 내용이 설명 칸에 글자로 입력됩니다."}</p>
                     </div>
                     <textarea id="report-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="예: 보도 턱이 높아서 보행기가 걸려요." rows={5} />
                   </div>
