@@ -3,6 +3,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, readPrototypeSession, registerPrototypeAccount } from "./auth";
 import { deleteReport, getReportMedia, getReports, ReportStatus, saveReport, StoredMedia, StoredReport } from "./storage";
 import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
+import { issueEmailVerificationCode, isEmailVerified, verifyEmailCode } from "./emailVerification";
 
 type View = "home" | "report" | "history" | "rewards";
 type AuthMode = "login" | "signup";
@@ -233,6 +234,11 @@ function App() {
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authPasswordConfirm, setAuthPasswordConfirm] = useState("");
+  const [authVerificationCode, setAuthVerificationCode] = useState("");
+  const [authVerificationIssuedFor, setAuthVerificationIssuedFor] = useState("");
+  const [authEmailVerified, setAuthEmailVerified] = useState(false);
+  const [authVerificationMessage, setAuthVerificationMessage] = useState("");
+  const [authTestCode, setAuthTestCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
@@ -392,6 +398,39 @@ function App() {
     setAuthError("");
     setAuthPassword("");
     setAuthPasswordConfirm("");
+    setAuthVerificationCode("");
+    setAuthVerificationIssuedFor("");
+    setAuthEmailVerified(false);
+    setAuthVerificationMessage("");
+    setAuthTestCode("");
+  };
+
+  const requestAuthEmailVerification = () => {
+    const email = authEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setAuthError("이메일 주소를 정확히 입력해주세요.");
+      return;
+    }
+    const code = issueEmailVerificationCode(email);
+    setAuthVerificationIssuedFor(email);
+    setAuthVerificationCode("");
+    setAuthEmailVerified(false);
+    setAuthVerificationMessage("인증번호를 발급했어요. 5분 안에 입력해주세요.");
+    setAuthTestCode(code);
+    setAuthError("");
+  };
+
+  const confirmAuthEmailVerification = () => {
+    const email = authEmail.trim().toLowerCase();
+    if (!verifyEmailCode(email, authVerificationCode)) {
+      setAuthVerificationMessage("인증번호가 맞지 않거나 유효시간이 지났어요.");
+      setAuthEmailVerified(false);
+      return;
+    }
+    setAuthEmailVerified(true);
+    setAuthVerificationMessage("이메일 인증이 완료됐어요.");
+    setAuthTestCode("");
+    setAuthError("");
   };
 
   const submitAuth = async (event: FormEvent) => {
@@ -412,6 +451,10 @@ function App() {
       }
       if (authPassword !== authPasswordConfirm) {
         setAuthError("비밀번호 확인이 맞지 않습니다.");
+        return;
+      }
+      if (!authEmailVerified || !isEmailVerified(email)) {
+        setAuthError("이메일 인증을 완료해주세요.");
         return;
       }
     }
@@ -805,10 +848,11 @@ function App() {
                 <button type="button" role="tab" aria-selected={authMode === "login"} className={authMode === "login" ? "active" : ""} onClick={() => changeAuthMode("login")}>로그인</button>
                 <button type="button" role="tab" aria-selected={authMode === "signup"} className={authMode === "signup" ? "active" : ""} onClick={() => changeAuthMode("signup")}>회원가입</button>
               </div>
-              <div className="app-auth-heading"><h2>{authMode === "login" ? "다시 만나 반가워요." : "지켜路와 함께해요."}</h2><p>{authMode === "login" ? "가입한 이메일과 비밀번호를 입력해주세요." : "간단한 정보만 입력하면 바로 시작할 수 있어요."}</p></div>
+              <div className="app-auth-heading"><h2>{authMode === "login" ? "다시 만나 반가워요." : "지켜路와 함께해요."}</h2><p>{authMode === "login" ? "가입한 이메일과 비밀번호를 입력해주세요." : "이메일 인증 후 새 계정을 만들 수 있어요."}</p></div>
               <form className="app-auth-form" onSubmit={submitAuth}>
                 {authMode === "signup" && <label><span>이름</span><input value={authName} onChange={(event) => setAuthName(event.target.value)} autoComplete="name" placeholder="이름 입력" /></label>}
-                <label><span>이메일</span><input type="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} autoComplete="email" placeholder="name@example.com" /></label>
+                <label><span>이메일</span><span className={authMode === "signup" ? "app-email-field" : ""}><input type="email" value={authEmail} onChange={(event) => { setAuthEmail(event.target.value); if (event.target.value.trim().toLowerCase() !== authVerificationIssuedFor) { setAuthEmailVerified(false); setAuthVerificationMessage(""); setAuthTestCode(""); } }} autoComplete="email" placeholder="name@example.com" />{authMode === "signup" && <button type="button" onClick={requestAuthEmailVerification}>{authVerificationIssuedFor ? "다시 받기" : "인증번호 받기"}</button>}</span></label>
+                {authMode === "signup" && authVerificationIssuedFor && <div className={`app-email-verification ${authEmailVerified ? "verified" : ""}`}><label><span>인증번호</span><span><input inputMode="numeric" maxLength={6} value={authVerificationCode} onChange={(event) => setAuthVerificationCode(event.target.value.replace(/\D/g, ""))} placeholder="6자리 입력" disabled={authEmailVerified} /><button type="button" onClick={confirmAuthEmailVerification} disabled={authEmailVerified}>{authEmailVerified ? "인증 완료" : "확인"}</button></span></label><p>{authVerificationMessage}</p>{authTestCode && <small>시연용 인증번호 <b>{authTestCode}</b></small>}</div>}
                 <label><span>비밀번호</span><span className="app-password-field"><input type={showPassword ? "text" : "password"} value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} autoComplete={authMode === "signup" ? "new-password" : "current-password"} placeholder={authMode === "signup" ? "8자 이상 입력" : "비밀번호 입력"} /><button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? "숨기기" : "보기"}</button></span></label>
                 {authMode === "signup" && <label><span>비밀번호 확인</span><input type={showPassword ? "text" : "password"} value={authPasswordConfirm} onChange={(event) => setAuthPasswordConfirm(event.target.value)} autoComplete="new-password" placeholder="비밀번호를 다시 입력" /></label>}
                 {authError && <p className="app-auth-error" role="alert">{authError}</p>}
@@ -816,7 +860,6 @@ function App() {
               </form>
               <p className="app-auth-switch">{authMode === "login" ? "아직 계정이 없나요?" : "이미 계정이 있나요?"} <button type="button" onClick={() => changeAuthMode(authMode === "login" ? "signup" : "login")}>{authMode === "login" ? "회원가입" : "로그인"}</button></p>
             </section>
-            <p className="app-auth-note">현재는 화면과 사용 흐름을 확인하는 프로토타입입니다.<br />AWS 연결 후에는 홈페이지와 같은 계정·기록을 사용합니다.</p>
           </main>
         </div>
       </div>

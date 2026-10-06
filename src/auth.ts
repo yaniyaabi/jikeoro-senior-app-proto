@@ -1,3 +1,5 @@
+import { clearEmailVerification, isEmailVerified } from "./emailVerification";
+
 export type PrototypeUser = {
   id: string;
   name: string;
@@ -57,6 +59,7 @@ export function readPrototypeSession(): PrototypeUser | null {
 
 export async function registerPrototypeAccount(name: string, email: string, password: string) {
   const normalizedEmail = email.trim().toLowerCase();
+  if (!isEmailVerified(normalizedEmail)) throw new Error("이메일 인증을 먼저 완료해주세요.");
   const accounts = readAccounts();
   if (accounts.some((account) => account.email === normalizedEmail)) throw new Error("이미 가입된 이메일입니다. 로그인해주세요.");
   const salt = bytesToHex(crypto.getRandomValues(new Uint8Array(16)));
@@ -69,6 +72,7 @@ export async function registerPrototypeAccount(name: string, email: string, pass
     createdAt: new Date().toISOString(),
   };
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([...accounts, account]));
+  clearEmailVerification();
   return saveSession({ id: account.id, name: account.name, email: account.email });
 }
 
