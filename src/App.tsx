@@ -545,7 +545,7 @@ function App() {
       if (files.length > available) setError("사진·영상·음성은 모두 합쳐 5개까지 넣을 수 있습니다.");
       return [...current, ...files.slice(0, available).map((file) => ({
         id: crypto.randomUUID(),
-        kind: file.type.startsWith("video/") ? "video" as const : "image" as const,
+        kind: file.type.startsWith("video/") ? "video" as const : file.type.startsWith("audio/") ? "audio" as const : "image" as const,
         file,
         url: URL.createObjectURL(file),
       }))];
@@ -928,13 +928,32 @@ function App() {
                       </div>
                     )}
                   </fieldset>
-                  <label className="description-field separated-description">
-                    <span>설명</span>
-                    <textarea value={description} onChange={(event) => setDescription(event.target.value)} placeholder="예: 보도 턱이 높아서 보행기가 걸려요." rows={5} />
-                  </label>
-                  <div className="voice-actions">
-                    <button type="button" className={`provided-control-button${listening ? " active" : ""}`} onClick={startSpeechInput} aria-label={listening ? "말을 듣고 있어요" : "말로 글쓰기"}><img src={iconPath(listening ? "speech-dark.png" : "speech-light.png")} alt="" /></button>
-                    <button type="button" className={`provided-control-button${recording ? " recording" : ""}`} onClick={recording ? stopAudioRecording : startAudioRecording} aria-label={recording ? "녹음 끝내기" : "현장음 녹음"}><img src={iconPath(recording ? "record-stop.png" : "ambient-record.png")} alt="" />{recording && <small className="recording-time">{recordingSeconds}초 녹음 중</small>}</button>
+                  <div className="description-field separated-description">
+                    <div className="description-field-heading">
+                      <label htmlFor="report-description">설명 <small>선택</small></label>
+                      <button type="button" className={`report-audio-action${listening ? " active" : ""}`} onClick={startSpeechInput} aria-pressed={listening}>
+                        <span className="speech-write-icon" aria-hidden="true">
+                          <svg viewBox="0 0 36 28"><path d="M4 3.5h28a2.5 2.5 0 0 1 2.5 2.5v13a2.5 2.5 0 0 1-2.5 2.5H16l-7 4v-4H4A2.5 2.5 0 0 1 1.5 19V6A2.5 2.5 0 0 1 4 3.5Z"/><path d="M7 9h22M7 13h22M7 17h15"/></svg>
+                        </span>
+                        {listening ? "말하기 끝내기" : "말로 글쓰기"}
+                      </button>
+                      <p>{listening ? "말씀하시면 설명 칸에 바로 입력됩니다." : "말한 내용이 설명 칸에 글자로 입력됩니다."}</p>
+                    </div>
+                    <textarea id="report-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="예: 보도 턱이 높아서 보행기가 걸려요." rows={5} />
+                  </div>
+                  <div className="voice-recorder">
+                    <div>
+                      <strong>현장음 녹음</strong>
+                      <small>{recording ? `${recordingSeconds}초 녹음 중` : "현장의 소리를 별도 파일로 남길 수 있어요."}</small>
+                    </div>
+                    <button type="button" className={`report-audio-action${recording ? " recording" : ""}`} onClick={recording ? stopAudioRecording : startAudioRecording}>
+                      <span className="record-action-icon" aria-hidden="true">{recording ? "■" : "●"}</span>
+                      {recording ? "녹음 끝내기" : "현장음 녹음"}
+                    </button>
+                    <label className="audio-file-button report-audio-action">
+                      <input type="file" accept="audio/*" onChange={addFiles} />
+                      녹음 파일 선택
+                    </label>
                   </div>
                   {attachments.some((item) => item.kind === "audio") && (
                     <div className="audio-attachment-list" aria-label="녹음한 현장음">

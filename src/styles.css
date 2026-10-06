@@ -197,7 +197,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .next-button:disabled { opacity: .65; cursor: wait; }
 
 .risk-fieldset { border: 0; padding: 0; margin: 0; }
-.risk-fieldset legend, .location-box h2, .description-field>span { display: block; margin: 0 0 13px; font-size: 21px; font-weight: 950; }
+.risk-fieldset legend, .location-box h2 { display: block; margin: 0 0 13px; font-size: 21px; font-weight: 950; }
 .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .risk-grid button { min-height: 117px; border: 2px solid #d0dde0; border-radius: 17px; background: #f8fbfb; color: var(--ink); padding: 12px; display: grid; grid-template-columns: 52px 1fr; grid-template-rows: auto auto; align-items: center; column-gap: 9px; text-align: left; cursor: pointer; }
 .risk-grid button:last-child { grid-column: 1/3; min-height: 84px; }
@@ -236,16 +236,30 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .description-field { display: block; }
 .separated-description { margin-top: 21px; padding-top: 20px; border-top: 2px solid #e3eaec; }
 .description-field textarea { min-height: 145px; resize: vertical; }
-.voice-actions { width: min(100%,320px); display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px auto 0; }
-.voice-actions button { min-height: 122px; border: 2px solid #c8d7dc; border-radius: 17px; background: #f7fafb; color: var(--ink); padding: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; }
-.voice-actions button.active, .voice-actions button.recording { border-color: var(--coral); background: #fff0ed; }
-.voice-actions button>span { font-size: 27px; color: var(--coral); margin-bottom: 7px; }
-.voice-actions button strong { font-size: 17px; }
-.voice-actions button small { margin-top: 5px; color: var(--muted); font-size: 12px; }
-.voice-actions button.provided-control-button { position: relative; min-height: 0; border: 0; border-radius: 0; background: transparent; padding: 0; overflow: visible; }
-.voice-actions button.provided-control-button.active, .voice-actions button.provided-control-button.recording { border: 0; background: transparent; }
+.description-field-heading { min-height: 50px; display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.description-field-heading>label { flex: 0 0 auto; font-size: 17px; font-weight: 950; }
+.description-field-heading>label small { display: inline-block; margin-left: 3px; border-radius: 999px; background: #e4ece1; color: #61766d; padding: 3px 6px; font-size: 10px; font-weight: 900; vertical-align: middle; }
+.description-field-heading>p { min-width: 0; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.report-audio-action { height: 50px; min-height: 50px; box-sizing: border-box; border: 1px solid #c7d3c8; border-radius: 11px; background: #eef4ea; color: var(--ink); padding: 9px 12px; font: inherit; font-size: 14px; font-weight: 950; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; cursor: pointer; }
+.description-field-heading>.report-audio-action { flex: 0 0 142px; width: 142px; }
+.report-audio-action.active { background: var(--navy); border-color: var(--navy); color: white; }
+.speech-write-icon { width: 24px; height: 20px; display: grid; place-items: center; flex: 0 0 auto; }
+.speech-write-icon svg { width: 100%; height: 100%; overflow: visible; }
+.speech-write-icon svg path:first-child { fill: var(--navy); stroke: var(--navy); stroke-width: 1.5; }
+.speech-write-icon svg path:last-child { fill: none; stroke: #eef4ea; stroke-width: 1.6; stroke-linecap: round; }
+.report-audio-action.active .speech-write-icon svg path:first-child { fill: var(--lime); stroke: var(--lime); }
+.report-audio-action.active .speech-write-icon svg path:last-child { stroke: var(--navy); }
+.voice-recorder { margin-top: 12px; border: 1px solid #d2dbd2; border-radius: 14px; background: white; padding: 13px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 9px; }
+.voice-recorder>div { grid-column: 1/-1; display: flex; flex-direction: column; gap: 4px; }
+.voice-recorder>div strong { font-size: 17px; }
+.voice-recorder>div small { color: var(--muted); font-size: 13px; }
+.voice-recorder>.report-audio-action { width: 100%; min-width: 0; }
+.voice-recorder button.recording { background: var(--coral); border-color: var(--coral); color: white; }
+.record-action-icon { width: 18px; color: var(--coral); display: inline-grid; place-items: center; flex: 0 0 auto; font-size: 13px; }
+.voice-recorder button.recording .record-action-icon { color: white; }
+.audio-file-button { position: relative; }
+.audio-file-button input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; }
 .provided-control-button>img { display: block; width: 100%; height: auto; object-fit: contain; }
-.voice-actions .recording-time { position: absolute; left: 50%; bottom: -18px; translate: -50% 0; width: max-content; margin: 0; color: var(--coral); font-size: 12px; font-weight: 900; }
 .audio-attachment-list { margin-top: 12px; }
 .audio-attachment-list article { position: relative; min-height: 88px; border: 2px solid #d2dfe2; border-radius: 15px; background: #f4f8f8; padding: 13px 47px 13px 13px; display: grid; grid-template-columns: 62px 1fr; align-items: center; gap: 8px; }
 .audio-attachment-list article>span { width: 38px; height: 38px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; font-size: 20px; font-weight: 900; }
