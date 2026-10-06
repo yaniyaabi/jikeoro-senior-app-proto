@@ -74,6 +74,11 @@ const riskDetails: Record<string, { name: string; help: string; symbol: string }
 };
 
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
+const appIconPath = `${import.meta.env.BASE_URL}icon-v2-192.png`;
+
+function BrandName() {
+  return <>지켜<span className="brand-hanja">路</span></>;
+}
 
 const REWARD_EXCHANGE_MINIMUM = 10_000;
 const REWARD_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd6PApYqiWa-HbE5LyGA8bKAecQshSCMu38oAD6E1xlUOWRVQ/viewform";
@@ -759,8 +764,8 @@ function App() {
   const launchScreen = showLaunch ? (
     <div className="launch-screen" role="status" aria-label="지켜로 앱을 시작합니다">
       <div className="launch-brand">
-        <span className="launch-symbol" aria-hidden="true">路</span>
-        <div className="launch-name"><strong>지켜路</strong><span>JIKEORO</span></div>
+        <img className="launch-symbol" src={appIconPath} alt="" />
+        <div className="launch-name"><strong><BrandName /></strong><span>JIKEORO</span></div>
         <i aria-hidden="true" />
         <p>우리 동네 보행안전 지도</p>
       </div>
@@ -774,7 +779,7 @@ function App() {
         {launchScreen}
         <div className="phone-app auth-phone">
           <main className="app-auth-page">
-            <div className="app-auth-brand"><span>路</span><div><strong>지켜路</strong><small>우리 동네 쉬운 제보</small></div></div>
+            <div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div>
             <section className="app-auth-intro">
               <p>나의 기록을 한곳에서</p>
               <h1>함께 안전한 길을<br />만들어가요.</h1>
@@ -809,8 +814,8 @@ function App() {
       <div className="phone-app">
         <header className="app-header">
           <button className="brand-button" onClick={() => navigate("home")} aria-label="지켜로 홈">
-            <span className="brand-symbol">路</span>
-            <span><strong>지켜路</strong><small>쉬운 제보</small></span>
+            <img className="brand-symbol" src={appIconPath} alt="" />
+            <span><strong><BrandName /></strong><small>쉬운 제보</small></span>
           </button>
           <div className="header-tools">
             <button onClick={speakPage} aria-label={speaking ? "읽어주기 중지" : "현재 화면 전체 읽어주기"}><span>{speaking ? "■" : "♬"}</span> {speaking ? "읽기 중지" : "읽어주기"}</button>
