@@ -541,9 +541,10 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
 @media (max-width: 560px) {
   .app-stage { padding: 0; }
   .phone-app { width: 100%; min-height: 100vh; border-radius: 0; box-shadow: none; }
-  .app-header { height: 86px; padding-left: 14px; padding-right: 12px; }
-  .brand-symbol { width: 47px; height: 47px; font-size: 25px; }
-  .brand-button strong { font-size: 20px; }
+  .app-header { height: 92px; padding-left: 14px; padding-right: 12px; }
+  .brand-symbol { width: 50px; height: 50px; font-size: 27px; }
+  .brand-button strong { font-size: 22px; }
+  .brand-button small { display: block; font-size: 13px; }
   .header-tools button { min-width: 53px; min-height: 49px; font-size: 10px; }
   .app-main { padding: 20px 14px 32px; }
   .hello-card h1 { font-size: 31px; }
@@ -567,7 +568,8 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .report-guide-steps small { font-size: 12px; white-space: normal; word-break: keep-all; }
   .app-header { gap: 7px; padding-left: 10px; padding-right: 8px; }
   .brand-button { gap: 7px; }
-  .brand-button small { display: none; }
+  .brand-button strong { font-size: 21px; }
+  .brand-button small { display: block; font-size: 12px; }
   .header-tools { gap: 4px; }
   .header-tools button { min-width: 47px; padding: 4px 3px; font-size: 9px; }
   .capture-grid { grid-template-columns: 1fr 1fr; }
