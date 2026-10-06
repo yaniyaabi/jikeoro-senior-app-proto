@@ -863,7 +863,7 @@ function App() {
 
               {step === 1 && (
                 <div className="flow-card">
-                  <p className="lead-text">사진이나 영상이 없어도 제보할 수 있습니다.</p>
+                  <p className="lead-text">사진이나 영상을 촬영하거나 기기에 저장된 사진이나 영상을 선택해주세요.</p>
                   <div className="capture-grid">
                     <button type="button" className="capture-button primary-capture" onClick={() => setMediaPickerKind("image")}>
                       <img className="provided-media-icon" src={iconPath("camera.png")} alt="" /><strong>사진 촬영·선택</strong><small>카메라 또는 사진첩</small>
