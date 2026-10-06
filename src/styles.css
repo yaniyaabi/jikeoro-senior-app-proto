@@ -207,6 +207,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .risk-grid button strong { align-self: end; font-size: 19px; }
 .risk-grid button:nth-child(4) strong { font-size: 17px; line-height: 1.15; }
 .risk-grid button small { align-self: start; color: var(--muted); font-size: 12px; line-height: 1.35; }
+.risk-detail-panel { margin-top: 16px; scroll-margin-top: 118px; border: 2px solid #c9d9d0; border-radius: 19px; background: linear-gradient(145deg,#f7fbf3,#edf5e8); padding: 16px 13px 14px; animation: risk-detail-reveal .24s ease-out both; }
+.risk-detail-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin: 0 2px 13px; }
+.risk-detail-heading>div { display: flex; align-items: center; gap: 8px; }
+.risk-detail-heading span { border-radius: 999px; background: var(--navy); color: var(--lime); padding: 5px 9px; font-size: 12px; font-weight: 950; }
+.risk-detail-heading strong { font-size: 18px; letter-spacing: -.03em; }
+.risk-detail-heading p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.35; text-align: right; }
+.risk-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.risk-detail-grid button { position: relative; min-height: 81px; border: 2px solid #d1ddd5; border-radius: 14px; background: rgba(255,255,255,.92); color: var(--ink); padding: 10px 9px; display: grid; grid-template-columns: 35px minmax(0,1fr); align-items: center; gap: 8px; text-align: left; cursor: pointer; box-shadow: 0 3px 0 rgba(16,45,42,.04); transition: border-color .16s,background .16s,transform .16s,box-shadow .16s; }
+.risk-detail-grid button:hover { transform: translateY(-1px); border-color: #9fbaaa; box-shadow: 0 5px 12px rgba(16,45,42,.08); }
+.risk-detail-grid button>i { width: 35px; height: 35px; border-radius: 11px; background: #e6eee4; color: var(--navy); display: grid; place-items: center; font-size: 19px; font-style: normal; font-weight: 950; }
+.risk-detail-grid button>span { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.risk-detail-grid button strong { font-size: 14px; line-height: 1.25; letter-spacing: -.025em; }
+.risk-detail-grid button small { color: var(--muted); font-size: 10px; line-height: 1.3; }
+.risk-detail-grid button>b { position: absolute; right: 7px; top: 7px; width: 19px; height: 19px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; font-size: 11px; opacity: 0; transform: scale(.6); transition: opacity .16s,transform .16s; }
+.risk-detail-grid button.selected { border-color: var(--navy); background: #f2f9e9; box-shadow: 0 4px 0 rgba(16,45,42,.12),0 8px 16px rgba(16,45,42,.08); }
+.risk-detail-grid button.selected>i { background: var(--lime); box-shadow: inset 0 0 0 1px rgba(16,45,42,.08); }
+.risk-detail-grid button.selected>b { opacity: 1; transform: scale(1); }
+@keyframes risk-detail-reveal { from { opacity: 0; transform: translateY(-7px); } to { opacity: 1; transform: translateY(0); } }
 .location-box { margin-top: 20px; padding-top: 20px; border-top: 2px solid #e3eaec; }
 .location-box>p { margin: -5px 0 13px; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .location-button { width: 100%; min-height: 61px; border: 2px solid var(--navy); border-radius: 15px; background: white; color: var(--navy); font-size: 17px; font-weight: 950; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }

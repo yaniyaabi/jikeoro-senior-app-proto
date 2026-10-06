@@ -31,6 +31,47 @@ const riskTypes = [
   { name: "기타", icon: "category-other.png", help: "그 밖의 위험" },
 ];
 
+const riskDetails: Record<string, { name: string; help: string; symbol: string }[]> = {
+  인도: [
+    { name: "턱·단차", help: "높이 차이로 바퀴가 걸려요", symbol: "↕" },
+    { name: "보도 파손", help: "깨지거나 들뜬 곳이 있어요", symbol: "⌁" },
+    { name: "적치물·통행 방해", help: "물건이나 시설물이 길을 막아요", symbol: "▣" },
+    { name: "보도 폭 부족", help: "길이 좁아 지나가기 어려워요", symbol: "↔" },
+    { name: "경사·진입로", help: "경사가 가파르거나 진입이 어려워요", symbol: "∠" },
+    { name: "기타 인도 위험", help: "위 항목에 없는 인도 문제예요", symbol: "+" },
+  ],
+  횡단보도: [
+    { name: "보행 신호 짧음", help: "시간 안에 건너기 어려워요", symbol: "◷" },
+    { name: "신호기 문제", help: "신호등이나 음향신호가 불편해요", symbol: "◉" },
+    { name: "노면표시 흐림", help: "횡단보도 선이 잘 보이지 않아요", symbol: "≡" },
+    { name: "진입부 단차", help: "보도와 도로 사이 턱이 높아요", symbol: "↕" },
+    { name: "시야 방해", help: "차량이나 시설물에 가려져요", symbol: "◐" },
+    { name: "기타 횡단보도 위험", help: "위 항목에 없는 문제예요", symbol: "+" },
+  ],
+  조도: [
+    { name: "가로등 부족", help: "주변에 불빛이 충분하지 않아요", symbol: "☼" },
+    { name: "가로등 고장", help: "불이 꺼지거나 깜빡여요", symbol: "×" },
+    { name: "빛 가림", help: "나무나 시설물이 불빛을 가려요", symbol: "◒" },
+    { name: "눈부심·명암 차이", help: "밝기 차이로 앞이 잘 안 보여요", symbol: "◑" },
+    { name: "기타 조도 문제", help: "위 항목에 없는 밝기 문제예요", symbol: "+" },
+  ],
+  "날씨 관련 위험": [
+    { name: "빗물·배수 불량", help: "물이 고이거나 잘 빠지지 않아요", symbol: "≈" },
+    { name: "눈·결빙", help: "눈이나 얼음 때문에 위험해요", symbol: "✣" },
+    { name: "미끄러운 노면", help: "바닥이 젖어 미끄러워요", symbol: "~" },
+    { name: "침수", help: "물이 차서 지나가기 어려워요", symbol: "≋" },
+    { name: "낙엽·흙", help: "쌓인 낙엽이나 흙 때문에 위험해요", symbol: "⌁" },
+    { name: "기타 날씨 위험", help: "위 항목에 없는 날씨 문제예요", symbol: "+" },
+  ],
+  기타: [
+    { name: "불법 주정차", help: "차량이 보행 공간을 막고 있어요", symbol: "P" },
+    { name: "공사 구간", help: "공사 때문에 이동이 불편해요", symbol: "△" },
+    { name: "계단·난간", help: "계단이나 손잡이가 위험해요", symbol: "⌜" },
+    { name: "안내표지 부족", help: "방향이나 주의 표시가 부족해요", symbol: "!" },
+    { name: "그 밖의 위험", help: "직접 설명이 필요한 문제예요", symbol: "+" },
+  ],
+};
+
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
 
 const quickPhrases = [
@@ -173,6 +214,7 @@ function App() {
   const [step, setStep] = useState(1);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [riskType, setRiskType] = useState("");
+  const [riskDetail, setRiskDetail] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState<LocationPoint | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>(null);
@@ -200,6 +242,7 @@ function App() {
   const imageLibraryRef = useRef<HTMLInputElement>(null);
   const videoCameraRef = useRef<HTMLInputElement>(null);
   const videoLibraryRef = useRef<HTMLInputElement>(null);
+  const riskDetailPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -229,6 +272,17 @@ function App() {
   useEffect(() => {
     attachmentsRef.current = attachments;
   }, [attachments]);
+
+  useEffect(() => {
+    if (!riskType || step !== 2 || view !== "report") return;
+    const frame = window.requestAnimationFrame(() => {
+      riskDetailPanelRef.current?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [riskType, step, view]);
 
   useEffect(() => () => {
     attachmentsRef.current.forEach((item) => URL.revokeObjectURL(item.url));
@@ -384,6 +438,7 @@ function App() {
     attachments.forEach((item) => URL.revokeObjectURL(item.url));
     setAttachments([]);
     setRiskType("");
+    setRiskDetail("");
     setDescription("");
     setLocation(null);
     setLocationMode(null);
@@ -542,6 +597,10 @@ function App() {
         setError("위험의 종류를 하나 선택해주세요.");
         return;
       }
+      if (!riskDetail) {
+        setError("선택한 위험의 세부 유형을 하나 골라주세요.");
+        return;
+      }
       setStep(3);
     } else if (step === 3) {
       if (!location && !place.trim()) {
@@ -562,6 +621,7 @@ function App() {
       id: reportId,
       userId: currentUser!.id,
       riskType,
+      riskDetail,
       description: description.trim() || "현장에서 발견한 위험요소입니다.",
       latitude: location?.latitude ?? null,
       longitude: location?.longitude ?? null,
@@ -766,11 +826,28 @@ function App() {
                     <legend>위험요소 유형</legend>
                     <div className="risk-grid">
                       {riskTypes.map((item) => (
-                        <button type="button" className={riskType === item.name ? "selected" : ""} onClick={() => setRiskType(item.name)} key={item.name}>
+                        <button type="button" className={riskType === item.name ? "selected" : ""} onClick={() => { setRiskType(item.name); setRiskDetail(""); setError(""); }} key={item.name}>
                           <img className="risk-type-icon" src={iconPath(item.icon)} alt="" /><strong>{item.name}</strong><small>{item.help}</small>
                         </button>
                       ))}
                     </div>
+                    {riskType && (
+                      <div className="risk-detail-panel" aria-live="polite" ref={riskDetailPanelRef}>
+                        <div className="risk-detail-heading">
+                          <div><span>{riskType}</span><strong>세부 유형</strong></div>
+                          <p>가장 가까운 항목 하나를 골라주세요.</p>
+                        </div>
+                        <div className="risk-detail-grid">
+                          {riskDetails[riskType].map((item) => (
+                            <button type="button" className={riskDetail === item.name ? "selected" : ""} onClick={() => { setRiskDetail(item.name); setError(""); }} key={item.name}>
+                              <i aria-hidden="true">{item.symbol}</i>
+                              <span><strong>{item.name}</strong><small>{item.help}</small></span>
+                              <b aria-hidden="true">✓</b>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </fieldset>
                   <label className="description-field separated-description">
                     <span>설명</span>
@@ -830,6 +907,7 @@ function App() {
                     <h2>제보내용 확인</h2>
                     <dl>
                       <div><dt>위험유형</dt><dd>{riskType}</dd></div>
+                      <div><dt>세부유형</dt><dd>{riskDetail}</dd></div>
                       <div><dt>위치</dt><dd>{locationMode === "gps" && location ? `지도에서 선택한 위치 (${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)})` : place}</dd></div>
                       <div><dt>첨부</dt><dd>사진 {attachments.filter((item) => item.kind === "image").length} · 영상 {attachments.filter((item) => item.kind === "video").length} · 음성 {attachments.filter((item) => item.kind === "audio").length}</dd></div>
                     </dl>
@@ -864,7 +942,7 @@ function App() {
               <div className="history-list">
                 {reports.map((report) => (
                   <article className="history-card-button" key={report.id} role="button" tabIndex={0} onClick={() => setSelectedReport(report)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedReport(report); }}>
-                    <div className="history-top"><span className="report-type">{report.riskType}</span><time>{formatDate(report.createdAt)}</time></div>
+                    <div className="history-top"><span className="report-type">{report.riskType}{report.riskDetail ? ` · ${report.riskDetail}` : ""}</span><time>{formatDate(report.createdAt)}</time></div>
                     <h2>{report.description}</h2>
                     <p>◎ {report.place}</p>
                     <div className="history-status"><span>{report.status}</span><strong>{statusHelp[report.status]}</strong></div>
@@ -927,7 +1005,7 @@ function App() {
           <div className="app-detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedReport(null)}>
             <section className="app-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="app-detail-title">
               <button className="app-detail-close" type="button" onClick={() => setSelectedReport(null)} aria-label="상세 내용 닫기">×</button>
-              <div className="app-detail-heading"><span className="report-type">{selectedReport.riskType}</span><time>{formatDate(selectedReport.createdAt)}</time><h2 id="app-detail-title">{selectedReport.description}</h2><p>◎ {selectedReport.place}</p></div>
+              <div className="app-detail-heading"><span className="report-type">{selectedReport.riskType}{selectedReport.riskDetail ? ` · ${selectedReport.riskDetail}` : ""}</span><time>{formatDate(selectedReport.createdAt)}</time><h2 id="app-detail-title">{selectedReport.description}</h2><p>◎ {selectedReport.place}</p></div>
               <section className="app-detail-status"><span>{selectedReport.status}</span><strong>{statusHelp[selectedReport.status]}</strong></section>
               <section className="app-detail-media"><h3>첨부한 사진·영상·음성 <b>{selectedReport.mediaCount}</b></h3>
                 {detailMedia.length ? <div>{detailMedia.map((item) => <figure key={item.id}>

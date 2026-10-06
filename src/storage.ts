@@ -12,6 +12,7 @@ export type StoredReport = {
   id: string;
   userId: string;
   riskType: string;
+  riskDetail?: string;
   description: string;
   latitude: number | null;
   longitude: number | null;
