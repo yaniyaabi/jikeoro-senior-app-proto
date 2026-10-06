@@ -1125,7 +1125,7 @@ function App() {
                       <div className="report-main">
                         <div className="report-meta"><span className={`status-chip status-${report.status}`}>{reportStatus[report.status].label}</span><small>{formatDate(report.createdAt)} · {report.riskType}</small></div>
                         <h2>{report.description}</h2>
-                        <p>⌖ {report.place}</p>
+                        <p>{report.place}</p>
                         {Boolean(report.mediaCount) && <span className="report-media-count">사진·영상·음성 {report.mediaCount}개 첨부</span>}
                       </div>
                       <div className="response-box"><small>{reportDepartment(report)} 답변</small><p>{reportResponse(report)}</p></div>
