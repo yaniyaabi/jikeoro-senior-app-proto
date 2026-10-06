@@ -85,9 +85,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .brand-button strong { font-size: 22px; letter-spacing: -.04em; }
 .brand-hanja { font-weight: 1000; -webkit-text-stroke: .35px currentColor; text-shadow: .35px 0 currentColor,-.35px 0 currentColor,0 .35px currentColor,0 -.35px currentColor; }
 .brand-button small { font-size: 13px; color: var(--muted); font-weight: 800; }
-.header-tools { display: flex; gap: 7px; }
-.header-tools button { min-width: 57px; min-height: 53px; border: 1px solid #ccd7ce; border-radius: 12px; background: white; color: var(--ink); font-size: 11px; font-weight: 900; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
-.header-tools span { font-size: 19px; color: var(--coral); }
+.header-tools { display: flex; gap: 8px; }
+.header-tools button { min-width: 64px; min-height: 59px; padding: 5px 6px; border: 1px solid #ccd7ce; border-radius: 14px; background: white; color: var(--ink); font-size: 12px; font-weight: 900; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.header-tools span { font-size: 20px; color: var(--coral); }
 .app-main { padding: 22px 17px 34px; }
 
 .home-main { padding-top: 14px; padding-bottom: 8px; }
@@ -544,7 +544,7 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .brand-symbol { width: 50px; height: 50px; font-size: 27px; }
   .brand-button strong { font-size: 22px; }
   .brand-button small { display: block; font-size: 13px; }
-  .header-tools button { min-width: 53px; min-height: 49px; font-size: 10px; }
+  .header-tools button { min-width: 60px; min-height: 56px; font-size: 11px; }
   .app-main { padding: 20px 14px 32px; }
   .hello-card h1 { font-size: 31px; }
 }
@@ -569,8 +569,8 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .brand-button { gap: 7px; }
   .brand-button strong { font-size: 21px; }
   .brand-button small { display: block; font-size: 12px; }
-  .header-tools { gap: 4px; }
-  .header-tools button { min-width: 47px; padding: 4px 3px; font-size: 9px; }
+  .header-tools { gap: 5px; }
+  .header-tools button { min-width: 54px; min-height: 53px; padding: 4px 3px; font-size: 10px; }
   .capture-grid { grid-template-columns: 1fr 1fr; }
   .capture-button { min-height: 136px; padding: 14px 9px; }
   .capture-button>span { width: 50px; height: 50px; margin-bottom: 10px; font-size: 23px; }
