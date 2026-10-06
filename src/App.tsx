@@ -978,7 +978,7 @@ function App() {
                   {attachments.some((item) => item.kind === "audio") && (
                     <div className="audio-attachment-list" aria-label="녹음한 현장음">
                       {attachments.filter((item) => item.kind === "audio").map((item) => (
-                        <article key={item.id}><img className="audio-preview-label" src={iconPath("record-play.png")} alt="녹음내용 듣기" /><audio src={item.url} controls /><button type="button" onClick={() => removeAttachment(item.id)} aria-label="현장음 삭제">×</button></article>
+                        <article key={item.id}><audio src={item.url} controls /><button type="button" onClick={() => removeAttachment(item.id)} aria-label="현장음 삭제">×</button></article>
                       ))}
                     </div>
                   )}
