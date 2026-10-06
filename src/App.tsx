@@ -5,6 +5,7 @@ import { deleteReport, getReportMedia, getReports, ReportStatus, saveReport, Sto
 
 type View = "home" | "report" | "history" | "rewards";
 type AuthMode = "login" | "signup";
+type ActivityFilter = "all" | "active" | "completed";
 type MediaKind = "image" | "video" | "audio";
 type Attachment = { id: string; kind: MediaKind; file: File; url: string };
 type MediaPreview = StoredMedia & { url: string };
@@ -102,16 +103,14 @@ const reportStatus: Record<ReportStatus, { label: string; defaultResponse: strin
   },
 };
 
+const reportStage: Record<ReportStatus, number> = { received: 1, review: 2, action: 3, completed: 4 };
+
 function reportResponse(report: StoredReport) {
   return report.response?.trim() || reportStatus[report.status].defaultResponse;
 }
 
 function reportDepartment(report: StoredReport) {
-  return report.department?.trim() || "담당 기관 배정 중";
-}
-
-function reportResponseSource(report: StoredReport) {
-  return report.department?.trim() ? `${report.department.trim()} 답변` : "지켜路 접수 안내";
+  return report.department?.trim() || "지켜路 운영팀";
 }
 
 function NavIcon({ name }: { name: "home" | "report" | "history" | "reward" }) {
@@ -236,6 +235,7 @@ function App() {
   const [locationMessage, setLocationMessage] = useState("");
   const [place, setPlace] = useState("");
   const [reports, setReports] = useState<StoredReport[]>([]);
+  const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
   const [selectedReport, setSelectedReport] = useState<StoredReport | null>(null);
   const [detailMedia, setDetailMedia] = useState<MediaPreview[]>([]);
   const [contrast, setContrast] = useState(() => localStorage.getItem("jikeoro-senior-contrast") === "true");
@@ -350,6 +350,11 @@ function App() {
   const rewardExchangeRemaining = Math.max(0, REWARD_EXCHANGE_MINIMUM - participation.points);
   const rewardExchangeProgress = Math.min(100, (participation.points / REWARD_EXCHANGE_MINIMUM) * 100);
   const canExchangeReward = participation.points >= REWARD_EXCHANGE_MINIMUM;
+  const visibleReports = useMemo(() => reports.filter((report) => {
+    if (activityFilter === "completed") return report.status === "completed";
+    if (activityFilter === "active") return report.status !== "completed";
+    return true;
+  }), [activityFilter, reports]);
 
   const pageTitle = useMemo(() => {
     if (view === "report") return step === 1 ? "위험 모습을 남겨주세요" : step === 2 ? "위험한 이유를 알려주세요" : step === 3 ? "위험한 장소를 확인해주세요" : step === 4 ? "제보내용을 확인해주세요" : "제보가 완료됐어요";
@@ -1008,22 +1013,35 @@ function App() {
 
           {view === "history" && (
             <section className="plain-page">
-              <div className="plain-heading"><p>MY REPORTS</p><h1>내가 남긴 기록</h1><span>제보가 어떻게 처리되고 있는지 확인할 수 있습니다.</span></div>
-              <div className="history-list">
-                {reports.map((report) => (
-                  <article className="history-card-button" key={report.id} role="button" tabIndex={0} onClick={() => setSelectedReport(report)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedReport(report); }}>
-                    <div className="history-top"><span className="report-type">{report.riskType}{report.riskDetail ? ` · ${report.riskDetail}` : ""}</span><time>{formatDate(report.createdAt)}</time></div>
-                    <h2>{report.description}</h2>
-                    <p>◎ {report.place}</p>
-                    <section className={`history-response status-${report.status}`} aria-label="현재 처리 현황">
-                      <div className="history-response-heading"><span>{reportStatus[report.status].label}</span><time>최근 업데이트 {formatDate(report.updatedAt)}</time></div>
-                      <strong>{reportDepartment(report)}</strong>
-                      <p>{reportResponse(report)}</p>
-                    </section>
-                    <b className="history-detail-hint">처리 이력·사진 자세히 보기 →</b>
-                  </article>
-                ))}
-                {!reports.length && <div className="empty-history"><span>＋</span><h2>아직 남긴 기록이 없습니다.</h2><p>첫 위험요소를 발견하면 사진이나 말로 간단히 알려주세요.</p></div>}
+              <div className="activity-board">
+                <div className="activity-heading">
+                  <div><p className="activity-eyebrow">MY REPORTS</p><h1>내가 남긴 기록과 대응 현황</h1></div>
+                  <div className="activity-filters" role="group" aria-label="내 기록 상태 필터">
+                    <button className={activityFilter === "all" ? "active" : ""} onClick={() => setActivityFilter("all")}>전체 {reports.length}</button>
+                    <button className={activityFilter === "active" ? "active" : ""} onClick={() => setActivityFilter("active")}>처리 중</button>
+                    <button className={activityFilter === "completed" ? "active" : ""} onClick={() => setActivityFilter("completed")}>완료</button>
+                  </div>
+                </div>
+                <div className="member-report-list" aria-live="polite">
+                  {visibleReports.map((report) => (
+                    <article className="member-report" key={report.id} role="button" tabIndex={0} aria-label={`${report.description} 상세 내용 보기`} onClick={() => setSelectedReport(report)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedReport(report); } }}>
+                      <div className="report-main">
+                        <div className="report-meta"><span className={`status-chip status-${report.status}`}>{reportStatus[report.status].label}</span><small>{formatDate(report.createdAt)} · {report.riskType}</small></div>
+                        <h2>{report.description}</h2>
+                        <p>⌖ {report.place}</p>
+                        {Boolean(report.mediaCount) && <span className="report-media-count">사진·영상·음성 {report.mediaCount}개 첨부</span>}
+                      </div>
+                      <div className="response-box"><small>{reportDepartment(report)} 답변</small><p>{reportResponse(report)}</p></div>
+                      <ol className="status-track" aria-label={`${report.description} 처리 단계`}>
+                        {["접수", "현장 검토", "조치 전달", "개선 완료"].map((label, index) => (
+                          <li className={index < reportStage[report.status] ? "done" : ""} key={label}><i>{index < reportStage[report.status] ? "✓" : index + 1}</i><span>{label}</span></li>
+                        ))}
+                      </ol>
+                      <span className="member-report-open-hint">상세 보기 <b>→</b></span>
+                    </article>
+                  ))}
+                  {!visibleReports.length && <p className="empty-member-reports">아직 해당하는 기록이 없어요.</p>}
+                </div>
               </div>
               <button className="next-button" onClick={openReport}><span>＋</span>새로운 위험 제보하기</button>
             </section>
@@ -1074,37 +1092,40 @@ function App() {
         )}
 
         {selectedReport && (
-          <div className="app-detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedReport(null)}>
-            <section className="app-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="app-detail-title">
-              <button className="app-detail-close" type="button" onClick={() => setSelectedReport(null)} aria-label="상세 내용 닫기">×</button>
-              <div className="app-detail-heading"><span className="report-type">{selectedReport.riskType}{selectedReport.riskDetail ? ` · ${selectedReport.riskDetail}` : ""}</span><time>{formatDate(selectedReport.createdAt)}</time><h2 id="app-detail-title">{selectedReport.description}</h2><p>◎ {selectedReport.place}</p></div>
-              <section className={`app-detail-process status-${selectedReport.status}`} aria-labelledby="app-detail-process-title">
-                <div className="app-detail-process-heading"><div><small>현재 처리 현황</small><h3 id="app-detail-process-title">{reportStatus[selectedReport.status].label}</h3></div><time>{formatDate(selectedReport.updatedAt)} 업데이트</time></div>
-                <div className="app-detail-response"><small>{reportResponseSource(selectedReport)}</small><p>{reportResponse(selectedReport)}</p></div>
-                <ol className="app-detail-timeline" aria-label="처리 업데이트 이력">
-                  {[...selectedReport.statusHistory].reverse().map((update, index) => (
-                    <li key={`${update.createdAt}-${index}`}>
-                      <i aria-hidden="true" />
-                      <div><span>{reportStatus[update.status].label}</span><time>{formatDate(update.createdAt)}</time><p>{update.note}</p>{update.department && <small>{update.department}</small>}</div>
-                    </li>
-                  ))}
-                </ol>
-              </section>
-              <section className="app-detail-media"><h3>첨부한 사진·영상·음성 <b>{selectedReport.mediaCount}</b></h3>
-                {detailMedia.length ? <div>{detailMedia.map((item) => <figure key={item.id}>
-                  {item.kind === "image" && <img src={item.url} alt="첨부한 위험 현장" />}
-                  {item.kind === "video" && <video src={item.url} controls />}
-                  {item.kind === "audio" && <audio src={item.url} controls />}
-                  <figcaption>{item.kind === "image" ? "현장 사진" : item.kind === "video" ? "현장 영상" : "현장음"}</figcaption>
-                </figure>)}</div> : <p>이 기록에는 첨부된 자료가 없습니다.</p>}
-              </section>
-              <dl className="app-detail-facts">
-                <div><dt>위치</dt><dd>{selectedReport.place}<small>{selectedReport.latitude != null && selectedReport.longitude != null ? `${selectedReport.latitude.toFixed(5)}, ${selectedReport.longitude.toFixed(5)}` : "직접 입력한 장소"}</small></dd></div>
-                <div><dt>참여 포인트</dt><dd>100P</dd></div>
-              </dl>
-              <div className="app-detail-actions">
-                <button className="app-detail-delete" type="button" onClick={() => removeReport(selectedReport)}>삭제하기</button>
-                <button className="next-button" type="button" onClick={() => setSelectedReport(null)}>확인했습니다</button>
+          <div className="member-detail-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSelectedReport(null)}>
+            <section className="member-detail-modal" role="dialog" aria-modal="true" aria-labelledby="member-detail-title">
+              <button className="member-detail-close" type="button" onClick={() => setSelectedReport(null)} aria-label="상세 내용 닫기">×</button>
+              <header className="member-detail-heading">
+                <div className="report-meta"><span className={`status-chip status-${selectedReport.status}`}>{reportStatus[selectedReport.status].label}</span><small>{selectedReport.riskType} · {formatDate(selectedReport.createdAt)}</small></div>
+                <h2 id="member-detail-title">{selectedReport.description}</h2>
+                <p>내가 남긴 위험 기록의 내용과 첨부자료를 확인할 수 있어요.</p>
+              </header>
+              <div className="member-detail-grid">
+                <div className="member-detail-main">
+                  <section className="member-detail-section"><h3>제보 내용</h3><p>{selectedReport.description}</p></section>
+                  <section className="member-detail-section">
+                    <div className="member-detail-section-title"><h3>첨부자료</h3><span>{detailMedia.length || selectedReport.mediaCount}개</span></div>
+                    {detailMedia.length ? <div className="member-media-gallery">{detailMedia.map((item, index) => <figure className={`member-media-item media-${item.kind}`} key={item.id}>
+                      {item.kind === "image" && <img src={item.url} alt={`${selectedReport.description} 첨부 사진 ${index + 1}`} />}
+                      {item.kind === "video" && <video src={item.url} controls />}
+                      {item.kind === "audio" && <div className="member-audio-preview"><span>●</span><audio src={item.url} controls /></div>}
+                      <figcaption><b>{item.kind === "image" ? "사진" : item.kind === "video" ? "영상" : "음성"}</b><span>{item.name}</span></figcaption>
+                    </figure>)}</div> : <p className="member-media-message">이 기록에는 첨부자료가 없어요.</p>}
+                  </section>
+                </div>
+                <aside className="member-detail-side">
+                  <dl className="member-detail-facts">
+                    <div><dt>위험유형</dt><dd>{selectedReport.riskType}{selectedReport.riskDetail ? ` · ${selectedReport.riskDetail}` : ""}</dd></div>
+                    <div><dt>위치</dt><dd>{selectedReport.place}</dd></div>
+                    {selectedReport.latitude != null && selectedReport.longitude != null && <div><dt>위치 좌표</dt><dd>{selectedReport.latitude.toFixed(5)}, {selectedReport.longitude.toFixed(5)}</dd></div>}
+                    <div><dt>제보 시각</dt><dd>{formatDate(selectedReport.createdAt)}</dd></div>
+                  </dl>
+                  <div className="member-detail-response"><small>{reportDepartment(selectedReport)} 답변</small><p>{reportResponse(selectedReport)}</p></div>
+                </aside>
+              </div>
+              <div className="member-detail-actions">
+                <button className="member-delete-button" type="button" onClick={() => removeReport(selectedReport)}>기록 삭제</button>
+                <button className="member-detail-done" type="button" onClick={() => setSelectedReport(null)}>확인</button>
               </div>
             </section>
           </div>
