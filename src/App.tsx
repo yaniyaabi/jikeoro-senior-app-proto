@@ -1212,8 +1212,9 @@ function App() {
                 <aside className="member-detail-side">
                   <dl className="member-detail-facts">
                     <div><dt>위험유형</dt><dd>{selectedReport.riskType}{selectedReport.riskDetail ? ` · ${selectedReport.riskDetail}` : ""}</dd></div>
-                    <div><dt>위치</dt><dd>{selectedReport.place}</dd></div>
-                    {selectedReport.latitude != null && selectedReport.longitude != null && <div><dt>위치 좌표</dt><dd>{selectedReport.latitude.toFixed(5)}, {selectedReport.longitude.toFixed(5)}</dd></div>}
+                    {selectedReport.latitude != null && selectedReport.longitude != null
+                      ? <div><dt>위치 좌표</dt><dd>{selectedReport.latitude.toFixed(5)}, {selectedReport.longitude.toFixed(5)}</dd></div>
+                      : <div><dt>위치</dt><dd>{selectedReport.place}</dd></div>}
                     <div><dt>제보 시각</dt><dd>{formatDate(selectedReport.createdAt)}</dd></div>
                   </dl>
                   <div className="member-detail-response"><small>{reportDepartment(selectedReport)} 답변</small><p>{reportResponse(selectedReport)}</p></div>
