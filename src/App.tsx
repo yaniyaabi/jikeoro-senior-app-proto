@@ -2,6 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "re
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, readPrototypeSession, registerPrototypeAccount } from "./auth";
 import { deleteReport, getReportMedia, getReports, ReportStatus, saveReport, StoredMedia, StoredReport } from "./storage";
+import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
 
 type View = "home" | "report" | "history" | "rewards";
 type AuthMode = "login" | "signup";
@@ -78,15 +79,6 @@ const appIconPath = `${import.meta.env.BASE_URL}icon-v2-192.png`;
 function BrandName() {
   return <>지켜<span className="brand-hanja">路</span></>;
 }
-
-const REWARD_EXCHANGE_MINIMUM = 10_000;
-const REWARD_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSd6PApYqiWa-HbE5LyGA8bKAecQshSCMu38oAD6E1xlUOWRVQ/viewform";
-const REWARD_FORM_ENTRIES = {
-  name: "entry.1605426205",
-  email: "entry.1819571806",
-  phone: "entry.1254984587",
-  points: "entry.103413830",
-};
 
 const reportStatus: Record<ReportStatus, { label: string; defaultResponse: string }> = {
   received: {
@@ -269,6 +261,8 @@ function App() {
   const [rewardFormOpen, setRewardFormOpen] = useState(false);
   const [rewardPhone, setRewardPhone] = useState("");
   const [rewardFormError, setRewardFormError] = useState("");
+  const [rewardRequests, setRewardRequests] = useState<RewardRequest[]>([]);
+  const [rewardRequestNotice, setRewardRequestNotice] = useState("");
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -365,11 +359,21 @@ function App() {
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [rewardFormOpen]);
 
+  useEffect(() => {
+    const refresh = () => setRewardRequests(readRewardRequests());
+    refresh();
+    window.addEventListener("storage", refresh);
+    return () => window.removeEventListener("storage", refresh);
+  }, []);
+
   const participation = useMemo(() => calculateParticipation(reports), [reports]);
   const progress = Math.min(100, (participation.missionProgress / 3) * 100);
-  const rewardExchangeRemaining = Math.max(0, REWARD_EXCHANGE_MINIMUM - participation.points);
-  const rewardExchangeProgress = Math.min(100, (participation.points / REWARD_EXCHANGE_MINIMUM) * 100);
-  const canExchangeReward = participation.points >= REWARD_EXCHANGE_MINIMUM;
+  const myRewardRequests = currentUser ? rewardRequests.filter((request) => request.email.toLowerCase() === currentUser.email.toLowerCase()) : [];
+  const pendingRewardRequest = myRewardRequests.find((request) => request.status === "pending");
+  const rewardAvailablePoints = Math.max(0, participation.points - myRewardRequests.length * REWARD_EXCHANGE_MINIMUM);
+  const rewardExchangeRemaining = Math.max(0, REWARD_EXCHANGE_MINIMUM - rewardAvailablePoints);
+  const rewardExchangeProgress = Math.min(100, (rewardAvailablePoints / REWARD_EXCHANGE_MINIMUM) * 100);
+  const canExchangeReward = rewardAvailablePoints >= REWARD_EXCHANGE_MINIMUM && !pendingRewardRequest;
   const visibleReports = useMemo(() => reports.filter((report) => {
     if (activityFilter === "completed") return report.status === "completed";
     if (activityFilter === "active") return report.status !== "completed";
@@ -437,8 +441,10 @@ function App() {
   };
 
   const openRewardForm = () => {
+    if (pendingRewardRequest) return;
     setRewardPhone(localStorage.getItem("jikeoro-reward-phone") ?? "");
     setRewardFormError("");
+    setRewardRequestNotice("");
     setRewardFormOpen(true);
   };
 
@@ -450,18 +456,28 @@ function App() {
       setRewardFormError("휴대전화 번호를 정확히 입력해주세요.");
       return;
     }
-    if (REWARD_FORM_URL.includes("FORM_ID")) {
-      setRewardFormError("신청 양식을 연결하는 중입니다. 잠시 후 다시 시도해주세요.");
+    if (participation.points - myRewardRequests.length * REWARD_EXCHANGE_MINIMUM < REWARD_EXCHANGE_MINIMUM) {
+      setRewardFormError("교환 가능한 마일리지를 다시 확인해주세요.");
       return;
     }
+    const nextRequest: RewardRequest = {
+      id: `reward-${crypto.randomUUID()}`,
+      applicantId: currentUser.id,
+      name: currentUser.name,
+      email: currentUser.email,
+      phone: normalizedPhone,
+      points: participation.points,
+      exchangePoints: REWARD_EXCHANGE_MINIMUM,
+      source: "app",
+      status: "pending",
+      requestedAt: new Date().toISOString(),
+      sentAt: null,
+    };
+    const nextRequests = [nextRequest, ...readRewardRequests()];
+    writeRewardRequests(nextRequests);
+    setRewardRequests(nextRequests);
     localStorage.setItem("jikeoro-reward-phone", rewardPhone.trim());
-    const formUrl = new URL(REWARD_FORM_URL);
-    formUrl.searchParams.set("usp", "pp_url");
-    formUrl.searchParams.set(REWARD_FORM_ENTRIES.name, currentUser.name);
-    formUrl.searchParams.set(REWARD_FORM_ENTRIES.email, currentUser.email);
-    formUrl.searchParams.set(REWARD_FORM_ENTRIES.phone, rewardPhone.trim());
-    formUrl.searchParams.set(REWARD_FORM_ENTRIES.points, `${participation.points}P`);
-    window.open(formUrl.toString(), "_blank", "noopener,noreferrer");
+    setRewardRequestNotice("상품권 교환 신청이 접수됐어요. 담당자가 확인 후 휴대전화로 발송합니다.");
     setRewardFormOpen(false);
   };
 
@@ -1096,14 +1112,15 @@ function App() {
                 <p>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</p>
               </article>
               <article className="app-reward-exchange" aria-labelledby="app-reward-title">
-                <div className="app-reward-label"><span>마일리지 사용</span><b>교환 준비 중</b></div>
+                <div className="app-reward-label"><span>마일리지 사용</span><b>{pendingRewardRequest ? "접수 완료" : "교환 신청"}</b></div>
                 <h2 id="app-reward-title">모은 마일리지를<br />상품권으로 바꿔요.</h2>
-                <p>10,000P부터 온누리상품권 등 지역상품권으로 교환할 수 있도록 준비하고 있어요.</p>
-                <div className="app-voucher-preview"><i><img src={`${import.meta.env.BASE_URL}onnuri-logo-3d.png`} alt="디지털 온누리상품권" /></i><div><small>디지털 온누리상품권</small><strong>10,000P부터</strong></div></div>
+                <p>500P를 모으면 디지털 온누리상품권 교환을 신청할 수 있어요.</p>
+                <div className="app-voucher-preview"><i><img src={`${import.meta.env.BASE_URL}onnuri-logo-3d.png`} alt="디지털 온누리상품권" /></i><div><small>디지털 온누리상품권</small><strong>500P</strong></div></div>
                 <div className="app-reward-progress" aria-label={`상품권 교환까지 ${Math.round(rewardExchangeProgress)}%`}><span style={{ width: `${rewardExchangeProgress}%` }} /></div>
-                <div className="app-reward-status"><span>현재 {participation.points.toLocaleString()}P</span><strong>{canExchangeReward ? "교환 가능" : `${rewardExchangeRemaining.toLocaleString()}P 남음`}</strong></div>
-                <button type="button" disabled={!canExchangeReward} onClick={openRewardForm}>{canExchangeReward ? "상품권 교환 신청하기" : "10,000P부터 신청할 수 있어요"}</button>
-                <small>신청서 접수시, 담당자가 확인 후 휴대전화로 상품권을 발송합니다.</small>
+                <div className="app-reward-status"><span>사용 가능 {rewardAvailablePoints.toLocaleString()}P</span><strong>{pendingRewardRequest ? "관리자 확인 중" : canExchangeReward ? "교환 가능" : `${rewardExchangeRemaining.toLocaleString()}P 남음`}</strong></div>
+                <button type="button" disabled={!canExchangeReward} onClick={openRewardForm}>{pendingRewardRequest ? "신청 접수 완료" : canExchangeReward ? "상품권 교환 신청하기" : "500P부터 신청할 수 있어요"}</button>
+                {rewardRequestNotice && <p className="app-reward-request-notice" role="status">{rewardRequestNotice}</p>}
+                <small>신청서 접수 시, 담당자가 확인 후 휴대전화로 상품권을 발송합니다.</small>
               </article>
             </section>
           )}
@@ -1114,16 +1131,16 @@ function App() {
             <section className="app-reward-form-sheet" role="dialog" aria-modal="true" aria-labelledby="app-reward-form-title">
               <button className="app-reward-form-close" type="button" onClick={() => setRewardFormOpen(false)} aria-label="교환 신청 닫기">×</button>
               <img className="app-reward-form-logo" src={`${import.meta.env.BASE_URL}onnuri-logo-3d.png`} alt="디지털 온누리상품권" />
-              <p>10,000P REWARD</p>
+              <p>500P REWARD</p>
               <h2 id="app-reward-form-title">상품권 교환을 신청할까요?</h2>
-              <span>회원 정보와 연락처가 입력된 Google Form이 열립니다. 내용을 확인해 제출하면 담당자가 확인 후 휴대전화로 보내드려요.</span>
+              <span>휴대전화 번호를 입력하면 관리자 콘솔에 교환 신청이 바로 접수됩니다.</span>
               <form onSubmit={submitRewardForm}>
                 <div className="app-reward-applicant"><span><small>이름</small><strong>{currentUser.name}</strong></span><span><small>이메일</small><strong>{currentUser.email}</strong></span></div>
                 <label><span>상품권 받을 휴대전화 번호</span><input type="tel" inputMode="tel" autoComplete="tel" value={rewardPhone} onChange={(event) => { setRewardPhone(event.target.value); setRewardFormError(""); }} placeholder="010-1234-5678" /></label>
                 {rewardFormError && <p className="app-reward-form-error" role="alert">{rewardFormError}</p>}
-                <button type="submit">Google Form에서 신청 계속하기 <b>→</b></button>
+                <button type="submit">상품권 교환 신청하기 <b>→</b></button>
               </form>
-              <small>Google Form 제출 전까지 포인트는 차감되지 않습니다.</small>
+              <small>신청하면 교환 마일리지 500P가 사용 처리됩니다.</small>
             </section>
           </div>
         )}
