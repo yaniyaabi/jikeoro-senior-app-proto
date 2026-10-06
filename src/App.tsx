@@ -889,12 +889,12 @@ function App() {
                         <p>원하는 방법을 하나 골라주세요.</p>
                         <div className="media-source-actions">
                           <button type="button" onClick={() => openNativeMediaPicker(mediaPickerKind === "image" ? "image-camera" : "video-camera")}>
-                            <span aria-hidden="true">{mediaPickerKind === "image" ? "📷" : "●"}</span>
+                            <img className="media-source-action-icon" src={iconPath("source-capture.png")} alt="" />
                             <strong>지금 촬영</strong>
                             <small>카메라 열기</small>
                           </button>
                           <button type="button" onClick={() => openNativeMediaPicker(mediaPickerKind === "image" ? "image-library" : "video-library")}>
-                            <span aria-hidden="true">▧</span>
+                            <img className="media-source-action-icon" src={iconPath("source-library.png")} alt="" />
                             <strong>{mediaPickerKind === "image" ? "사진첩에서 선택" : "보관함에서 선택"}</strong>
                             <small>저장된 {mediaPickerKind === "image" ? "사진" : "영상"} 가져오기</small>
                           </button>
