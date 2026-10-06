@@ -124,6 +124,22 @@ function NavIcon({ name }: { name: "home" | "report" | "history" | "reward" }) {
   );
 }
 
+function LocationPinIcon() {
+  return (
+    <span className="location-action-icon current-location-icon" aria-hidden="true">
+      <svg viewBox="0 0 28 36"><path d="M14 1.5C7.1 1.5 1.5 7.1 1.5 14c0 9.5 12.5 20.5 12.5 20.5S26.5 23.5 26.5 14C26.5 7.1 20.9 1.5 14 1.5Z"/><circle cx="14" cy="13.5" r="5.8"/></svg>
+    </span>
+  );
+}
+
+function ManualInputIcon() {
+  return (
+    <span className="location-action-icon manual-location-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 24"><rect x="1" y="3" width="30" height="18" rx="3"/><path d="M6 8h2m3 0h2m3 0h2m3 0h2m3 0h1M6 12h2m3 0h2m3 0h2m3 0h2m3 0h1M7 16h18"/></svg>
+    </span>
+  );
+}
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }
@@ -972,8 +988,8 @@ function App() {
                     <legend>위치</legend>
                     <p className="location-guide">GPS 지도의 핀을 맞추거나 알고 있는 장소를 직접 적어주세요.</p>
                     <div className="location-methods">
-                      <button type="button" className={`provided-control-button${locationMode === "gps" ? " selected" : ""}`} onClick={requestLocation} aria-label="현재 위치 사용"><img src={iconPath(locationMode === "gps" ? "location-current-dark.png" : "location-current-light.png")} alt="" /></button>
-                      <button type="button" className={`provided-control-button${locationMode === "manual" ? " selected" : ""}`} onClick={() => { setLocationMode("manual"); setLocation(null); setLocationMessage(""); }} aria-label="직접 입력"><img src={iconPath(locationMode === "manual" ? "location-manual-dark.png" : "location-manual-light.png")} alt="" /></button>
+                      <button type="button" className={locationMode === "gps" ? "selected" : ""} onClick={requestLocation} aria-pressed={locationMode === "gps"}><LocationPinIcon /><strong>현재 위치 사용</strong></button>
+                      <button type="button" className={locationMode === "manual" ? "selected" : ""} onClick={() => { setLocationMode("manual"); setLocation(null); setLocationMessage(""); }} aria-pressed={locationMode === "manual"}><ManualInputIcon /><strong>직접 입력</strong></button>
                     </div>
                     {locationMode === "gps" && !location && locationMessage && <p className="location-message">{locationMessage}</p>}
                     {locationMode === "gps" && location && (
