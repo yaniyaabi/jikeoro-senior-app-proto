@@ -777,7 +777,7 @@ function App() {
       userId: currentUser!.id,
       riskType,
       riskDetail,
-      description: description.trim() || "현장에서 발견한 위험요소입니다.",
+      description: description.trim(),
       latitude: location?.latitude ?? null,
       longitude: location?.longitude ?? null,
       accuracy: location?.accuracy ?? null,

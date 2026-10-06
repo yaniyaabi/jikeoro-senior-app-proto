@@ -81,6 +81,7 @@ function normalizeReport(report: StoredReport & Record<string, unknown>): Stored
 
   return {
     ...report,
+    description: report.description === "현장에서 발견한 위험요소입니다." ? "" : report.description,
     riskType: normalizeRiskType(report.riskType),
     status,
     updatedAt,
