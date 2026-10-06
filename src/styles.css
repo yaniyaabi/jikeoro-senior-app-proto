@@ -270,13 +270,14 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .location-fieldset legend { margin-bottom: 8px; font-size: 21px; font-weight: 950; }
 .location-guide { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.55; }
 .location-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-.location-methods button { min-height: 64px; border: 2px solid #c8d7dc; border-radius: 13px; background: #f8fbf6; color: var(--ink); padding: 10px 8px; display: flex; align-items: center; justify-content: center; gap: 9px; cursor: pointer; }
+.location-methods button { width: 100%; min-width: 0; min-height: 64px; box-sizing: border-box; border: 2px solid #c8d7dc; border-radius: 13px; background: #f8fbf6; color: var(--ink); padding: 10px 8px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+.location-methods button:first-child { gap: 6px; }
 .location-methods button.selected { border-color: var(--navy); background: var(--navy); color: white; }
-.location-methods button strong { font-size: 17px; font-weight: 950; white-space: nowrap; }
+.location-methods button strong { width: 108px; font-size: 17px; font-weight: 950; white-space: nowrap; text-align: left; }
 .location-action-icon { width: 30px; height: 30px; display: inline-grid; place-items: center; padding: 0; flex: 0 0 auto; }
 .location-action-icon svg { display: block; overflow: visible; }
 .current-location-icon { color: var(--coral); }
-.current-location-icon svg { width: 24px; height: 30px; }
+.current-location-icon svg { width: 30px; height: 30px; }
 .current-location-icon svg path { fill: currentColor; }
 .current-location-icon svg circle { fill: white; }
 .manual-location-icon { color: #587269; }
@@ -573,6 +574,8 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .capture-button>span { width: 50px; height: 50px; margin-bottom: 10px; font-size: 23px; }
   .capture-button strong { font-size: 16px; }
   .capture-button small { font-size: 11px; }
+  .location-methods button { gap: 6px; padding-left: 5px; padding-right: 5px; }
+  .location-methods button strong { width: auto; font-size: 15px; }
 }
 
 @media (max-width: 320px) {
