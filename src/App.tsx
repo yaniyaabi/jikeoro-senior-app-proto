@@ -840,7 +840,6 @@ function App() {
                         <div className="risk-detail-grid">
                           {riskDetails[riskType].map((item) => (
                             <button type="button" className={riskDetail === item.name ? "selected" : ""} onClick={() => { setRiskDetail(item.name); setError(""); }} key={item.name}>
-                              <i aria-hidden="true">{item.symbol}</i>
                               <span><strong>{item.name}</strong><small>{item.help}</small></span>
                               <b aria-hidden="true">✓</b>
                             </button>
