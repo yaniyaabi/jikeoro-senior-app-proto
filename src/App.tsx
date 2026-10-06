@@ -110,6 +110,10 @@ function reportDepartment(report: StoredReport) {
   return report.department?.trim() || "지켜路 운영팀";
 }
 
+function reportTitle(report: Pick<StoredReport, "description" | "riskType">) {
+  return report.description.trim() || `${report.riskType} 위험요소를 발견했어요`;
+}
+
 function NavIcon({ name }: { name: "home" | "report" | "history" | "reward" }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -777,7 +781,7 @@ function App() {
       userId: currentUser!.id,
       riskType,
       riskDetail,
-      description: description.trim(),
+      description: description.trim() || `${riskType} 위험요소를 발견했어요`,
       latitude: location?.latitude ?? null,
       longitude: location?.longitude ?? null,
       accuracy: location?.accuracy ?? null,
@@ -1121,15 +1125,15 @@ function App() {
                 </div>
                 <div className="member-report-list" aria-live="polite">
                   {visibleReports.map((report) => (
-                    <article className="member-report" key={report.id} role="button" tabIndex={0} aria-label={`${report.description} 상세 내용 보기`} onClick={() => setSelectedReport(report)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedReport(report); } }}>
+                    <article className="member-report" key={report.id} role="button" tabIndex={0} aria-label={`${reportTitle(report)} 상세 내용 보기`} onClick={() => setSelectedReport(report)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedReport(report); } }}>
                       <div className="report-main">
                         <div className="report-meta"><span className={`status-chip status-${report.status}`}>{reportStatus[report.status].label}</span><small>{formatDate(report.createdAt)} · {report.riskType}</small></div>
-                        <h2>{report.description}</h2>
+                        <h2>{reportTitle(report)}</h2>
                         <p>{report.place}</p>
                         {Boolean(report.mediaCount) && <span className="report-media-count">사진·영상·음성 {report.mediaCount}개 첨부</span>}
                       </div>
                       <div className="response-box"><small>{reportDepartment(report)} 답변</small><p>{reportResponse(report)}</p></div>
-                      <ol className="status-track" aria-label={`${report.description} 처리 단계`}>
+                      <ol className="status-track" aria-label={`${reportTitle(report)} 처리 단계`}>
                         {["접수", "현장 검토", "조치 전달", "개선 완료"].map((label, index) => (
                           <li className={index < reportStage[report.status] ? "done" : ""} key={label}><i>{index < reportStage[report.status] ? "✓" : index + 1}</i><span>{label}</span></li>
                         ))}
@@ -1193,16 +1197,16 @@ function App() {
               <button className="member-detail-close" type="button" onClick={() => setSelectedReport(null)} aria-label="상세 내용 닫기">×</button>
               <header className="member-detail-heading">
                 <div className="report-meta"><span className={`status-chip status-${selectedReport.status}`}>{reportStatus[selectedReport.status].label}</span><small>{selectedReport.riskType} · {formatDate(selectedReport.createdAt)}</small></div>
-                <h2 id="member-detail-title">{selectedReport.description}</h2>
+                <h2 id="member-detail-title">{reportTitle(selectedReport)}</h2>
                 <p>내가 남긴 위험 기록의 내용과 첨부자료를 확인할 수 있어요.</p>
               </header>
               <div className="member-detail-grid">
                 <div className="member-detail-main">
-                  <section className="member-detail-section"><h3>제보 내용</h3><p>{selectedReport.description}</p></section>
+                  <section className="member-detail-section"><h3>제보 내용</h3><p>{reportTitle(selectedReport)}</p></section>
                   <section className="member-detail-section">
                     <div className="member-detail-section-title"><h3>첨부자료</h3><span>{detailMedia.length || selectedReport.mediaCount}개</span></div>
                     {detailMedia.length ? <div className="member-media-gallery">{detailMedia.map((item, index) => <figure className={`member-media-item media-${item.kind}`} key={item.id}>
-                      {item.kind === "image" && <img src={item.url} alt={`${selectedReport.description} 첨부 사진 ${index + 1}`} />}
+                      {item.kind === "image" && <img src={item.url} alt={`${reportTitle(selectedReport)} 첨부 사진 ${index + 1}`} />}
                       {item.kind === "video" && <video src={item.url} controls />}
                       {item.kind === "audio" && <div className="member-audio-preview"><span>●</span><audio src={item.url} controls /></div>}
                       <figcaption><b>{item.kind === "image" ? "사진" : item.kind === "video" ? "영상" : "음성"}</b><span>{item.name}</span></figcaption>
