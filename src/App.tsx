@@ -1105,7 +1105,6 @@ function App() {
                 <button type="button" disabled={!canExchangeReward} onClick={openRewardForm}>{canExchangeReward ? "상품권 교환 신청하기" : "10,000P부터 신청할 수 있어요"}</button>
                 <small>신청서를 보내면 담당자가 확인한 뒤 입력한 휴대전화로 상품권을 발송합니다.</small>
               </article>
-              <p className="prototype-note">현재 버전은 기능 시연용입니다. 제보와 파일은 이 기기의 브라우저에만 저장됩니다.</p>
             </section>
           )}
         </main>
