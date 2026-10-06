@@ -252,9 +252,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .audio-preview-label { width: 58px; height: auto; display: block; object-fit: contain; }
 .audio-attachment-list audio { width: 100%; min-width: 0; height: 38px; }
 .audio-attachment-list button { position: absolute; right: 8px; top: 23px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #dce6e7; color: var(--navy); font-size: 22px; cursor: pointer; }
-.quick-phrases { margin-top: 17px; display: flex; flex-wrap: wrap; gap: 7px; }
-.quick-phrases>span { width: 100%; font-size: 14px; font-weight: 900; }
-.quick-phrases button { border: 1px solid #b9cbd0; border-radius: 999px; background: white; color: var(--navy); padding: 9px 11px; font-size: 13px; font-weight: 850; cursor: pointer; }
 .location-fieldset { border: 0; padding: 0; margin: 0; }
 .location-fieldset legend { margin-bottom: 8px; font-size: 21px; font-weight: 950; }
 .location-guide { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.55; }
