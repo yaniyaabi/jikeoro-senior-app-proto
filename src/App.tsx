@@ -806,7 +806,7 @@ function App() {
                       ))}
                     </div>
                   )}
-                  <p className="media-privacy">얼굴과 차량번호가 보이면 제출 전에 확인해주세요. 첨부자료는 이 기기에 저장됩니다.</p>
+                  <p className="media-privacy">얼굴과 차량번호가 보이면 제출 전에 확인해주세요.</p>
                   <button className="next-button" onClick={goNext}>{attachments.length ? "선택한 자료와 계속하기" : "자료 없이 계속하기"}<span>→</span></button>
                 </div>
               )}
