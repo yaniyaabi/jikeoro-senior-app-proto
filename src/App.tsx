@@ -109,9 +109,9 @@ const onboardingSlides: { eyebrow: string; title: [string, string]; description:
     kind: "location",
   },
   {
-    eyebrow: "권한 안내",
-    title: ["필요한 기능만", "직접 허용해주세요."],
-    description: "허용 여부는 나중에 휴대전화 설정에서 언제든 바꿀 수 있어요.",
+    eyebrow: "함께 시작해요",
+    title: ["우리 동네를", "함께 지켜요."],
+    description: "제보에 필요한 기능만 직접 허용해주세요. 나중에 휴대전화 설정에서 바꿀 수 있어요.",
     kind: "permissions",
   },
 ];
@@ -1110,7 +1110,7 @@ function App() {
         <div className="onboarding-actions">
           {onboardingStep > 0 && <button className="onboarding-back" type="button" onClick={() => moveOnboarding(-1)}>이전</button>}
           <button className="onboarding-next" type="button" onClick={onboardingStep === onboardingSlides.length - 1 ? finishOnboarding : () => moveOnboarding(1)}>
-            {onboardingStep === onboardingSlides.length - 1 ? "지켜로 시작하기" : "다음"}<span aria-hidden="true">→</span>
+            {onboardingStep === onboardingSlides.length - 1 ? "함께 시작하기" : "다음"}<span aria-hidden="true">→</span>
           </button>
         </div>
       </section>
