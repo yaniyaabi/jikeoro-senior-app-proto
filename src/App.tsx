@@ -14,7 +14,7 @@ type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
-type OnboardingArtworkKind = "welcome" | "readability" | "report" | "location" | "progress" | "permissions";
+type OnboardingArtworkKind = "welcome" | "report" | "location" | "progress" | "permissions";
 type TextSize = "normal" | "large";
 type PermissionStatus = "idle" | "requesting" | "granted" | "denied" | "unsupported";
 
@@ -97,12 +97,6 @@ const onboardingSlides: { eyebrow: string; title: [string, string]; description:
     kind: "welcome",
   },
   {
-    eyebrow: "보기 편하게",
-    title: ["내게 편한 화면으로", "맞춰서 시작하세요."],
-    description: "글자 크기와 화면 대비를 바로 비교하고 선택할 수 있어요.",
-    kind: "readability",
-  },
-  {
     eyebrow: "간편한 제보",
     title: ["사진이 없어도", "제보할 수 있어요."],
     description: "사진이나 영상을 남기고 위험유형을 고르세요. 자료 없이 바로 시작해도 괜찮아요.",
@@ -175,16 +169,6 @@ function OnboardingArtwork({ kind }: { kind: OnboardingArtworkKind }) {
           <circle className="art-alert" cx="72" cy="194" r="34" />
           <path className="art-alert-mark" d="M72 176v24m0 10h.1" />
           <path className="art-add" d="M216 32v28m-14-14h28" />
-        </svg>
-      )}
-      {kind === "readability" && (
-        <svg viewBox="0 0 280 250">
-          <rect className="art-readability-card" x="36" y="43" width="94" height="164" rx="22" />
-          <rect className="art-readability-card selected" x="150" y="28" width="98" height="194" rx="22" />
-          <circle className="art-readability-dot" cx="83" cy="78" r="18" />
-          <circle className="art-readability-dot selected" cx="199" cy="66" r="22" />
-          <path className="art-readability-line" d="M57 119h52m-52 19h43m-43 19h50m108-43h-55m55 23h-44m44 23h-55" />
-          <path className="art-check-small" d="m188 199 8 8 17-20" />
         </svg>
       )}
       {kind === "location" && (
@@ -1074,20 +1058,6 @@ function App() {
           <span>{activeOnboardingSlide.eyebrow}</span>
           <h1 id="onboarding-title">{activeOnboardingSlide.title[0]}<br />{activeOnboardingSlide.title[1]}</h1>
           <p>{activeOnboardingSlide.description}</p>
-          {activeOnboardingSlide.kind === "readability" && (
-            <div className="onboarding-readability-controls">
-              <fieldset>
-                <legend>글자 크기</legend>
-                <button type="button" className={textSize === "normal" ? "active" : ""} onClick={() => setTextSize("normal")}><b>가</b> 기본 글씨</button>
-                <button type="button" className={textSize === "large" ? "active" : ""} onClick={() => setTextSize("large")}><b className="large">가</b> 큰 글씨</button>
-              </fieldset>
-              <fieldset>
-                <legend>화면 대비</legend>
-                <button type="button" className={!contrast ? "active" : ""} onClick={() => setContrast(false)}><i className="normal-view" /> 기본 화면</button>
-                <button type="button" className={contrast ? "active" : ""} onClick={() => setContrast(true)}><i className="contrast-view" /> 고대비</button>
-              </fieldset>
-            </div>
-          )}
           {activeOnboardingSlide.kind === "permissions" && (
             <div className="onboarding-permissions">
               <article>
