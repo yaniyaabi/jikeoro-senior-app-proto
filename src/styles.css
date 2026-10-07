@@ -753,7 +753,7 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .home-feature-report .home-feature-label { left:23px; top:22px; }
 .home-feature-history .home-feature-label,.home-feature-rewards .home-feature-label { display:none; }
 .home-feature-icon { position:absolute; z-index:2; right:14px; top:10px; width:92px; height:92px; display:grid; place-items:center; color:var(--ink); filter:drop-shadow(0 10px 10px rgba(16,45,42,.17)); }
-.home-feature-history .home-feature-icon,.home-feature-rewards .home-feature-icon { left:50%; right:auto; transform:translateX(-50%); }
+.home-feature-history .home-feature-icon,.home-feature-rewards .home-feature-icon { left:auto; right:10px; transform:none; }
 .home-feature-icon svg { width:42px; height:42px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .home-feature-icon img { width:100%; height:100%; object-fit:contain; display:block; }
 .home-feature-card>strong { position:absolute; z-index:2; left:20px; right:18px; bottom:49px; font-size:calc(24px + var(--text-bump)); line-height:1.12; letter-spacing:-.045em; }
