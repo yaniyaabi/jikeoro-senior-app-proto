@@ -1423,7 +1423,10 @@ function App() {
           {view === "rewards" && (
             <section className="plain-page rewards-page">
               <div className="plain-heading"><p>TOGETHER</p><h1>참여와 마일리지</h1><span>작은 기록이 안전한 동네를 만듭니다.</span></div>
-              <div className="total-points"><span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><p>전체 제보 {reports.length}건 · 개선 완료 {participation.completedCount}건</p></div>
+              <div className="total-points">
+                <img className="mileage-mascot" src={`${import.meta.env.BASE_URL}splash-mascot-3d.png`} alt="" />
+                <span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><p>전체 제보 {reports.length}건 · 개선 완료 {participation.completedCount}건</p>
+              </div>
               <article className="large-mission">
                 <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
                 <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
