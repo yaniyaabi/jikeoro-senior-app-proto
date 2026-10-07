@@ -814,16 +814,22 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .member-report:last-child { border:0; }
 .empty-member-reports { border-radius:24px; background:white; padding:32px 20px; text-align:center; box-shadow:var(--soft-shadow); }
 
-.total-points { min-height:164px; border-radius:29px; background:var(--tile-blue); color:var(--ink); padding:23px; box-shadow:var(--soft-shadow); }
-.total-points span { color:#244c69; }
-.total-points strong { color:var(--ink); }
-.large-mission { min-height:226px; border:0; border-radius:29px; background:var(--tile-green); padding:23px; box-shadow:var(--soft-shadow); }
-.large-mission>div:first-child,.large-mission>p { color:#294f31; }
-.large-mission .progress-track { background:rgba(255,255,255,.58); }
-.large-mission .progress-track span { background:var(--navy); }
-.app-reward-exchange { border:0; border-radius:29px; background:#e5f2dc; padding:23px; box-shadow:var(--soft-shadow); }
-.app-reward-exchange::after { background:rgba(255,255,255,.28); border:0; }
-.app-reward-exchange>p,.app-reward-exchange>small { color:#594d21; }
+.total-points { min-height:164px; border-radius:29px; background:var(--navy); color:#fff; padding:23px; box-shadow:var(--soft-shadow); }
+.total-points span { color:#c8d8d3; }
+.total-points strong { color:var(--lime); }
+.large-mission { min-height:226px; border:1px solid var(--line); border-radius:29px; background:#eef3ed; padding:23px; box-shadow:var(--soft-shadow); }
+.large-mission>div:first-child,.large-mission>p { color:#536966; }
+.large-mission .progress-track { background:#fff; }
+.large-mission .progress-track span { background:var(--lime); }
+.app-reward-exchange { border:1px solid var(--line); border-radius:29px; background:#fff; padding:23px; box-shadow:var(--soft-shadow); }
+.app-reward-exchange::after { display:none; }
+.app-reward-label span { color:var(--navy); }
+.app-reward-label b { border-color:#cbd8ce; background:#eef3ed; color:var(--navy); }
+.app-reward-exchange>p,.app-reward-exchange>small { color:var(--muted); }
+.app-reward-progress { background:#dce4dc; box-shadow:none; }
+.app-reward-progress>span { background:var(--lime); box-shadow:none; }
+.app-reward-status { color:var(--muted); }
+.app-reward-status strong { color:var(--navy); }
 .app-reward-exchange>button { min-height:58px; border-radius:18px; background:var(--navy); }
 
 .bottom-nav { left:50%; right:auto; bottom:10px; width:min(calc(100% - 24px),456px); min-height:82px; transform:translateX(-50%); padding:7px 8px max(7px,env(safe-area-inset-bottom)); border:0; border-radius:27px; background:rgba(255,255,255,.96); box-shadow:0 12px 34px rgba(16,45,42,.18); }
