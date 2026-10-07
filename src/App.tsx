@@ -14,7 +14,17 @@ type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
-type OnboardingArtworkKind = "welcome" | "report" | "location" | "progress";
+type OnboardingArtworkKind = "welcome" | "readability" | "report" | "location" | "progress" | "permissions";
+type TextSize = "normal" | "large";
+type PermissionStatus = "idle" | "requesting" | "granted" | "denied" | "unsupported";
+
+const permissionStatusLabel: Record<PermissionStatus, string> = {
+  idle: "허용하기",
+  requesting: "확인 중…",
+  granted: "허용됨",
+  denied: "다시 허용",
+  unsupported: "사용 시 확인",
+};
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -87,6 +97,12 @@ const onboardingSlides: { eyebrow: string; title: [string, string]; description:
     kind: "welcome",
   },
   {
+    eyebrow: "보기 편하게",
+    title: ["내게 편한 화면으로", "맞춰서 시작하세요."],
+    description: "글자 크기와 화면 대비를 바로 비교하고 선택할 수 있어요.",
+    kind: "readability",
+  },
+  {
     eyebrow: "간편한 제보",
     title: ["사진이 없어도", "제보할 수 있어요."],
     description: "사진이나 영상을 남기고 위험유형을 고르세요. 자료 없이 바로 시작해도 괜찮아요.",
@@ -99,10 +115,10 @@ const onboardingSlides: { eyebrow: string; title: [string, string]; description:
     kind: "location",
   },
   {
-    eyebrow: "한눈에 확인",
-    title: ["내 기록과 진행상황을", "계속 확인할 수 있어요."],
-    description: "제보가 어떻게 처리되는지 확인하고, 참여 마일리지도 모아보세요.",
-    kind: "progress",
+    eyebrow: "권한 안내",
+    title: ["필요한 기능만", "직접 허용해주세요."],
+    description: "허용 여부는 나중에 휴대전화 설정에서 언제든 바꿀 수 있어요.",
+    kind: "permissions",
   },
 ];
 
@@ -161,6 +177,16 @@ function OnboardingArtwork({ kind }: { kind: OnboardingArtworkKind }) {
           <path className="art-add" d="M216 32v28m-14-14h28" />
         </svg>
       )}
+      {kind === "readability" && (
+        <svg viewBox="0 0 280 250">
+          <rect className="art-readability-card" x="36" y="43" width="94" height="164" rx="22" />
+          <rect className="art-readability-card selected" x="150" y="28" width="98" height="194" rx="22" />
+          <circle className="art-readability-dot" cx="83" cy="78" r="18" />
+          <circle className="art-readability-dot selected" cx="199" cy="66" r="22" />
+          <path className="art-readability-line" d="M57 119h52m-52 19h43m-43 19h50m108-43h-55m55 23h-44m44 23h-55" />
+          <path className="art-check-small" d="m188 199 8 8 17-20" />
+        </svg>
+      )}
       {kind === "location" && (
         <svg viewBox="0 0 280 250">
           <path className="art-map" d="m39 58 62-23 77 24 62-23v156l-62 23-77-24-62 23Z" />
@@ -181,6 +207,16 @@ function OnboardingArtwork({ kind }: { kind: OnboardingArtworkKind }) {
           <path className="art-copy-line" d="M115 69h83m-83 14h55m-55 35h83m-83 14h68m-68 35h83m-83 14h46" />
           <circle className="art-points" cx="211" cy="198" r="36" />
           <path className="art-heart" d="M211 213s-20-11-20-27c0-13 16-17 20-6 4-11 20-7 20 6 0 16-20 27-20 27Z" />
+        </svg>
+      )}
+      {kind === "permissions" && (
+        <svg viewBox="0 0 280 250">
+          <path className="art-shield" d="M140 27c27 20 56 25 83 28v58c0 58-36 94-83 113-47-19-83-55-83-113V55c27-3 56-8 83-28Z" />
+          <rect className="art-camera" x="82" y="86" width="58" height="45" rx="11" />
+          <circle className="art-camera-lens" cx="111" cy="108" r="11" />
+          <path className="art-mic" d="M169 83v31a15 15 0 0 0 30 0V83a15 15 0 0 0-30 0Zm-10 29v4a25 25 0 0 0 50 0v-4m-25 29v18m-14 0h28" />
+          <path className="art-location-small" d="M139 151c-20 0-36 16-36 36 0 27 36 54 36 54s36-27 36-54c0-20-16-36-36-36Z" />
+          <circle className="art-location-center" cx="139" cy="187" r="11" />
         </svg>
       )}
     </div>
@@ -370,6 +406,10 @@ function App() {
   const [selectedReport, setSelectedReport] = useState<StoredReport | null>(null);
   const [detailMedia, setDetailMedia] = useState<MediaPreview[]>([]);
   const [contrast, setContrast] = useState(() => localStorage.getItem("jikeoro-senior-contrast") === "true");
+  const [textSize, setTextSize] = useState<TextSize>(() => localStorage.getItem("jikeoro-senior-text-size") === "large" ? "large" : "normal");
+  const [readabilityOpen, setReadabilityOpen] = useState(false);
+  const [mediaPermission, setMediaPermission] = useState<PermissionStatus>("idle");
+  const [locationPermission, setLocationPermission] = useState<PermissionStatus>("idle");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -403,11 +443,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!showOnboarding) return;
+    if (!showOnboarding && !readabilityOpen) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = previousOverflow; };
-  }, [showOnboarding]);
+  }, [showOnboarding, readabilityOpen]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -421,6 +461,11 @@ function App() {
     document.documentElement.dataset.contrast = contrast ? "high" : "normal";
     localStorage.setItem("jikeoro-senior-contrast", String(contrast));
   }, [contrast]);
+
+  useEffect(() => {
+    document.documentElement.dataset.textSize = textSize;
+    localStorage.setItem("jikeoro-senior-text-size", textSize);
+  }, [textSize]);
 
   useEffect(() => {
     speechRunRef.current += 1;
@@ -962,6 +1007,34 @@ function App() {
     moveOnboarding(startX > endX ? 1 : -1);
   };
 
+  const requestMediaPermission = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMediaPermission("unsupported");
+      return;
+    }
+    setMediaPermission("requesting");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: "environment" } });
+      stream.getTracks().forEach((track) => track.stop());
+      setMediaPermission("granted");
+    } catch {
+      setMediaPermission("denied");
+    }
+  };
+
+  const requestLocationPermission = () => {
+    if (!navigator.geolocation) {
+      setLocationPermission("unsupported");
+      return;
+    }
+    setLocationPermission("requesting");
+    navigator.geolocation.getCurrentPosition(
+      () => setLocationPermission("granted"),
+      () => setLocationPermission("denied"),
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 },
+    );
+  };
+
   const launchScreen = showLaunch ? (
     <div className="launch-screen" role="status" aria-label="지켜로 앱을 시작합니다">
       <div className="launch-brand">
@@ -996,6 +1069,35 @@ function App() {
           <span>{activeOnboardingSlide.eyebrow}</span>
           <h1 id="onboarding-title">{activeOnboardingSlide.title[0]}<br />{activeOnboardingSlide.title[1]}</h1>
           <p>{activeOnboardingSlide.description}</p>
+          {activeOnboardingSlide.kind === "readability" && (
+            <div className="onboarding-readability-controls">
+              <fieldset>
+                <legend>글자 크기</legend>
+                <button type="button" className={textSize === "normal" ? "active" : ""} onClick={() => setTextSize("normal")}><b>가</b> 기본 글씨</button>
+                <button type="button" className={textSize === "large" ? "active" : ""} onClick={() => setTextSize("large")}><b className="large">가</b> 큰 글씨</button>
+              </fieldset>
+              <fieldset>
+                <legend>화면 대비</legend>
+                <button type="button" className={!contrast ? "active" : ""} onClick={() => setContrast(false)}><i className="normal-view" /> 기본 화면</button>
+                <button type="button" className={contrast ? "active" : ""} onClick={() => setContrast(true)}><i className="contrast-view" /> 고대비</button>
+              </fieldset>
+            </div>
+          )}
+          {activeOnboardingSlide.kind === "permissions" && (
+            <div className="onboarding-permissions">
+              <article>
+                <span aria-hidden="true">●</span>
+                <div><strong>카메라·마이크</strong><small>사진·영상 촬영과 음성 녹음</small></div>
+                <button type="button" className={mediaPermission} onClick={requestMediaPermission} disabled={mediaPermission === "requesting" || mediaPermission === "granted"}>{permissionStatusLabel[mediaPermission]}</button>
+              </article>
+              <article>
+                <span aria-hidden="true">⌖</span>
+                <div><strong>위치</strong><small>현재 위치 확인과 지도 핀</small></div>
+                <button type="button" className={locationPermission} onClick={requestLocationPermission} disabled={locationPermission === "requesting" || locationPermission === "granted"}>{permissionStatusLabel[locationPermission]}</button>
+              </article>
+              <small>사진첩은 사용자가 직접 고른 사진과 영상만 불러옵니다.</small>
+            </div>
+          )}
         </div>
 
         <div className="onboarding-dots" role="tablist" aria-label="사용 안내 단계">
@@ -1022,14 +1124,41 @@ function App() {
     </div>
   ) : null;
 
+  const readabilitySheet = readabilityOpen ? (
+    <div className="readability-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setReadabilityOpen(false)}>
+      <section className="readability-sheet" role="dialog" aria-modal="true" aria-labelledby="readability-title">
+        <button className="readability-close" type="button" onClick={() => setReadabilityOpen(false)} aria-label="보기 설정 닫기">×</button>
+        <span className="readability-symbol" aria-hidden="true">가</span>
+        <p>보기 설정</p>
+        <h2 id="readability-title">내게 편한 화면으로<br />바꿔보세요.</h2>
+        <fieldset>
+          <legend>글자 크기</legend>
+          <div>
+            <button type="button" className={textSize === "normal" ? "active" : ""} onClick={() => setTextSize("normal")}><b>가</b><span>기본 글씨</span></button>
+            <button type="button" className={textSize === "large" ? "active" : ""} onClick={() => setTextSize("large")}><b className="large">가</b><span>큰 글씨</span></button>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>화면 대비</legend>
+          <div>
+            <button type="button" className={!contrast ? "active" : ""} onClick={() => setContrast(false)}><i className="normal-view" /><span>기본 화면</span></button>
+            <button type="button" className={contrast ? "active" : ""} onClick={() => setContrast(true)}><i className="contrast-view" /><span>고대비</span></button>
+          </div>
+        </fieldset>
+        <button className="readability-done" type="button" onClick={() => setReadabilityOpen(false)}>이 설정으로 보기 <span>→</span></button>
+      </section>
+    </div>
+  ) : null;
+
   if (!currentUser) {
     return (
       <div className="app-stage auth-stage">
         {launchScreen}
         {onboardingScreen}
+        {readabilitySheet}
         <div className="phone-app auth-phone">
           <main className="app-auth-page">
-            <div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div>
+            <div className="app-auth-top"><div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div><button className="app-readability-launch" type="button" onClick={() => setReadabilityOpen(true)}><span aria-hidden="true">가</span> 보기 설정</button></div>
             <section className="app-auth-intro">
               <p>나의 기록을 한곳에서</p>
               <h1>함께 안전한 길을<br />만들어가요.</h1>
@@ -1062,6 +1191,7 @@ function App() {
     <div className="app-stage">
       {launchScreen}
       {onboardingScreen}
+      {readabilitySheet}
       <div className="phone-app">
         <header className="app-header">
           <button className="brand-button" onClick={() => navigate("home")} aria-label="지켜로 홈">
@@ -1070,7 +1200,7 @@ function App() {
           </button>
           <div className="header-tools">
             <button onClick={speakPage} aria-label={speaking ? "읽어주기 중지" : "현재 화면 전체 읽어주기"}><span>{speaking ? "■" : "♬"}</span> {speaking ? "읽기 중지" : "읽어주기"}</button>
-            <button onClick={() => setContrast((value) => !value)} aria-label="고대비 화면 전환"><span>◐</span> 고대비</button>
+            <button onClick={() => setReadabilityOpen(true)} aria-label="글자 크기와 화면 대비 설정"><span>가</span> 보기 설정</button>
           </div>
         </header>
 
