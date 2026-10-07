@@ -1432,7 +1432,7 @@ function App() {
                 <div>
                   <span>이번 달 동네 미션</span>
                   {participation.missionCompleted
-                    ? <img className="mission-complete-popper" src={`${import.meta.env.BASE_URL}icons/mission-celebration-3d.png`} alt="" />
+                    ? <img className="mission-complete-popper" src={`${import.meta.env.BASE_URL}icons/mission-celebration-vivid-3d.png`} alt="" />
                     : <strong>{participation.missionProgress}/3 완료</strong>}
                 </div>
                 <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
