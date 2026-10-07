@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">돋보기로 동네를 살피는 지켜로</title>
+  <rect width="512" height="512" rx="116" fill="#b7f06b"/>
+  <ellipse cx="202" cy="248" rx="91" ry="126" fill="#fff"/>
+  <ellipse cx="316" cy="248" rx="91" ry="126" fill="#fff"/>
+  <ellipse cx="213" cy="258" rx="40" ry="64" fill="#102d2a"/>
+  <ellipse cx="321" cy="258" rx="40" ry="64" fill="#102d2a"/>
+  <circle cx="326" cy="255" r="89" fill="none" stroke="#ff654f" stroke-width="28"/>
+  <path d="M389 319 443 373" fill="none" stroke="#102d2a" stroke-width="35" stroke-linecap="round"/>
+</svg>
