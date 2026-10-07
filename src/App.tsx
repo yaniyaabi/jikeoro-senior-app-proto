@@ -99,7 +99,7 @@ const onboardingSlides: { eyebrow: string; title: [string, string]; description:
   {
     eyebrow: "간편한 제보",
     title: ["사진이 없어도", "제보할 수 있어요."],
-    description: "사진이나 영상을 남기고 위험유형을 고르세요. 자료 없이 바로 시작해도 괜찮아요.",
+    description: "사진이나 영상을 남기고 위험유형을 고르세요.",
     kind: "report",
   },
   {
