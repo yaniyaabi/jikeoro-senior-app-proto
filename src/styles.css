@@ -263,12 +263,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .report-guide-copy>p { margin: 0; color: #38564d; font-size:calc(15px + var(--text-bump)); line-height: 1.55; font-weight: 800; word-break: keep-all; }
 .report-guide-copy>small { margin-top: 11px; border-radius: 11px; background: #eff5e9; padding: 10px 11px; display: flex; align-items: flex-start; gap: 7px; color: #526c62; font-size:calc(12px + var(--text-bump)); line-height: 1.45; font-weight: 800; word-break: keep-all; }
 .report-guide-copy>small b { flex: 0 0 auto; color: #3f8443; }
-.report-guide-tabs { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-top: 14px; }
-.report-guide-tabs button { min-width: 0; min-height: 68px; border: 1px solid #ccd7ce; border-radius: 12px; background: white; color: var(--ink); padding: 7px 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; }
-.report-guide-tabs button>b { width: 27px; height: 27px; border-radius: 50%; background: #e7eee5; display: grid; place-items: center; font-size:calc(13px + var(--text-bump)); }
-.report-guide-tabs button>span { font-size:calc(10px + var(--text-bump)); line-height: 1.2; font-weight: 900; word-break: keep-all; }
-.report-guide-tabs button.active { background: var(--navy); border-color: var(--navy); color: white; }
-.report-guide-tabs button.active>b { background: var(--lime); color: var(--navy); }
 .report-guide-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 9px; }
 .report-guide-navigation button { min-height: 43px; border: 1px solid #c6d3c9; border-radius: 11px; background: white; color: var(--ink); font-size:calc(13px + var(--text-bump)); font-weight: 900; cursor: pointer; }
 .report-guide-navigation button:last-child { background: #edf4e8; }
@@ -701,9 +695,6 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
   .home-main .report-hero h2 { font-size:calc(22px + var(--text-bump)); }
   .home-main .report-guide-card { padding: 15px; }
   .report-guide-copy h3 { font-size:calc(21px + var(--text-bump)); }
-  .report-guide-tabs { gap: 4px; }
-  .report-guide-tabs button { min-height: 65px; }
-  .report-guide-tabs button>span { font-size:calc(9px + var(--text-bump)); }
   .app-header { gap: 7px; padding-left: 10px; padding-right: 8px; }
   .brand-button { gap: 7px; }
   .brand-button strong { font-size:calc(21px + var(--text-bump)); }
@@ -720,8 +711,6 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 }
 
 @media (max-width: 320px) {
-  .report-guide-tabs { grid-template-columns: repeat(2,1fr); }
-  .report-guide-tabs button { min-height: 58px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -785,10 +774,6 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .report-guide-copy>span { background:#e5f2dc; color:var(--ink); }
 .report-guide-copy h3 { font-size:calc(24px + var(--text-bump)); }
 .report-guide-copy small { background:white; border-radius:14px; }
-.report-guide-tabs { gap:7px; }
-.report-guide-tabs button { min-height:70px; border:0; border-radius:18px; background:#eef2ed; }
-.report-guide-tabs button.active { background:var(--navy); }
-.report-guide-tabs button>b { background:white; }
 .report-guide-navigation button { min-height:46px; border:0; border-radius:15px; background:#eef2ed; }
 .report-guide-navigation button:last-child { background:#dff1c8; }
 .report-guide-start { min-height:58px; border-radius:18px; }

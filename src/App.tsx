@@ -1248,19 +1248,6 @@ function App() {
                   <p>{reportGuideSteps[guideStep - 1].description}</p>
                   <small><b>✓</b>{reportGuideSteps[guideStep - 1].tip}</small>
                 </div>
-                <div className="report-guide-tabs" role="group" aria-label="제보 방법 단계 선택">
-                  {reportGuideSteps.map((item, index) => (
-                    <button
-                      type="button"
-                      className={guideStep === index + 1 ? "active" : ""}
-                      aria-pressed={guideStep === index + 1}
-                      onClick={() => setGuideStep(index + 1)}
-                      key={item.shortTitle}
-                    >
-                      <b>{index + 1}</b><span>{item.shortTitle}</span>
-                    </button>
-                  ))}
-                </div>
                 <div className="report-guide-navigation">
                   <button type="button" onClick={() => setGuideStep((value) => Math.max(1, value - 1))} disabled={guideStep === 1}>← 이전</button>
                   <button type="button" onClick={() => setGuideStep((value) => Math.min(4, value + 1))} disabled={guideStep === 4}>다음 →</button>
