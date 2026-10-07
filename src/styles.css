@@ -799,8 +799,8 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .risk-grid button.selected { border:4px solid #3f6d4d; background:#bad8b7; }
 .risk-grid button>span { border-radius:17px; background:rgba(255,255,255,.75); color:var(--ink); }
 .risk-grid button small { color:#395d52; }
-.risk-grid .risk-type-icon { filter:grayscale(.45) sepia(.32) hue-rotate(78deg) saturate(.9) contrast(.96); opacity:.96; }
-.risk-grid button.selected .risk-type-icon { filter:grayscale(.15) sepia(.42) hue-rotate(74deg) saturate(1.28) contrast(1.04); opacity:1; }
+.risk-grid .risk-type-icon { filter:grayscale(1) sepia(1) hue-rotate(70deg) saturate(1.1) brightness(.68) contrast(1.05); opacity:.96; }
+.risk-grid button.selected .risk-type-icon { filter:grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.1) brightness(.52) contrast(1.1); opacity:1; }
 .risk-detail-panel { border-color:#b9d0ba; background:linear-gradient(145deg,#f1f7ee,#e3efe0); }
 .risk-detail-grid button { border-color:#c1d6c2; background:#edf5ea; }
 .risk-detail-grid button:hover { border-color:#8eaf92; background:#deedd9; }
