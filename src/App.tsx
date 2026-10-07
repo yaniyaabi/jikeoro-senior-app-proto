@@ -292,7 +292,8 @@ function App() {
   const [theme, setTheme] = useState<ColorTheme>(() => {
     const saved = localStorage.getItem("jikeoro-senior-theme");
     if (saved === "light" || saved === "dark") return saved;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const mobileDevice = window.matchMedia("(max-width: 768px)").matches || window.matchMedia("(pointer: coarse)").matches;
+    return mobileDevice && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   });
   const [contrast, setContrast] = useState(() => localStorage.getItem("jikeoro-senior-contrast") === "true");
   const [error, setError] = useState("");
