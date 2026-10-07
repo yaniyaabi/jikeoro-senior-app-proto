@@ -1016,6 +1016,7 @@ html[data-contrast="high"] .app-reward-exchange { box-shadow:inset 0 0 0 3px #00
 .jikeoro-small-walker { fill:none; stroke:var(--onboarding-navy); stroke-width:7; stroke-linecap:round; stroke-linejoin:round; }
 
 .onboarding-copy { text-align:center; }
+.onboarding-screen:not(.onboarding-screen-permissions) .onboarding-copy { transform:translateY(-14px); }
 .onboarding-copy>span { min-height:auto; background:transparent; color:#527061; padding:0; font-size:calc(13px + var(--text-bump)); letter-spacing:.02em; }
 .onboarding-copy h1 { max-width:430px; margin:12px auto 10px; color:var(--onboarding-ink); font-size:clamp(28px,7.4vw,36px); line-height:1.2; letter-spacing:-.05em; }
 .onboarding-copy p { max-width:410px; margin:0 auto; color:var(--onboarding-soft); font-size:calc(15px + var(--text-bump)); line-height:1.55; font-weight:650; }
