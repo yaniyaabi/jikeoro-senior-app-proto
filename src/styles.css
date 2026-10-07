@@ -828,7 +828,6 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .total-points { position:relative; min-height:136px; border-radius:29px; background:var(--navy); color:#fff; padding:21px 23px; align-content:center; row-gap:13px; box-shadow:var(--soft-shadow); }
 .total-points span { color:#c8d8d3; }
 .total-points strong { color:var(--lime); line-height:1; align-self:center; }
-.mileage-mascot { position:absolute; z-index:2; right:-3px; top:auto; bottom:calc(100% - 38px); width:180px; height:180px; object-fit:contain; pointer-events:none; filter:drop-shadow(0 12px 12px rgba(8,41,37,.22)); transform:rotate(1deg); }
 .large-mission { min-height:226px; border:2px solid #a9df5e; border-radius:29px; background:#e4f8bd; padding:23px; box-shadow:var(--soft-shadow); }
 .large-mission>div:first-child { color:#4f702d; }
 .large-mission>p { color:#48642d; }
