@@ -121,25 +121,25 @@ const reportGuideSteps = [
     shortTitle: "사진·영상",
     title: "위험 모습을 남겨요",
     description: "사진이나 영상이 있다면 촬영하거나 기기에서 골라주세요.",
-    tip: "자료가 없어도 바로 다음 단계로 넘어갈 수 있어요.",
+    artwork: "onboarding/02-camera.png",
   },
   {
     shortTitle: "위험한 이유",
     title: "위험한 이유를 알려줘요",
     description: "위험 종류를 고르고, 편한 방법으로 상황을 설명해주세요.",
-    tip: "직접 쓰거나 ‘말로 글쓰기’를 이용할 수 있어요.",
+    artwork: "onboarding/01-hazard.png",
   },
   {
     shortTitle: "위치 확인",
     title: "위험한 장소를 확인해요",
     description: "현재 위치를 불러온 뒤 지도에서 정확한 장소를 확인해주세요.",
-    tip: "GPS가 어렵다면 장소 이름을 직접 적어도 돼요.",
+    artwork: "onboarding/03-location.png",
   },
   {
     shortTitle: "내용 보내기",
     title: "내용을 확인하고 보내요",
     description: "위험유형과 위치가 맞는지 마지막으로 확인하면 끝이에요.",
-    tip: "틀린 내용이 있으면 이전 단계로 돌아가 고칠 수 있어요.",
+    artwork: "icons/feature-history-3d.png",
   },
 ] as const;
 
@@ -1212,7 +1212,7 @@ function App() {
                   <span>{guideStep}단계</span>
                   <h3>{reportGuideSteps[guideStep - 1].title}</h3>
                   <p>{reportGuideSteps[guideStep - 1].description}</p>
-                  <small><b>✓</b>{reportGuideSteps[guideStep - 1].tip}</small>
+                  <img className="report-guide-illustration" src={`${import.meta.env.BASE_URL}${reportGuideSteps[guideStep - 1].artwork}`} alt="" />
                 </div>
                 <div className="report-guide-navigation">
                   <button type="button" onClick={() => setGuideStep((value) => Math.max(1, value - 1))} disabled={guideStep === 1}>← 이전</button>

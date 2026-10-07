@@ -785,10 +785,11 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .report-guide-heading-row>span { background:#eaf7d8; color:#385d2b; }
 .report-guide-heading-row>button { border-radius:999px; background:#f0f3ef; padding:7px 10px; text-decoration:none; }
 .report-guide-heading h2 { margin-top:15px; font-size:calc(28px + var(--text-bump)); }
-.report-guide-copy { min-height:151px; margin-top:18px; border-radius:22px; background:#f0f3ed; padding:18px; box-shadow:none; }
-.report-guide-copy>span { background:#e5f2dc; color:var(--ink); }
-.report-guide-copy h3 { font-size:calc(24px + var(--text-bump)); }
-.report-guide-copy small { background:white; border-radius:14px; }
+.report-guide-copy { min-height:164px; margin-top:18px; border-radius:22px; background:#f0f3ed; padding:18px; box-shadow:none; display:grid; grid-template-columns:minmax(0,1fr) 118px; grid-template-rows:auto auto 1fr; column-gap:12px; align-items:center; }
+.report-guide-copy>span,.report-guide-copy h3,.report-guide-copy>p { grid-column:1; }
+.report-guide-copy>span { justify-self:start; background:#e5f2dc; color:var(--ink); }
+.report-guide-copy h3 { margin-top:10px; font-size:calc(24px + var(--text-bump)); }
+.report-guide-illustration { grid-column:2; grid-row:1/4; width:118px; height:118px; object-fit:contain; filter:drop-shadow(0 10px 10px rgba(16,45,42,.12)); }
 .report-guide-navigation button { min-height:46px; border:0; border-radius:15px; background:#eef2ed; }
 .report-guide-navigation button:last-child { background:#dff1c8; }
 .report-guide-start { min-height:58px; border-radius:18px; }
@@ -1069,6 +1070,8 @@ html[data-contrast="high"] .app-reward-exchange { box-shadow:inset 0 0 0 3px #00
 .onboarding-permissions>small { color:#7f8d87; font-size:calc(12px + var(--text-bump)); line-height:1.5; }
 
 @media (max-width:365px) {
+  .report-guide-copy { grid-template-columns:minmax(0,1fr) 92px; column-gap:8px; padding:15px; }
+  .report-guide-illustration { width:92px; height:92px; }
   .onboarding-screen { grid-template-rows:auto minmax(218px,1fr) auto auto auto; padding-left:20px; padding-right:20px; }
   .onboarding-artwork svg,.onboarding-artwork img { width:min(75vw,270px); }
   .onboarding-copy h1 { font-size:calc(29px + var(--text-bump)); }
