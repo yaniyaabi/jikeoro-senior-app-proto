@@ -121,25 +121,25 @@ const reportGuideSteps = [
     shortTitle: "사진·영상",
     title: "위험 모습을 남겨요",
     description: "사진이나 영상이 있다면 촬영하거나 기기에서 골라주세요.",
-    artwork: "onboarding/02-camera.png",
+    artwork: "icons/guide-step-capture.png",
   },
   {
     shortTitle: "위험한 이유",
     title: "위험한 이유를 알려줘요",
     description: "위험 종류를 고르고, 편한 방법으로 상황을 설명해주세요.",
-    artwork: "onboarding/01-hazard.png",
+    artwork: "icons/guide-step-risk.png",
   },
   {
     shortTitle: "위치 확인",
     title: "위험한 장소를 확인해요",
     description: "현재 위치를 불러온 뒤 지도에서 정확한 장소를 확인해주세요.",
-    artwork: "onboarding/03-location.png",
+    artwork: "icons/guide-step-location.png",
   },
   {
     shortTitle: "내용 보내기",
     title: "내용을 확인하고 보내요",
     description: "위험유형과 위치가 맞는지 마지막으로 확인하면 끝이에요.",
-    artwork: "icons/feature-history-3d.png",
+    artwork: "icons/guide-step-submit.png",
   },
 ] as const;
 
