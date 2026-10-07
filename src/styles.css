@@ -837,11 +837,11 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .bottom-nav button>span { width:42px; height:37px; border-radius:14px; background:transparent; }
 .bottom-nav button svg { width:25px; height:25px; }
 .bottom-nav button>strong { font-size:calc(12px + var(--text-bump)); }
-.bottom-nav button.active { background:#eef6e5; }
+.bottom-nav button.active { background:#f5f8f2; }
 .bottom-nav button.active>span { background:transparent; }
-.bottom-nav .report-nav { background:#e5f2dc; color:var(--ink); }
+.bottom-nav .report-nav { background:#f0f6ec; color:var(--ink); }
 .bottom-nav .report-nav>span,.bottom-nav .report-nav.active>span { background:transparent; }
-.bottom-nav .report-nav.active { background:var(--navy); color:#fff; box-shadow:none; }
+.bottom-nav .report-nav.active { background:#e1eedc; color:var(--ink); box-shadow:none; }
 
 .auth-phone { isolation:isolate; background:#fffdf8; }
 .auth-phone::before,.auth-phone::after { content:""; position:absolute; z-index:-1; border-radius:50%; pointer-events:none; }
