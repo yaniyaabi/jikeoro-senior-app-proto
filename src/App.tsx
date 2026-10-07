@@ -265,11 +265,11 @@ function reportTitle(report: Pick<StoredReport, "description" | "riskType">) {
 
 function NavIcon({ name }: { name: "home" | "report" | "history" | "reward" }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      {name === "home" && <><path d="M3.75 10.25 12 3.75l8.25 6.5" /><path d="M5.75 9.25v10a1.5 1.5 0 0 0 1.5 1.5h9.5a1.5 1.5 0 0 0 1.5-1.5v-10" /><path d="M9.5 20.75v-6.5h5v6.5" /></>}
-      {name === "report" && <><path d="M5.25 4.25h13.5a2 2 0 0 1 2 2v8.25a2 2 0 0 1-2 2H11l-4.5 3v-3H5.25a2 2 0 0 1-2-2V6.25a2 2 0 0 1 2-2Z" /><path d="M12 7.75v5.5M9.25 10.5h5.5" /></>}
-      {name === "history" && <><rect x="4.5" y="3.5" width="15" height="17" rx="2.5" /><path d="m8 9 1.3 1.3L12 7.7M13.8 9h2.4M8 15l1.3 1.3 2.7-2.6M13.8 15h2.4" /></>}
-      {name === "reward" && <><path d="M12 20.5S4.25 16.15 4.25 9.75A4.25 4.25 0 0 1 12 7.3a4.25 4.25 0 0 1 7.75 2.45c0 6.4-7.75 10.75-7.75 10.75Z" /><path d="M12 7.3V4.5M8.4 5.55 7 3.55M15.6 5.55l1.4-2" /></>}
+    <svg className="nav-symbol" viewBox="0 0 24 24" aria-hidden="true">
+      {name === "home" && <path fillRule="evenodd" d="M12 2.3 2.6 9.9v9.2c0 1.4 1.1 2.5 2.5 2.5h5v-6.4h3.8v6.4h5c1.4 0 2.5-1.1 2.5-2.5V9.9L12 2.3Z" />}
+      {name === "report" && <path fillRule="evenodd" d="M5.2 3.4h13.6a3 3 0 0 1 3 3v8.2a3 3 0 0 1-3 3h-7.2l-5.8 3.7v-3.7h-.6a3 3 0 0 1-3-3V6.4a3 3 0 0 1 3-3Zm5.7 3.2v2.8H8.1v2.2h2.8v2.8h2.2v-2.8h2.8V9.4h-2.8V6.6h-2.2Z" />}
+      {name === "history" && <path fillRule="evenodd" d="M8.2 2.5h7.6a1.8 1.8 0 0 1 1.7 1.3h1.2A2.3 2.3 0 0 1 21 6.1v13.1a2.3 2.3 0 0 1-2.3 2.3H5.3A2.3 2.3 0 0 1 3 19.2V6.1a2.3 2.3 0 0 1 2.3-2.3h1.2a1.8 1.8 0 0 1 1.7-1.3Zm.3 3h7v-1h-7v1Zm-.9 4.1a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm3.2.2h6.3v1.6h-6.3V9.8Zm-3.2 4.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2Zm3.2.2h6.3v1.6h-6.3v-1.6Z" />}
+      {name === "reward" && <path d="M12 21.3c-.6 0-8.4-4.5-8.4-11.3A4.9 4.9 0 0 1 12 6.6a4.9 4.9 0 0 1 8.4 3.4c0 6.8-7.8 11.3-8.4 11.3ZM11 5.8c-.2-2 1.2-3.6 3.4-3.9.1 2.1-1.3 3.6-3.4 3.9Z" />}
     </svg>
   );
 }

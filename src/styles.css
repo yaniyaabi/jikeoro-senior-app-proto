@@ -551,7 +551,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .bottom-nav { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; width: 100%; max-width: 480px; min-height: 94px; margin: 0 auto; padding: 9px 10px max(9px, env(safe-area-inset-bottom)); background: rgba(253,254,250,.98); border-top: 1px solid #d9e1d7; display: grid; grid-template-columns: repeat(4,1fr); box-shadow: 0 -9px 25px rgba(16,45,42,.07); backdrop-filter: blur(14px); }
 .bottom-nav button { position: relative; min-width:0; min-height: 74px; border: 0; border-radius: 20px; background: transparent; color: #6d8179; padding: 7px 3px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: background .16s,color .16s; }
 .bottom-nav button>span { width: 46px; height: 42px; border-radius: 15px; background:#eef3ed; display: grid; place-items: center; transition: background .16s,color .16s; }
-.bottom-nav button svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2.15; stroke-linecap: round; stroke-linejoin: round; }
+.bottom-nav button svg { width: 27px; height: 27px; fill: currentColor; stroke: none; }
 .bottom-nav button>strong { font-size:calc(14px + var(--text-bump)); line-height:1; font-weight: 900; letter-spacing: -.035em; }
 .bottom-nav button.active { background:#edf6e3; color: var(--ink); }
 .bottom-nav button.active>span { background: #dceec8; color: var(--ink); }
