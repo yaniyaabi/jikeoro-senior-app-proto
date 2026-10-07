@@ -555,10 +555,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .bottom-nav button>strong { font-size:calc(14px + var(--text-bump)); line-height:1; font-weight: 900; letter-spacing: -.035em; }
 .bottom-nav button.active { background:#edf6e3; color: var(--ink); }
 .bottom-nav button.active>span { background: #dceec8; color: var(--ink); }
-.bottom-nav .report-nav { color:#21472b; }
-.bottom-nav .report-nav>span { background:#dff5bd; color:#173d2d; }
-.bottom-nav .report-nav.active { background:var(--lime); color:var(--ink); }
-.bottom-nav .report-nav.active>span { background:rgba(255,255,255,.58); color:var(--ink); }
 .bottom-nav button:active { background:#e4efd9; }
 
 .member-detail-backdrop { position: fixed; z-index: 50; inset: 0; background: rgba(2,30,38,.72); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom)); }
@@ -839,9 +835,6 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .bottom-nav button>strong { font-size:calc(12px + var(--text-bump)); }
 .bottom-nav button.active { background:#f5f8f2; }
 .bottom-nav button.active>span { background:transparent; }
-.bottom-nav .report-nav { background:#f0f6ec; color:var(--ink); }
-.bottom-nav .report-nav>span,.bottom-nav .report-nav.active>span { background:transparent; }
-.bottom-nav .report-nav.active { background:#e1eedc; color:var(--ink); box-shadow:none; }
 
 .auth-phone { isolation:isolate; background:#fffdf8; }
 .auth-phone::before,.auth-phone::after { content:""; position:absolute; z-index:-1; border-radius:50%; pointer-events:none; }
