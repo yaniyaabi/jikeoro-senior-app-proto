@@ -1428,11 +1428,15 @@ function App() {
                 <span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><p>전체 제보 {reports.length}건 · 개선 완료 {participation.completedCount}건</p>
               </div>
               <article className="large-mission">
-                <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
+                <div>
+                  <span>이번 달 동네 미션</span>
+                  {participation.missionCompleted
+                    ? <img className="mission-complete-popper" src={`${import.meta.env.BASE_URL}icons/mission-celebration-3d.png`} alt="" />
+                    : <strong>{participation.missionProgress}/3 완료</strong>}
+                </div>
                 <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
                 <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
-                <p className={participation.missionCompleted ? "mission-complete-message" : undefined}>
-                  {participation.missionCompleted && <img src={`${import.meta.env.BASE_URL}icons/mission-celebration-3d.png`} alt="" />}
+                <p>
                   <span>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</span>
                 </p>
               </article>
