@@ -839,7 +839,7 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .app-reward-label b { border-color:#cbd8ce; background:#eef3ed; color:var(--navy); }
 .app-reward-exchange>p,.app-reward-exchange>small { color:var(--muted); }
 .app-reward-progress { background:#dce4dc; box-shadow:none; }
-.app-reward-progress>span { background:var(--lime); box-shadow:none; }
+.app-reward-progress>span { background:linear-gradient(90deg,#ffd43b,#ff8a3d); box-shadow:none; }
 .app-reward-status { color:var(--muted); }
 .app-reward-status strong { color:var(--navy); }
 .app-reward-exchange>button { min-height:58px; border-radius:18px; background:var(--navy); }
