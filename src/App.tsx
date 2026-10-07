@@ -14,6 +14,7 @@ type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
+type OnboardingArtworkKind = "welcome" | "report" | "location" | "progress";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -76,6 +77,34 @@ const riskDetails: Record<string, { name: string; help: string }[]> = {
 
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
 const appIconPath = `${import.meta.env.BASE_URL}icon-v2-192.png`;
+const ONBOARDING_STORAGE_KEY = "jikeoro-senior-onboarding-v1";
+
+const onboardingSlides: { eyebrow: string; title: [string, string]; description: string; kind: OnboardingArtworkKind }[] = [
+  {
+    eyebrow: "반가워요",
+    title: ["걷다가 발견한 위험,", "지켜로에 알려주세요."],
+    description: "누구나 쉽고 빠르게 우리 동네의 위험한 길을 기록할 수 있어요.",
+    kind: "welcome",
+  },
+  {
+    eyebrow: "간편한 제보",
+    title: ["사진이 없어도", "제보할 수 있어요."],
+    description: "사진이나 영상을 남기고 위험유형을 고르세요. 자료 없이 바로 시작해도 괜찮아요.",
+    kind: "report",
+  },
+  {
+    eyebrow: "정확한 위치",
+    title: ["지도에서 위험한 곳을", "확인해주세요."],
+    description: "현재 위치의 핀을 옮기거나 알고 있는 장소를 직접 적을 수 있어요.",
+    kind: "location",
+  },
+  {
+    eyebrow: "한눈에 확인",
+    title: ["내 기록과 진행상황을", "계속 확인할 수 있어요."],
+    description: "제보가 어떻게 처리되는지 확인하고, 참여 마일리지도 모아보세요.",
+    kind: "progress",
+  },
+];
 
 const reportGuideSteps = [
   {
@@ -106,6 +135,56 @@ const reportGuideSteps = [
 
 function BrandName() {
   return <>지켜<span className="brand-hanja">路</span></>;
+}
+
+function OnboardingArtwork({ kind }: { kind: OnboardingArtworkKind }) {
+  return (
+    <div className={`onboarding-artwork onboarding-artwork-${kind}`} aria-hidden="true">
+      {kind === "welcome" && (
+        <svg viewBox="0 0 280 250">
+          <path className="art-road" d="M48 232c10-56 43-71 79-94 31-20 31-50 71-86" />
+          <path className="art-road-line" d="M48 232c10-56 43-71 79-94 31-20 31-50 71-86" />
+          <circle className="art-head" cx="129" cy="102" r="14" />
+          <path className="art-person" d="m126 119-18 43m18-43 27 23m-27-23 8 49m-8-6-28 33m36-27 25 34" />
+          <circle className="art-sun" cx="218" cy="43" r="28" />
+          <path className="art-check" d="m205 43 10 10 19-22" />
+        </svg>
+      )}
+      {kind === "report" && (
+        <svg viewBox="0 0 280 250">
+          <rect className="art-card-back" x="50" y="36" width="166" height="166" rx="25" />
+          <rect className="art-card" x="68" y="53" width="166" height="166" rx="25" />
+          <path className="art-mountain" d="m91 173 37-45 28 29 18-18 38 34" />
+          <circle className="art-sun" cx="189" cy="91" r="16" />
+          <circle className="art-alert" cx="72" cy="194" r="34" />
+          <path className="art-alert-mark" d="M72 176v24m0 10h.1" />
+          <path className="art-add" d="M216 32v28m-14-14h28" />
+        </svg>
+      )}
+      {kind === "location" && (
+        <svg viewBox="0 0 280 250">
+          <path className="art-map" d="m39 58 62-23 77 24 62-23v156l-62 23-77-24-62 23Z" />
+          <path className="art-map-line" d="m101 35v156m77-132v156M55 115c36-15 65 19 94 1 34-21 43 11 77-8" />
+          <path className="art-pin" d="M140 53c-34 0-61 27-61 61 0 46 61 96 61 96s61-50 61-96c0-34-27-61-61-61Z" />
+          <circle className="art-pin-center" cx="140" cy="113" r="24" />
+          <path className="art-check" d="m126 113 10 11 21-25" />
+        </svg>
+      )}
+      {kind === "progress" && (
+        <svg viewBox="0 0 280 250">
+          <rect className="art-card" x="41" y="28" width="198" height="194" rx="28" />
+          <circle className="art-step active" cx="80" cy="76" r="18" />
+          <circle className="art-step active" cx="80" cy="125" r="18" />
+          <circle className="art-step" cx="80" cy="174" r="18" />
+          <path className="art-timeline" d="M80 94v13m0 36v13" />
+          <path className="art-check-small" d="m70 76 7 7 13-15m-20 57 7 7 13-15" />
+          <path className="art-copy-line" d="M115 69h83m-83 14h55m-55 35h83m-83 14h68m-68 35h83m-83 14h46" />
+          <circle className="art-points" cx="211" cy="198" r="36" />
+          <path className="art-heart" d="M211 213s-20-11-20-27c0-13 16-17 20-6 4-11 20-7 20 6 0 16-20 27-20 27Z" />
+        </svg>
+      )}
+    </div>
+  );
 }
 
 const reportStatus: Record<ReportStatus, { label: string; defaultResponse: string }> = {
@@ -259,6 +338,8 @@ function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange
 
 function App() {
   const [showLaunch, setShowLaunch] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(() => new URLSearchParams(window.location.search).get("onboarding-preview") === "1" || localStorage.getItem(ONBOARDING_STORAGE_KEY) !== "complete");
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [currentUser, setCurrentUser] = useState<PrototypeUser | null>(() => readPrototypeSession());
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [authName, setAuthName] = useState("");
@@ -313,12 +394,20 @@ function App() {
   const riskDetailPanelRef = useRef<HTMLDivElement>(null);
   const mainContentRef = useRef<HTMLElement>(null);
   const speechRunRef = useRef(0);
+  const onboardingTouchStartRef = useRef<number | null>(null);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const timer = window.setTimeout(() => setShowLaunch(false), reducedMotion ? 500 : 2300);
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!showOnboarding) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [showOnboarding]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -851,6 +940,28 @@ function App() {
     }
   };
 
+  const finishOnboarding = () => {
+    localStorage.setItem(ONBOARDING_STORAGE_KEY, "complete");
+    setShowOnboarding(false);
+    setOnboardingStep(0);
+  };
+
+  const openOnboarding = () => {
+    setOnboardingStep(0);
+    setShowOnboarding(true);
+  };
+
+  const moveOnboarding = (direction: -1 | 1) => {
+    setOnboardingStep((current) => Math.max(0, Math.min(onboardingSlides.length - 1, current + direction)));
+  };
+
+  const handleOnboardingTouchEnd = (endX: number) => {
+    const startX = onboardingTouchStartRef.current;
+    onboardingTouchStartRef.current = null;
+    if (startX === null || Math.abs(startX - endX) < 45) return;
+    moveOnboarding(startX > endX ? 1 : -1);
+  };
+
   const launchScreen = showLaunch ? (
     <div className="launch-screen" role="status" aria-label="지켜로 앱을 시작합니다">
       <div className="launch-brand">
@@ -863,10 +974,59 @@ function App() {
     </div>
   ) : null;
 
+  const activeOnboardingSlide = onboardingSlides[onboardingStep];
+  const onboardingScreen = showOnboarding ? (
+    <div className="onboarding-layer">
+      <section
+        className={`onboarding-screen onboarding-screen-${activeOnboardingSlide.kind}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="onboarding-title"
+        onTouchStart={(event) => { onboardingTouchStartRef.current = event.touches[0]?.clientX ?? null; }}
+        onTouchEnd={(event) => handleOnboardingTouchEnd(event.changedTouches[0]?.clientX ?? 0)}
+      >
+        <header className="onboarding-header">
+          <span><img src={appIconPath} alt="" /><b>지켜로 사용 안내</b></span>
+          <button type="button" onClick={finishOnboarding}>건너뛰기</button>
+        </header>
+
+        <OnboardingArtwork kind={activeOnboardingSlide.kind} />
+
+        <div className="onboarding-copy" aria-live="polite">
+          <span>{activeOnboardingSlide.eyebrow}</span>
+          <h1 id="onboarding-title">{activeOnboardingSlide.title[0]}<br />{activeOnboardingSlide.title[1]}</h1>
+          <p>{activeOnboardingSlide.description}</p>
+        </div>
+
+        <div className="onboarding-dots" role="tablist" aria-label="사용 안내 단계">
+          {onboardingSlides.map((slide, index) => (
+            <button
+              type="button"
+              role="tab"
+              aria-label={`${index + 1}단계: ${slide.eyebrow}`}
+              aria-selected={index === onboardingStep}
+              className={index === onboardingStep ? "active" : ""}
+              onClick={() => setOnboardingStep(index)}
+              key={slide.kind}
+            />
+          ))}
+        </div>
+
+        <div className="onboarding-actions">
+          {onboardingStep > 0 && <button className="onboarding-back" type="button" onClick={() => moveOnboarding(-1)}>이전</button>}
+          <button className="onboarding-next" type="button" onClick={onboardingStep === onboardingSlides.length - 1 ? finishOnboarding : () => moveOnboarding(1)}>
+            {onboardingStep === onboardingSlides.length - 1 ? "지켜로 시작하기" : "다음"}<span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  ) : null;
+
   if (!currentUser) {
     return (
       <div className="app-stage auth-stage">
         {launchScreen}
+        {onboardingScreen}
         <div className="phone-app auth-phone">
           <main className="app-auth-page">
             <div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div>
@@ -901,6 +1061,7 @@ function App() {
   return (
     <div className="app-stage">
       {launchScreen}
+      {onboardingScreen}
       <div className="phone-app">
         <header className="app-header">
           <button className="brand-button" onClick={() => navigate("home")} aria-label="지켜로 홈">
@@ -932,7 +1093,7 @@ function App() {
 
               <section className="report-guide-card" aria-labelledby="report-guide-title">
                 <div className="report-guide-heading">
-                  <span>처음이어도 괜찮아요</span>
+                  <div className="report-guide-heading-row"><span>처음이어도 괜찮아요</span><button type="button" onClick={openOnboarding}>처음 안내 다시 보기</button></div>
                   <h2 id="report-guide-title">위험요소 제보 방법</h2>
                   <p>실제 화면을 보면서 한 단계씩 익혀보세요.</p>
                 </div>
