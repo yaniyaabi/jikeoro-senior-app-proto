@@ -111,7 +111,7 @@ const onboardingSlides: { eyebrow: string; title: [string, string]; description:
   {
     eyebrow: "함께 시작해요",
     title: ["우리 동네를", "함께 지켜요."],
-    description: "제보에 필요한 기능만 직접 허용해주세요. 나중에 휴대전화 설정에서 바꿀 수 있어요.",
+    description: "제보에 필요한 기능만 직접 허용해주세요.",
     kind: "permissions",
   },
 ];
