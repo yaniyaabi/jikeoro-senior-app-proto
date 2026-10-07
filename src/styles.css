@@ -843,7 +843,7 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .large-mission>div:first-child,.large-mission>p { color:#536966; }
 .large-mission .progress-track { background:#fff; }
 .large-mission .progress-track span { background:var(--lime); }
-.app-reward-exchange { border:1px solid var(--line); border-radius:29px; background:#fff; padding:23px; box-shadow:var(--soft-shadow); }
+.app-reward-exchange { border:2px solid #ffb28c; border-radius:29px; background:linear-gradient(145deg,#fffaf6,#ffd9c2); padding:23px; box-shadow:var(--soft-shadow); }
 .app-reward-exchange::after { display:none; }
 .app-reward-label span { color:var(--navy); }
 .app-reward-label b { border-color:#cbd8ce; background:#eef3ed; color:var(--navy); }
