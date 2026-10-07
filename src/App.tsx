@@ -152,73 +152,78 @@ function OnboardingArtwork({ kind }: { kind: OnboardingArtworkKind }) {
     <div className={`onboarding-artwork onboarding-artwork-${kind}`} aria-hidden="true">
       {kind === "welcome" && (
         <svg viewBox="0 0 320 270">
-          <rect className="fresh-phone" x="76" y="22" width="168" height="224" rx="34" />
-          <path className="fresh-phone-notch" d="M137 39h46" />
-          <path className="fresh-route" d="M107 172c17-35 42-15 56-47 12-28 32-28 50-50" />
-          <circle className="fresh-route-dot start" cx="107" cy="172" r="9" />
-          <circle className="fresh-route-dot end" cx="213" cy="75" r="12" />
-          <path className="fresh-pin-check" d="m207 75 5 5 9-11" />
-          <path className="fresh-mascot" d="M105 182c0-32 21-55 55-55s55 23 55 55v27c0 18-14 32-32 32h-46c-18 0-32-14-32-32Z" />
-          <path className="fresh-arm" d="M111 190c-22-2-29 13-17 24 8 8 19 6 29-2m86-22c22-2 29 13 17 24-8 8-19 6-29-2" />
-          <circle className="fresh-face" cx="144" cy="182" r="5" />
-          <circle className="fresh-face" cx="176" cy="182" r="5" />
-          <path className="fresh-smile" d="M141 199c8 12 30 12 38 0" />
-          <circle className="fresh-spark yellow" cx="55" cy="68" r="14" />
-          <path className="fresh-spark green" d="M258 123h28m-14-14v28" />
+          <ellipse className="jikeoro-object-shadow" cx="161" cy="238" rx="128" ry="15" />
+          <circle className="jikeoro-scene-sun" cx="55" cy="53" r="22" />
+          <path className="jikeoro-sidewalk" d="M28 167 287 134l8 91L35 252Z" />
+          <path className="jikeoro-curb" d="m30 195 261-34" />
+          <path className="jikeoro-crosswalk" d="m173 179 27-4m12-2 27-4m12-2 27-4M178 198l27-4m12-2 27-4m12-2 27-4" />
+          <path className="jikeoro-lamp" d="M245 44v94m-1-89h28c0 18-9 28-28 28" />
+          <circle className="jikeoro-lamp-light" cx="260" cy="63" r="9" />
+          <circle className="jikeoro-person-head" cx="112" cy="91" r="18" />
+          <path className="jikeoro-person-hair" d="M95 89c2-20 31-25 36-3-12-7-23-6-36 3Z" />
+          <path className="jikeoro-person-body" d="M101 110c14-9 30-4 37 10l14 43-49 8-16-35c-5-11 1-20 14-26Z" />
+          <path className="jikeoro-person-limb" d="m105 166-8 48m32-52 22 43M98 215l-17 18m70-28 22 13M98 126l-22 34m57-36 21 25" />
+          <path className="jikeoro-cane" d="M157 148c8-3 13 0 13 6v55m0 0c0 10 13 10 17 3" />
+          <path className="jikeoro-crack" d="m214 205 13-12 8 10 13-14 12 9" />
+          <path className="jikeoro-hazard-pin" d="M236 100c-20 0-36 16-36 36 0 27 36 53 36 53s36-26 36-53c0-20-16-36-36-36Z" />
+          <path className="jikeoro-alert-mark" d="M236 119v23m0 10h.1" />
         </svg>
       )}
       {kind === "report" && (
         <svg viewBox="0 0 320 270">
-          <rect className="fresh-photo-back" x="61" y="43" width="197" height="172" rx="30" />
-          <rect className="fresh-photo" x="48" y="30" width="197" height="172" rx="30" />
-          <circle className="fresh-photo-sun" cx="190" cy="76" r="18" />
-          <path className="fresh-photo-land" d="m69 169 43-48 34 30 24-25 53 43" />
-          <circle className="fresh-camera-bubble" cx="238" cy="194" r="49" />
-          <rect className="fresh-camera" x="207" y="176" width="62" height="43" rx="12" />
-          <path className="fresh-camera-top" d="M222 176l7-10h18l7 10" />
-          <circle className="fresh-camera-lens" cx="238" cy="198" r="12" />
-          <circle className="fresh-face" cx="92" cy="82" r="5" />
-          <circle className="fresh-face" cx="112" cy="82" r="5" />
-          <path className="fresh-mini-smile" d="M90 96c6 7 18 7 24 0" />
-          <path className="fresh-spark green" d="M51 226h28m-14-14v28" />
-          <circle className="fresh-spark yellow" cx="272" cy="62" r="13" />
+          <ellipse className="jikeoro-object-shadow" cx="160" cy="248" rx="105" ry="13" />
+          <rect className="jikeoro-camera-phone" x="62" y="13" width="196" height="242" rx="34" />
+          <path className="jikeoro-camera-notch" d="M137 30h46" />
+          <rect className="jikeoro-viewfinder" x="80" y="53" width="160" height="145" rx="20" />
+          <path className="jikeoro-view-sidewalk" d="m81 134 158-30v94H81Z" />
+          <path className="jikeoro-view-curb" d="m82 151 157-30" />
+          <path className="jikeoro-view-crosswalk" d="m101 146 24-5m12-2 24-5m12-2 24-5m12-2 24-5" />
+          <path className="jikeoro-view-crack" d="m137 169 13-13 9 10 12-15 13 10" />
+          <path className="jikeoro-focus" d="M93 82V68h14m105 0h14v14M93 169v14h14m105 0h14v-14" />
+          <circle className="jikeoro-shutter-ring" cx="160" cy="225" r="20" />
+          <circle className="jikeoro-shutter" cx="160" cy="225" r="12" />
+          <circle className="jikeoro-warning-bubble" cx="246" cy="78" r="35" />
+          <path className="jikeoro-alert-mark" d="M246 60v22m0 10h.1" />
+          <path className="jikeoro-photo-check" d="m73 220 10 10 20-24" />
         </svg>
       )}
       {kind === "location" && (
         <svg viewBox="0 0 320 270">
-          <path className="fresh-map left" d="m42 68 76-27v166l-76 27Z" />
-          <path className="fresh-map middle" d="m118 41 84 31v166l-84-31Z" />
-          <path className="fresh-map right" d="m202 72 76-27v166l-76 27Z" />
-          <path className="fresh-map-road" d="M64 126c42-19 62 31 99 6 39-26 57 19 93-2" />
-          <path className="fresh-pin" d="M160 35c-37 0-66 29-66 66 0 50 66 105 66 105s66-55 66-105c0-37-29-66-66-66Z" />
-          <circle className="fresh-pin-face" cx="160" cy="99" r="31" />
-          <circle className="fresh-face" cx="149" cy="94" r="4.5" />
-          <circle className="fresh-face" cx="171" cy="94" r="4.5" />
-          <path className="fresh-mini-smile" d="M147 108c7 9 19 9 26 0" />
-          <circle className="fresh-spark yellow" cx="64" cy="50" r="13" />
-          <path className="fresh-spark green" d="M260 226h27m-13.5-13.5v27" />
+          <ellipse className="jikeoro-object-shadow" cx="160" cy="244" rx="128" ry="14" />
+          <rect className="jikeoro-map-card" x="31" y="27" width="258" height="216" rx="30" />
+          <path className="jikeoro-map-park" d="M48 43h85v72H48Z" />
+          <path className="jikeoro-map-river" d="M32 184c54-34 95 21 143-4 44-23 72 5 114-20v66H32Z" />
+          <path className="jikeoro-map-road" d="M51 138h216M162 45v178M72 63l174 146" />
+          <path className="jikeoro-map-route" d="M73 198c25-39 48-17 70-49 17-25 40-35 78-41" />
+          <circle className="jikeoro-route-start" cx="73" cy="198" r="9" />
+          <path className="jikeoro-map-crosswalk" d="M144 118h10m8 0h10m8 0h10m8 0h10M144 129h10m8 0h10m8 0h10m8 0h10" />
+          <path className="jikeoro-map-pin secondary" d="M91 65c-13 0-23 10-23 23 0 17 23 34 23 34s23-17 23-34c0-13-10-23-23-23Z" />
+          <circle className="jikeoro-map-pin-dot" cx="91" cy="88" r="7" />
+          <path className="jikeoro-map-pin primary" d="M224 69c-22 0-39 17-39 39 0 29 39 58 39 58s39-29 39-58c0-22-17-39-39-39Z" />
+          <circle className="jikeoro-map-pin-dot" cx="224" cy="108" r="12" />
+          <path className="jikeoro-alert-mark dark" d="M224 97v15m0 8h.1" />
         </svg>
       )}
       {kind === "permissions" && (
         <svg viewBox="0 0 320 270">
-          <rect className="fresh-phone" x="78" y="17" width="164" height="230" rx="34" />
-          <path className="fresh-phone-notch" d="M139 34h42" />
-          <rect className="fresh-permission-card green" x="98" y="65" width="124" height="46" rx="16" />
-          <rect className="fresh-permission-card yellow" x="98" y="120" width="124" height="46" rx="16" />
-          <rect className="fresh-permission-card blue" x="98" y="175" width="124" height="46" rx="16" />
-          <rect className="fresh-permission-camera" x="111" y="78" width="28" height="20" rx="5" />
-          <circle className="fresh-permission-lens" cx="125" cy="88" r="5" />
-          <path className="fresh-permission-mic" d="M123 132v11a7 7 0 0 0 14 0v-11m-19 11v2a12 12 0 0 0 24 0v-2m-12 14v6" />
-          <path className="fresh-permission-pin" d="M130 185c-8 0-14 6-14 14 0 11 14 21 14 21s14-10 14-21c0-8-6-14-14-14Z" />
-          <circle className="fresh-permission-pin-dot" cx="130" cy="199" r="4" />
-          <path className="fresh-toggle" d="M176 80h22a9 9 0 0 1 0 18h-22a9 9 0 0 1 0-18Z" />
-          <circle className="fresh-toggle-dot" cx="198" cy="89" r="7" />
-          <path className="fresh-toggle" d="M176 134h22a9 9 0 0 1 0 18h-22a9 9 0 0 1 0-18Z" />
-          <circle className="fresh-toggle-dot" cx="198" cy="143" r="7" />
-          <path className="fresh-toggle" d="M176 189h22a9 9 0 0 1 0 18h-22a9 9 0 0 1 0-18Z" />
-          <circle className="fresh-toggle-dot" cx="198" cy="198" r="7" />
-          <circle className="fresh-spark yellow" cx="57" cy="76" r="14" />
-          <path className="fresh-spark green" d="M257 190h28m-14-14v28" />
+          <ellipse className="jikeoro-object-shadow" cx="160" cy="242" rx="125" ry="14" />
+          <path className="jikeoro-permission-road" d="M29 213h262" />
+          <path className="jikeoro-permission-crosswalk" d="M46 196v34m24-34v34m24-34v34m24-34v34" />
+          <rect className="jikeoro-permission-phone" x="83" y="12" width="154" height="225" rx="32" />
+          <path className="jikeoro-camera-notch" d="M138 29h44" />
+          <rect className="jikeoro-app-mark" x="102" y="48" width="40" height="40" rx="12" />
+          <path className="jikeoro-app-road" d="M112 78c2-11 7-17 20-23" />
+          <rect className="jikeoro-permission-row mint" x="101" y="102" width="118" height="35" rx="13" />
+          <rect className="jikeoro-permission-row yellow" x="101" y="145" width="118" height="35" rx="13" />
+          <rect className="jikeoro-permission-row coral" x="101" y="188" width="118" height="35" rx="13" />
+          <rect className="jikeoro-row-camera" x="111" y="111" width="25" height="17" rx="4" />
+          <circle className="jikeoro-row-lens" cx="123.5" cy="119.5" r="4" />
+          <path className="jikeoro-row-mic" d="M119 151v8a6 6 0 0 0 12 0v-8m-17 8v2a11 11 0 0 0 22 0v-2m-11 12v5" />
+          <path className="jikeoro-row-pin" d="M124 193c-7 0-12 5-12 12 0 9 12 17 12 17s12-8 12-17c0-7-5-12-12-12Z" />
+          <circle className="jikeoro-row-pin-dot" cx="124" cy="205" r="3.5" />
+          <path className="jikeoro-row-check" d="m183 119 7 7 15-18m-22 54 7 7 15-18m-22 54 7 7 15-18" />
+          <circle className="jikeoro-person-head small" cx="266" cy="170" r="10" />
+          <path className="jikeoro-small-walker" d="m263 183-11 25m11-25 17 16m-17-16 5 29m-5-4-17 20m22-16 16 18" />
         </svg>
       )}
     </div>
