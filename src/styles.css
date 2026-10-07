@@ -549,6 +549,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .large-mission>div:first-child { display: flex; justify-content: space-between; color: #4f702d; font-size:calc(14px + var(--text-bump)); font-weight: 950; }
 .large-mission h2 { margin: 17px 0 14px; font-size:calc(27px + var(--text-bump)); line-height: 1.25; }
 .large-mission>p { margin: 13px 0 0; color: #48642d; font-size:calc(14px + var(--text-bump)); line-height: 1.5; font-weight: 800; }
+.large-mission>p.mission-complete-message { min-height:64px; margin-top:8px; display:grid; grid-template-columns:64px 1fr; align-items:center; gap:10px; }
+.mission-complete-message img { width:64px; height:64px; object-fit:contain; filter:drop-shadow(0 7px 8px rgba(58,93,36,.16)); }
 
 .bottom-nav { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; width: 100%; max-width: 480px; min-height: 94px; margin: 0 auto; padding: 9px 10px max(9px, env(safe-area-inset-bottom)); background: rgba(253,254,250,.98); border-top: 1px solid #d9e1d7; display: grid; grid-template-columns: repeat(4,1fr); box-shadow: 0 -9px 25px rgba(16,45,42,.07); backdrop-filter: blur(14px); }
 .bottom-nav button { position: relative; min-width:0; min-height: 74px; border: 0; border-radius: 20px; background: transparent; color: #6d8179; padding: 7px 3px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: background .16s,color .16s; }

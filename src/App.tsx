@@ -1428,7 +1428,10 @@ function App() {
                 <div><span>이번 달 동네 미션</span><strong>{participation.missionProgress}/3 완료</strong></div>
                 <h2>조명이 부족한 길<br />3곳을 기록해요</h2>
                 <div className="progress-track"><span style={{ width: `${progress}%` }} /></div>
-                <p>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</p>
+                <p className={participation.missionCompleted ? "mission-complete-message" : undefined}>
+                  {participation.missionCompleted && <img src={`${import.meta.env.BASE_URL}icons/mission-celebration-3d.png`} alt="" />}
+                  <span>{participation.missionCompleted ? "축하합니다! 150P가 적립됐어요." : `${3 - participation.missionProgress}곳을 더 기록하면 150P를 받을 수 있어요.`}</span>
+                </p>
               </article>
               <article className="app-reward-exchange" aria-labelledby="app-reward-title">
                 <div className="app-reward-label"><span>마일리지 사용</span><b>{pendingRewardRequest ? "접수 완료" : "교환 신청"}</b></div>
