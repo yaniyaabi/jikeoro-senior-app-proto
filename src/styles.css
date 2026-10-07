@@ -766,7 +766,7 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 
 .home-main .report-guide-card { margin-top:15px; border:0; border-radius:28px; padding:22px; box-shadow:var(--soft-shadow); }
 .report-guide-heading-row>span { background:#eaf7d8; color:#385d2b; }
-.report-guide-heading-row>button { border-radius:999px; background:#f0f3ef; padding:7px 10px; text-decoration:none; }
+.report-guide-heading-row>button { min-height:46px; border-radius:999px; background:#f0f3ef; padding:10px 15px; font-size:calc(13px + var(--text-bump)); text-decoration:none; }
 .report-guide-heading h2 { margin-top:15px; font-size:calc(28px + var(--text-bump)); }
 .report-guide-copy { min-height:164px; margin-top:18px; border-radius:22px; background:#f0f3ed; padding:18px; box-shadow:none; display:grid; grid-template-columns:minmax(0,1fr) 118px; grid-template-rows:auto auto 1fr; column-gap:12px; align-items:center; }
 .report-guide-copy>span,.report-guide-copy h3,.report-guide-copy>p { grid-column:1; }
