@@ -803,9 +803,9 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .risk-grid button small { color:#395d52; }
 .risk-grid .risk-type-icon { filter:grayscale(1) saturate(0) brightness(.92) contrast(.9); opacity:.78; }
 .risk-grid button.selected .risk-type-icon { filter:grayscale(1) sepia(1) hue-rotate(70deg) saturate(2.1) brightness(.52) contrast(1.1); opacity:1; }
-.risk-detail-panel { border-color:#b9d0ba; background:linear-gradient(145deg,#f1f7ee,#e3efe0); }
-.risk-detail-grid button { border-color:#c1d6c2; background:#edf5ea; }
-.risk-detail-grid button:hover { border-color:#8eaf92; background:#deedd9; }
+.risk-detail-panel { border-color:#d3d9d5; background:linear-gradient(145deg,#f7f8f6,#eef1ee); }
+.risk-detail-grid button { border-color:#d6dcd8; background:#f8f9f7; }
+.risk-detail-grid button:hover { border-color:#aebdb3; background:#f1f4f1; }
 .risk-detail-grid button.selected { border-color:#3f6d4d; background:#c1ddbd; box-shadow:0 4px 0 rgba(42,91,60,.14),0 8px 16px rgba(16,45,42,.08); }
 .risk-detail-grid button.selected>b { background:#295c40; color:#fff; }
 .next-button { min-height:59px; border-radius:19px; background:var(--navy); box-shadow:none; }
