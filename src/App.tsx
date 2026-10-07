@@ -1215,21 +1215,21 @@ function App() {
               <section className="home-feature-grid" aria-label="주요 기능">
                 <button className="home-feature-card home-feature-report" type="button" onClick={openReport}>
                   <span className="home-feature-label">빠른 제보</span>
-                  <span className="home-feature-icon"><NavIcon name="report" /></span>
+                  <span className="home-feature-icon"><img src={iconPath("feature-report-3d.png")} alt="" /></span>
                   <strong>위험요소<br />제보하기</strong>
                   <small>60초면 남길 수 있어요</small>
                   <b aria-hidden="true">→</b>
                 </button>
                 <button className="home-feature-card home-feature-history" type="button" onClick={() => navigate("history")}>
                   <span className="home-feature-label">처리 현황</span>
-                  <span className="home-feature-icon"><NavIcon name="history" /></span>
+                  <span className="home-feature-icon"><img src={iconPath("feature-history-3d.png")} alt="" /></span>
                   <strong>내 기록</strong>
                   <small>{reports.length}건의 제보</small>
                   <b aria-hidden="true">→</b>
                 </button>
                 <button className="home-feature-card home-feature-rewards" type="button" onClick={() => navigate("rewards")}>
                   <span className="home-feature-label">동네지킴이 Lv.{participation.level}</span>
-                  <span className="home-feature-icon"><NavIcon name="reward" /></span>
+                  <span className="home-feature-icon"><img src={iconPath("feature-rewards-3d.png")} alt="" /></span>
                   <strong>마일리지</strong>
                   <small>{participation.points.toLocaleString()}P</small>
                   <b aria-hidden="true">→</b>

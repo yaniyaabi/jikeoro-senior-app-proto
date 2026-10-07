@@ -777,9 +777,10 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .home-feature-label { position:absolute; z-index:2; left:20px; top:18px; display:inline-flex; min-height:29px; align-items:center; border-radius:999px; background:rgba(255,255,255,.72); padding:5px 10px; font-size:calc(12px + var(--text-bump)); font-weight:950; }
 .home-feature-report .home-feature-label { left:23px; top:22px; }
 .home-feature-history .home-feature-label,.home-feature-rewards .home-feature-label { display:none; }
-.home-feature-icon { position:absolute; z-index:2; right:20px; top:18px; width:74px; height:74px; border-radius:24px; background:rgba(255,255,255,.72); display:grid; place-items:center; color:var(--ink); }
+.home-feature-icon { position:absolute; z-index:2; right:14px; top:10px; width:92px; height:92px; display:grid; place-items:center; color:var(--ink); filter:drop-shadow(0 10px 10px rgba(16,45,42,.17)); }
 .home-feature-history .home-feature-icon,.home-feature-rewards .home-feature-icon { left:50%; right:auto; transform:translateX(-50%); }
 .home-feature-icon svg { width:42px; height:42px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.home-feature-icon img { width:100%; height:100%; object-fit:contain; display:block; }
 .home-feature-card>strong { position:absolute; z-index:2; left:20px; right:18px; bottom:49px; font-size:calc(24px + var(--text-bump)); line-height:1.12; letter-spacing:-.045em; }
 .home-feature-report>strong { left:23px; bottom:55px; font-size:calc(32px + var(--text-bump)); }
 .home-feature-card>small { position:absolute; z-index:2; left:20px; bottom:22px; font-size:calc(13px + var(--text-bump)); font-weight:850; opacity:.76; }
@@ -885,7 +886,7 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
   .home-feature-card { padding:17px; }
   .home-feature-report { min-height:204px; }
   .home-feature-history,.home-feature-rewards { min-height:180px; }
-  .home-feature-icon { right:15px; width:61px; height:61px; border-radius:20px; }
+  .home-feature-icon { right:9px; top:9px; width:78px; height:78px; }
   .home-feature-icon svg { width:35px; height:35px; }
   .home-feature-card>strong { left:17px; font-size:calc(21px + var(--text-bump)); }
   .home-feature-report>strong { left:20px; font-size:calc(29px + var(--text-bump)); }
