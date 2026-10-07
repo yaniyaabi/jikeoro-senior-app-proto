@@ -900,3 +900,106 @@ html[data-contrast="high"] .risk-grid button,
 html[data-contrast="high"] .total-points,
 html[data-contrast="high"] .large-mission,
 html[data-contrast="high"] .app-reward-exchange { box-shadow:inset 0 0 0 3px #001e1a; }
+
+/* Bright, minimal onboarding */
+.onboarding-layer { background:#fff; }
+.onboarding-screen {
+  background:#fff;
+  color:#111827;
+  padding:max(18px,env(safe-area-inset-top)) max(22px,calc((100vw - 480px)/2)) max(18px,env(safe-area-inset-bottom));
+  grid-template-rows:auto minmax(235px,1fr) auto auto auto;
+}
+.onboarding-screen::before,.onboarding-screen::after { display:none; }
+.onboarding-header { color:#111827; }
+.onboarding-header>span { font-size:calc(14px + var(--text-bump)); }
+.onboarding-header img { width:40px; height:40px; border-radius:13px; box-shadow:0 6px 18px rgba(47,141,244,.15); }
+.onboarding-header>button { min-height:42px; background:#f5f7f9; color:#64748b; box-shadow:none; }
+.onboarding-artwork { align-self:center; }
+.onboarding-artwork::before { display:none; }
+.onboarding-artwork svg { width:min(76vw,300px); max-height:290px; filter:none; }
+
+.fresh-phone { fill:#fff; stroke:#e7eaee; stroke-width:6; }
+.fresh-phone-notch { fill:none; stroke:#e7eaee; stroke-width:8; stroke-linecap:round; }
+.fresh-route { fill:none; stroke:#dbeafe; stroke-width:13; stroke-linecap:round; stroke-dasharray:2 20; }
+.fresh-route-dot.start { fill:#00c987; }
+.fresh-route-dot.end { fill:#ffd23f; }
+.fresh-pin-check { fill:none; stroke:#111827; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+.fresh-mascot { fill:#2f8df4; }
+.fresh-arm { fill:none; stroke:#2f8df4; stroke-width:22; stroke-linecap:round; }
+.fresh-face { fill:#111827; }
+.fresh-smile,.fresh-mini-smile { fill:none; stroke:#111827; stroke-width:6; stroke-linecap:round; }
+.fresh-mini-smile { stroke-width:4; }
+.fresh-spark.yellow { fill:#ffd23f; stroke:#ffd23f; stroke-width:8; stroke-linecap:round; }
+.fresh-spark.green { fill:none; stroke:#00c987; stroke-width:8; stroke-linecap:round; }
+
+.fresh-photo-back { fill:#dbeafe; }
+.fresh-photo { fill:#f7fbff; stroke:#2f8df4; stroke-width:4; }
+.fresh-photo-sun { fill:#ffd23f; }
+.fresh-photo-land { fill:none; stroke:#00c987; stroke-width:13; stroke-linecap:round; stroke-linejoin:round; }
+.fresh-camera-bubble { fill:#ffd23f; }
+.fresh-camera { fill:#fff; }
+.fresh-camera-top { fill:none; stroke:#fff; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; }
+.fresh-camera-lens { fill:#2f8df4; }
+
+.fresh-map { stroke:#fff; stroke-width:4; stroke-linejoin:round; }
+.fresh-map.left { fill:#dff7ef; }
+.fresh-map.middle { fill:#eef6ff; }
+.fresh-map.right { fill:#fff4c5; }
+.fresh-map-road { fill:none; stroke:#94a3b8; stroke-width:5; stroke-linecap:round; stroke-dasharray:10 10; }
+.fresh-pin { fill:#2f8df4; }
+.fresh-pin-face { fill:#fff; }
+
+.fresh-permission-card { stroke:none; }
+.fresh-permission-card.green { fill:#dff7ef; }
+.fresh-permission-card.yellow { fill:#fff3bd; }
+.fresh-permission-card.blue { fill:#dbeafe; }
+.fresh-permission-camera { fill:#00c987; }
+.fresh-permission-lens { fill:#fff; }
+.fresh-permission-mic { fill:none; stroke:#d59f00; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+.fresh-permission-pin { fill:#2f8df4; }
+.fresh-permission-pin-dot { fill:#fff; }
+.fresh-toggle { fill:#fff; }
+.fresh-toggle-dot { fill:#2f8df4; }
+
+.onboarding-copy { text-align:center; }
+.onboarding-copy>span { min-height:auto; background:transparent; color:#2f8df4; padding:0; font-size:calc(13px + var(--text-bump)); letter-spacing:.02em; }
+.onboarding-copy h1 { max-width:430px; margin:12px auto 10px; color:#111; font-size:clamp(28px,7.4vw,36px); line-height:1.2; letter-spacing:-.05em; }
+.onboarding-copy p { max-width:410px; margin:0 auto; color:#8b949e; font-size:calc(15px + var(--text-bump)); line-height:1.55; font-weight:650; }
+.onboarding-dots { gap:9px; padding:20px 0 17px; }
+.onboarding-dots button { width:10px; height:10px; background:#e5e7eb; }
+.onboarding-dots button.active { width:10px; background:#2f8df4; }
+.onboarding-actions { gap:10px; }
+.onboarding-actions button { min-height:60px; border-radius:20px; }
+.onboarding-back { flex:0 0 88px; border:1px solid #d8dee7; color:#334155; box-shadow:none; }
+.onboarding-next { background:#2f8df4; color:#fff; box-shadow:none; }
+.onboarding-next span { color:#fff; }
+
+.onboarding-screen-permissions { grid-template-rows:auto minmax(125px,.48fr) auto auto auto; }
+.onboarding-screen-permissions .onboarding-artwork svg { width:min(50vw,185px); max-height:190px; }
+.onboarding-screen-permissions .onboarding-copy h1 { font-size:clamp(25px,6.7vw,31px); }
+.onboarding-screen-permissions .onboarding-copy p { font-size:calc(13px + var(--text-bump)); }
+.onboarding-permissions { gap:7px; margin-top:13px; text-align:left; }
+.onboarding-permissions article { min-height:52px; border:0; border-radius:16px; background:#f6f8fa; }
+.onboarding-permissions article:nth-child(1)>span { background:#dff7ef; color:#008d62; }
+.onboarding-permissions article:nth-child(2)>span { background:#dbeafe; color:#1d6fd6; }
+.onboarding-permissions article button { border-radius:12px; background:#2f8df4; }
+.onboarding-permissions article button.granted { background:#dff7ef; color:#087654; }
+.onboarding-permissions article button.denied { background:#ffe7e3; color:#b13b2e; }
+.onboarding-permissions>small { color:#9aa1aa; }
+
+@media (max-width:365px) {
+  .onboarding-screen { grid-template-rows:auto minmax(218px,1fr) auto auto auto; padding-left:20px; padding-right:20px; }
+  .onboarding-artwork svg { width:min(75vw,270px); }
+  .onboarding-copy h1 { font-size:calc(29px + var(--text-bump)); }
+  .onboarding-copy p { font-size:calc(14px + var(--text-bump)); }
+  .onboarding-screen-permissions { grid-template-rows:auto minmax(100px,.35fr) auto auto auto; }
+  .onboarding-screen-permissions .onboarding-artwork svg { width:min(43vw,160px); max-height:160px; }
+  .onboarding-screen-permissions .onboarding-copy h1 { font-size:calc(25px + var(--text-bump)); }
+  .onboarding-screen-permissions .onboarding-copy p { font-size:calc(12px + var(--text-bump)); }
+  .onboarding-permissions { margin-top:9px; gap:5px; }
+  .onboarding-permissions article { min-height:48px; }
+  .onboarding-dots { padding-top:14px; padding-bottom:13px; }
+}
+
+html[data-contrast="high"] .onboarding-screen { background:#fff; color:#001e1a; }
+html[data-contrast="high"] .onboarding-next { background:#005f4a; }

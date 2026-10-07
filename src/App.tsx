@@ -14,7 +14,7 @@ type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
-type OnboardingArtworkKind = "welcome" | "report" | "location" | "progress" | "permissions";
+type OnboardingArtworkKind = "welcome" | "report" | "location" | "permissions";
 type TextSize = "normal" | "large";
 type PermissionStatus = "idle" | "requesting" | "granted" | "denied" | "unsupported";
 
@@ -151,56 +151,74 @@ function OnboardingArtwork({ kind }: { kind: OnboardingArtworkKind }) {
   return (
     <div className={`onboarding-artwork onboarding-artwork-${kind}`} aria-hidden="true">
       {kind === "welcome" && (
-        <svg viewBox="0 0 280 250">
-          <path className="art-road" d="M48 232c10-56 43-71 79-94 31-20 31-50 71-86" />
-          <path className="art-road-line" d="M48 232c10-56 43-71 79-94 31-20 31-50 71-86" />
-          <circle className="art-head" cx="129" cy="102" r="14" />
-          <path className="art-person" d="m126 119-18 43m18-43 27 23m-27-23 8 49m-8-6-28 33m36-27 25 34" />
-          <circle className="art-sun" cx="218" cy="43" r="28" />
-          <path className="art-check" d="m205 43 10 10 19-22" />
+        <svg viewBox="0 0 320 270">
+          <rect className="fresh-phone" x="76" y="22" width="168" height="224" rx="34" />
+          <path className="fresh-phone-notch" d="M137 39h46" />
+          <path className="fresh-route" d="M107 172c17-35 42-15 56-47 12-28 32-28 50-50" />
+          <circle className="fresh-route-dot start" cx="107" cy="172" r="9" />
+          <circle className="fresh-route-dot end" cx="213" cy="75" r="12" />
+          <path className="fresh-pin-check" d="m207 75 5 5 9-11" />
+          <path className="fresh-mascot" d="M105 182c0-32 21-55 55-55s55 23 55 55v27c0 18-14 32-32 32h-46c-18 0-32-14-32-32Z" />
+          <path className="fresh-arm" d="M111 190c-22-2-29 13-17 24 8 8 19 6 29-2m86-22c22-2 29 13 17 24-8 8-19 6-29-2" />
+          <circle className="fresh-face" cx="144" cy="182" r="5" />
+          <circle className="fresh-face" cx="176" cy="182" r="5" />
+          <path className="fresh-smile" d="M141 199c8 12 30 12 38 0" />
+          <circle className="fresh-spark yellow" cx="55" cy="68" r="14" />
+          <path className="fresh-spark green" d="M258 123h28m-14-14v28" />
         </svg>
       )}
       {kind === "report" && (
-        <svg viewBox="0 0 280 250">
-          <rect className="art-card-back" x="50" y="36" width="166" height="166" rx="25" />
-          <rect className="art-card" x="68" y="53" width="166" height="166" rx="25" />
-          <path className="art-mountain" d="m91 173 37-45 28 29 18-18 38 34" />
-          <circle className="art-sun" cx="189" cy="91" r="16" />
-          <circle className="art-alert" cx="72" cy="194" r="34" />
-          <path className="art-alert-mark" d="M72 176v24m0 10h.1" />
-          <path className="art-add" d="M216 32v28m-14-14h28" />
+        <svg viewBox="0 0 320 270">
+          <rect className="fresh-photo-back" x="61" y="43" width="197" height="172" rx="30" />
+          <rect className="fresh-photo" x="48" y="30" width="197" height="172" rx="30" />
+          <circle className="fresh-photo-sun" cx="190" cy="76" r="18" />
+          <path className="fresh-photo-land" d="m69 169 43-48 34 30 24-25 53 43" />
+          <circle className="fresh-camera-bubble" cx="238" cy="194" r="49" />
+          <rect className="fresh-camera" x="207" y="176" width="62" height="43" rx="12" />
+          <path className="fresh-camera-top" d="M222 176l7-10h18l7 10" />
+          <circle className="fresh-camera-lens" cx="238" cy="198" r="12" />
+          <circle className="fresh-face" cx="92" cy="82" r="5" />
+          <circle className="fresh-face" cx="112" cy="82" r="5" />
+          <path className="fresh-mini-smile" d="M90 96c6 7 18 7 24 0" />
+          <path className="fresh-spark green" d="M51 226h28m-14-14v28" />
+          <circle className="fresh-spark yellow" cx="272" cy="62" r="13" />
         </svg>
       )}
       {kind === "location" && (
-        <svg viewBox="0 0 280 250">
-          <path className="art-map" d="m39 58 62-23 77 24 62-23v156l-62 23-77-24-62 23Z" />
-          <path className="art-map-line" d="m101 35v156m77-132v156M55 115c36-15 65 19 94 1 34-21 43 11 77-8" />
-          <path className="art-pin" d="M140 53c-34 0-61 27-61 61 0 46 61 96 61 96s61-50 61-96c0-34-27-61-61-61Z" />
-          <circle className="art-pin-center" cx="140" cy="113" r="24" />
-          <path className="art-check" d="m126 113 10 11 21-25" />
-        </svg>
-      )}
-      {kind === "progress" && (
-        <svg viewBox="0 0 280 250">
-          <rect className="art-card" x="41" y="28" width="198" height="194" rx="28" />
-          <circle className="art-step active" cx="80" cy="76" r="18" />
-          <circle className="art-step active" cx="80" cy="125" r="18" />
-          <circle className="art-step" cx="80" cy="174" r="18" />
-          <path className="art-timeline" d="M80 94v13m0 36v13" />
-          <path className="art-check-small" d="m70 76 7 7 13-15m-20 57 7 7 13-15" />
-          <path className="art-copy-line" d="M115 69h83m-83 14h55m-55 35h83m-83 14h68m-68 35h83m-83 14h46" />
-          <circle className="art-points" cx="211" cy="198" r="36" />
-          <path className="art-heart" d="M211 213s-20-11-20-27c0-13 16-17 20-6 4-11 20-7 20 6 0 16-20 27-20 27Z" />
+        <svg viewBox="0 0 320 270">
+          <path className="fresh-map left" d="m42 68 76-27v166l-76 27Z" />
+          <path className="fresh-map middle" d="m118 41 84 31v166l-84-31Z" />
+          <path className="fresh-map right" d="m202 72 76-27v166l-76 27Z" />
+          <path className="fresh-map-road" d="M64 126c42-19 62 31 99 6 39-26 57 19 93-2" />
+          <path className="fresh-pin" d="M160 35c-37 0-66 29-66 66 0 50 66 105 66 105s66-55 66-105c0-37-29-66-66-66Z" />
+          <circle className="fresh-pin-face" cx="160" cy="99" r="31" />
+          <circle className="fresh-face" cx="149" cy="94" r="4.5" />
+          <circle className="fresh-face" cx="171" cy="94" r="4.5" />
+          <path className="fresh-mini-smile" d="M147 108c7 9 19 9 26 0" />
+          <circle className="fresh-spark yellow" cx="64" cy="50" r="13" />
+          <path className="fresh-spark green" d="M260 226h27m-13.5-13.5v27" />
         </svg>
       )}
       {kind === "permissions" && (
-        <svg viewBox="0 0 280 250">
-          <path className="art-shield" d="M140 27c27 20 56 25 83 28v58c0 58-36 94-83 113-47-19-83-55-83-113V55c27-3 56-8 83-28Z" />
-          <rect className="art-camera" x="82" y="86" width="58" height="45" rx="11" />
-          <circle className="art-camera-lens" cx="111" cy="108" r="11" />
-          <path className="art-mic" d="M169 83v31a15 15 0 0 0 30 0V83a15 15 0 0 0-30 0Zm-10 29v4a25 25 0 0 0 50 0v-4m-25 29v18m-14 0h28" />
-          <path className="art-location-small" d="M139 151c-20 0-36 16-36 36 0 27 36 54 36 54s36-27 36-54c0-20-16-36-36-36Z" />
-          <circle className="art-location-center" cx="139" cy="187" r="11" />
+        <svg viewBox="0 0 320 270">
+          <rect className="fresh-phone" x="78" y="17" width="164" height="230" rx="34" />
+          <path className="fresh-phone-notch" d="M139 34h42" />
+          <rect className="fresh-permission-card green" x="98" y="65" width="124" height="46" rx="16" />
+          <rect className="fresh-permission-card yellow" x="98" y="120" width="124" height="46" rx="16" />
+          <rect className="fresh-permission-card blue" x="98" y="175" width="124" height="46" rx="16" />
+          <rect className="fresh-permission-camera" x="111" y="78" width="28" height="20" rx="5" />
+          <circle className="fresh-permission-lens" cx="125" cy="88" r="5" />
+          <path className="fresh-permission-mic" d="M123 132v11a7 7 0 0 0 14 0v-11m-19 11v2a12 12 0 0 0 24 0v-2m-12 14v6" />
+          <path className="fresh-permission-pin" d="M130 185c-8 0-14 6-14 14 0 11 14 21 14 21s14-10 14-21c0-8-6-14-14-14Z" />
+          <circle className="fresh-permission-pin-dot" cx="130" cy="199" r="4" />
+          <path className="fresh-toggle" d="M176 80h22a9 9 0 0 1 0 18h-22a9 9 0 0 1 0-18Z" />
+          <circle className="fresh-toggle-dot" cx="198" cy="89" r="7" />
+          <path className="fresh-toggle" d="M176 134h22a9 9 0 0 1 0 18h-22a9 9 0 0 1 0-18Z" />
+          <circle className="fresh-toggle-dot" cx="198" cy="143" r="7" />
+          <path className="fresh-toggle" d="M176 189h22a9 9 0 0 1 0 18h-22a9 9 0 0 1 0-18Z" />
+          <circle className="fresh-toggle-dot" cx="198" cy="198" r="7" />
+          <circle className="fresh-spark yellow" cx="57" cy="76" r="14" />
+          <path className="fresh-spark green" d="M257 190h28m-14-14v28" />
         </svg>
       )}
     </div>
