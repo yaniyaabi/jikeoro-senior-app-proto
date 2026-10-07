@@ -143,19 +143,33 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .progress-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #65bd36, var(--lime)); }
 .mission-card>button { width: 100%; min-height: 50px; border: 0; background: transparent; color: #214d1a; padding: 13px 0 0; display: flex; align-items: center; justify-content: space-between; font-size: 17px; font-weight: 950; cursor: pointer; }
 
-.report-guide-card { border-radius: 23px; padding: 19px; background: white; border: 1px solid var(--line); box-shadow: 0 10px 28px rgba(16,45,42,.07); }
+.report-guide-card { border-radius: 23px; padding: 19px; background: white; border: 1px solid var(--line); box-shadow: 0 10px 28px rgba(16,45,42,.07); overflow: hidden; }
 .report-guide-heading>span { display: inline-flex; align-items: center; min-height: 30px; border-radius: 999px; background: #eaf6d9; color: #476b2d; padding: 6px 11px; font-size: 13px; font-weight: 950; }
 .report-guide-heading h2 { margin: 11px 0 5px; color: var(--ink); font-size: 26px; letter-spacing: -.045em; }
 .report-guide-heading p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; font-weight: 800; }
-.report-guide-steps { list-style: none; margin: 15px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
-.report-guide-steps li { min-width: 0; min-height: 84px; border-radius: 14px; background: #f1f5ed; padding: 13px 11px; display: flex; align-items: center; gap: 11px; }
-.report-guide-steps b { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; font-size: 16px; }
-.report-guide-steps li:first-child b { background: var(--coral); color: white; }
-.report-guide-steps li>span { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.report-guide-steps strong { color: var(--ink); font-size: 17px; white-space: nowrap; }
-.report-guide-steps small { color: var(--muted); font-size: 13px; line-height: 1.35; font-weight: 800; white-space: nowrap; }
-.report-guide-card>button { width: 100%; min-height: 49px; margin-top: 12px; border: 0; border-radius: 13px; background: var(--navy); color: white; padding: 11px 15px; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 950; cursor: pointer; }
-.report-guide-card>button span { color: var(--lime); font-size: 22px; line-height: 1; }
+.report-guide-slide { position: relative; width: 100%; min-height: 285px; margin-top: 15px; border: 0; border-radius: 20px; padding: 18px 18px 17px; color: var(--ink); cursor: pointer; touch-action: pan-y; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; transition: background .22s ease, transform .16s ease; }
+.report-guide-slide:active { transform: scale(.985); }
+.report-guide-slide.guide-media { background: #eef8e2; }
+.report-guide-slide.guide-reason { background: #e7f4f2; }
+.report-guide-slide.guide-location { background: #eaf3fa; }
+.report-guide-slide.guide-submit { background: #fff0e9; }
+.report-guide-count { position: absolute; top: 14px; left: 15px; min-width: 50px; min-height: 31px; border-radius: 999px; padding: 6px 10px; background: rgba(255,255,255,.88); color: var(--navy); font-size: 14px; line-height: 19px; font-weight: 950; box-shadow: 0 3px 12px rgba(16,45,42,.08); }
+.report-guide-illustration { width: 122px; height: 122px; margin: 8px 0 9px; border-radius: 39px; background: var(--navy); color: var(--lime); display: grid; place-items: center; box-shadow: 0 12px 25px rgba(16,45,42,.18); }
+.guide-submit .report-guide-illustration { background: var(--coral); color: white; }
+.report-guide-art { width: 92px; height: 92px; fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.report-guide-slide>strong { max-width: 320px; color: var(--ink); font-size: 23px; line-height: 1.3; letter-spacing: -.035em; word-break: keep-all; }
+.report-guide-slide>small { max-width: 310px; margin-top: 7px; color: var(--muted); font-size: 16px; line-height: 1.5; font-weight: 800; word-break: keep-all; }
+.report-guide-slide>em { margin-top: 11px; color: #3e685d; font-size: 13px; line-height: 1.4; font-style: normal; font-weight: 900; }
+.report-guide-dots { min-height: 32px; margin: 8px 0 5px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.report-guide-dots button { width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; padding: 0; cursor: pointer; display: grid; place-items: center; }
+.report-guide-dots button::after { content: ""; width: 9px; height: 9px; border-radius: 999px; background: #b5c5be; transition: width .2s ease, background .2s ease; }
+.report-guide-dots button.active::after { width: 26px; background: var(--navy); }
+.report-guide-actions { display: grid; grid-template-columns: 92px minmax(0,1fr); gap: 8px; }
+.report-guide-actions>button { min-height: 55px; border-radius: 14px; padding: 11px 14px; cursor: pointer; font-size: 16px; font-weight: 950; }
+.report-guide-actions>button:only-child { grid-column: 1 / -1; }
+.report-guide-prev { border: 2px solid #c6d2cc; background: white; color: var(--navy); }
+.report-guide-next { border: 0; background: var(--navy); color: white; }
+.report-guide-actions>button:active { transform: translateY(1px); }
 
 .report-type { padding: 8px 10px; border-radius: 999px; background: #ffe2dc; color: #ba4134; font-size: 14px; font-weight: 950; white-space: nowrap; }
 .flow-heading { display: grid; grid-template-columns: 48px 1fr; align-items: start; gap: 12px; margin-bottom: 15px; }
@@ -560,11 +574,13 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .home-main .hero-icon { width: 38px; height: 38px; }
   .home-main .report-hero h2 { font-size: 22px; }
   .home-main .report-guide-card { padding: 15px; }
-  .report-guide-steps { gap: 6px; }
-  .report-guide-steps li { min-height: 80px; padding: 10px 8px; gap: 7px; }
-  .report-guide-steps b { width: 31px; height: 31px; font-size: 15px; }
-  .report-guide-steps strong { font-size: 15px; }
-  .report-guide-steps small { font-size: 12px; white-space: normal; word-break: keep-all; }
+  .report-guide-heading h2 { font-size: 24px; }
+  .report-guide-slide { min-height: 270px; padding-left: 13px; padding-right: 13px; }
+  .report-guide-illustration { width: 108px; height: 108px; border-radius: 34px; }
+  .report-guide-art { width: 82px; height: 82px; }
+  .report-guide-slide>strong { font-size: 21px; }
+  .report-guide-slide>small { font-size: 15px; }
+  .report-guide-actions { grid-template-columns: 82px minmax(0,1fr); }
   .app-header { gap: 7px; padding-left: 10px; padding-right: 8px; }
   .brand-button { gap: 7px; }
   .brand-button strong { font-size: 21px; }
@@ -578,11 +594,6 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .capture-button small { font-size: 11px; }
   .location-methods button { gap: 6px; padding-left: 5px; padding-right: 5px; }
   .location-methods button strong { width: auto; font-size: 15px; }
-}
-
-@media (max-width: 320px) {
-  .report-guide-steps { grid-template-columns: 1fr; }
-  .report-guide-steps li { min-height: 62px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

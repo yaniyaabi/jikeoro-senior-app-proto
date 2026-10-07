@@ -14,6 +14,7 @@ type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
+type ReportGuideKind = "media" | "reason" | "location" | "submit";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -76,6 +77,39 @@ const riskDetails: Record<string, { name: string; help: string }[]> = {
 
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
 const appIconPath = `${import.meta.env.BASE_URL}icon-v2-192.png`;
+
+const reportGuideSlides: { kind: ReportGuideKind; title: string; description: string }[] = [
+  { kind: "media", title: "사진이나 영상을 추가해요", description: "지금 촬영하거나 보관함에서 선택할 수 있어요." },
+  { kind: "reason", title: "위험한 이유를 알려주세요", description: "편하게 말하거나 알맞은 항목을 고르면 돼요." },
+  { kind: "location", title: "위험한 위치를 확인해요", description: "현재 위치를 쓰거나 지도에서 직접 고를 수 있어요." },
+  { kind: "submit", title: "확인하고 제보를 보내요", description: "내용을 한 번 확인하면 제보가 완료돼요." },
+];
+
+function ReportGuideArt({ kind }: { kind: ReportGuideKind }) {
+  return (
+    <svg className="report-guide-art" viewBox="0 0 160 160" aria-hidden="true">
+      {kind === "media" && <>
+        <rect x="27" y="48" width="106" height="76" rx="19" />
+        <path d="M55 48l10-17h30l10 17" />
+        <circle cx="80" cy="86" r="23" />
+        <path d="M114 65h1" />
+      </>}
+      {kind === "reason" && <>
+        <path d="M27 38h106v68H79l-25 20v-20H27z" />
+        <rect x="67" y="56" width="26" height="34" rx="13" />
+        <path d="M58 78c0 13 9 22 22 22s22-9 22-22M80 100v14M67 114h26" />
+      </>}
+      {kind === "location" && <>
+        <path d="M80 128s39-35 39-66a39 39 0 1 0-78 0c0 31 39 66 39 66z" />
+        <circle cx="80" cy="62" r="15" />
+      </>}
+      {kind === "submit" && <>
+        <rect x="41" y="27" width="78" height="106" rx="14" />
+        <path d="M60 54h40M60 73h25M59 101l12 12 29-31" />
+      </>}
+    </svg>
+  );
+}
 
 function BrandName() {
   return <>지켜<span className="brand-hanja">路</span></>;
@@ -273,6 +307,7 @@ function App() {
   const [rewardFormError, setRewardFormError] = useState("");
   const [rewardRequests, setRewardRequests] = useState<RewardRequest[]>([]);
   const [rewardRequestNotice, setRewardRequestNotice] = useState("");
+  const [reportGuideStep, setReportGuideStep] = useState(0);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -285,6 +320,8 @@ function App() {
   const riskDetailPanelRef = useRef<HTMLDivElement>(null);
   const mainContentRef = useRef<HTMLElement>(null);
   const speechRunRef = useRef(0);
+  const reportGuideTouchStartRef = useRef<number | null>(null);
+  const reportGuideSwipedRef = useRef(false);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -384,6 +421,7 @@ function App() {
   const rewardExchangeRemaining = Math.max(0, REWARD_EXCHANGE_MINIMUM - rewardAvailablePoints);
   const rewardExchangeProgress = Math.min(100, (rewardAvailablePoints / REWARD_EXCHANGE_MINIMUM) * 100);
   const canExchangeReward = rewardAvailablePoints >= REWARD_EXCHANGE_MINIMUM && !pendingRewardRequest;
+  const activeReportGuide = reportGuideSlides[reportGuideStep];
   const visibleReports = useMemo(() => reports.filter((report) => {
     if (activityFilter === "completed") return report.status === "completed";
     if (activityFilter === "active") return report.status !== "completed";
@@ -396,6 +434,27 @@ function App() {
     if (view === "rewards") return "참여와 마일리지";
     return "오늘도 안전하게 걸어요";
   }, [view, step]);
+
+  const moveReportGuide = (direction: -1 | 1) => {
+    setReportGuideStep((current) => Math.max(0, Math.min(reportGuideSlides.length - 1, current + direction)));
+  };
+
+  const advanceReportGuide = () => {
+    if (reportGuideStep === reportGuideSlides.length - 1) {
+      openReport();
+      return;
+    }
+    moveReportGuide(1);
+  };
+
+  const finishReportGuideSwipe = (clientX: number) => {
+    const startX = reportGuideTouchStartRef.current;
+    reportGuideTouchStartRef.current = null;
+    if (startX === null || Math.abs(clientX - startX) < 42) return;
+    reportGuideSwipedRef.current = true;
+    moveReportGuide(clientX < startX ? 1 : -1);
+    window.setTimeout(() => { reportGuideSwipedRef.current = false; }, 0);
+  };
 
   const changeAuthMode = (mode: AuthMode) => {
     setAuthMode(mode);
@@ -906,15 +965,40 @@ function App() {
                 <div className="report-guide-heading">
                   <span>처음이어도 괜찮아요</span>
                   <h2 id="report-guide-title">위험요소 제보 방법</h2>
-                  <p>화면의 큰 버튼을 순서대로 누르면 됩니다.</p>
+                  <p>그림을 누르며 한 단계씩 살펴보세요.</p>
                 </div>
-                <ol className="report-guide-steps">
-                  <li><b>1</b><span><strong>사진·영상</strong><small>찍거나 선택해요</small></span></li>
-                  <li><b>2</b><span><strong>위험한 이유</strong><small>말하거나 골라요</small></span></li>
-                  <li><b>3</b><span><strong>위치 확인</strong><small>지도를 확인해요</small></span></li>
-                  <li><b>4</b><span><strong>내용 보내기</strong><small>확인하고 제출해요</small></span></li>
-                </ol>
-                <button onClick={openReport}>1단계부터 시작하기 <span>→</span></button>
+                <button
+                  type="button"
+                  className={`report-guide-slide guide-${activeReportGuide.kind}`}
+                  onClick={() => { if (!reportGuideSwipedRef.current) advanceReportGuide(); }}
+                  onTouchStart={(event) => { reportGuideTouchStartRef.current = event.touches[0]?.clientX ?? null; }}
+                  onTouchEnd={(event) => finishReportGuideSwipe(event.changedTouches[0]?.clientX ?? 0)}
+                  aria-label={`${reportGuideStep + 1}단계. ${activeReportGuide.title}. ${reportGuideStep === reportGuideSlides.length - 1 ? "누르면 제보를 시작합니다." : "누르면 다음 단계를 봅니다."}`}
+                >
+                  <span className="report-guide-count">{reportGuideStep + 1} / {reportGuideSlides.length}</span>
+                  <span className="report-guide-illustration"><ReportGuideArt kind={activeReportGuide.kind} /></span>
+                  <strong>{activeReportGuide.title}</strong>
+                  <small>{activeReportGuide.description}</small>
+                  <em>{reportGuideStep === reportGuideSlides.length - 1 ? "눌러서 제보 시작" : "눌러서 다음 보기"}</em>
+                </button>
+                <div className="report-guide-dots" role="group" aria-label="제보 방법 단계 선택">
+                  {reportGuideSlides.map((slide, index) => (
+                    <button
+                      type="button"
+                      className={reportGuideStep === index ? "active" : ""}
+                      onClick={() => setReportGuideStep(index)}
+                      aria-label={`${index + 1}단계 ${slide.title}`}
+                      aria-current={reportGuideStep === index ? "step" : undefined}
+                      key={slide.kind}
+                    />
+                  ))}
+                </div>
+                <div className="report-guide-actions">
+                  {reportGuideStep > 0 && <button type="button" className="report-guide-prev" onClick={() => moveReportGuide(-1)}>이전</button>}
+                  <button type="button" className="report-guide-next" onClick={advanceReportGuide}>
+                    {reportGuideStep === reportGuideSlides.length - 1 ? "제보 시작하기" : "다음 단계 보기"}
+                  </button>
+                </div>
               </section>
 
             </>
