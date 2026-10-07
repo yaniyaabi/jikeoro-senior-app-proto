@@ -1229,7 +1229,7 @@ function App() {
                 </button>
                 <button className="home-feature-card home-feature-rewards" type="button" onClick={() => navigate("rewards")}>
                   <span className="home-feature-label">동네지킴이 Lv.{participation.level}</span>
-                  <span className="home-feature-icon"><img src={iconPath("feature-rewards-blue-3d.png")} alt="" /></span>
+                  <span className="home-feature-icon"><img src={iconPath("feature-rewards-3d.png")} alt="" /></span>
                   <strong>마일리지</strong>
                   <small>{participation.points.toLocaleString()}P</small>
                   <b aria-hidden="true">→</b>
