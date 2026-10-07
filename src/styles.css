@@ -147,15 +147,56 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .report-guide-heading>span { display: inline-flex; align-items: center; min-height: 30px; border-radius: 999px; background: #eaf6d9; color: #476b2d; padding: 6px 11px; font-size: 13px; font-weight: 950; }
 .report-guide-heading h2 { margin: 11px 0 5px; color: var(--ink); font-size: 26px; letter-spacing: -.045em; }
 .report-guide-heading p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; font-weight: 800; }
-.report-guide-steps { list-style: none; margin: 15px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
-.report-guide-steps li { min-width: 0; min-height: 84px; border-radius: 14px; background: #f1f5ed; padding: 13px 11px; display: flex; align-items: center; gap: 11px; }
-.report-guide-steps b { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: var(--lime); display: grid; place-items: center; font-size: 16px; }
-.report-guide-steps li:first-child b { background: var(--coral); color: white; }
-.report-guide-steps li>span { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.report-guide-steps strong { color: var(--ink); font-size: 17px; white-space: nowrap; }
-.report-guide-steps small { color: var(--muted); font-size: 13px; line-height: 1.35; font-weight: 800; white-space: nowrap; }
-.report-guide-card>button { width: 100%; min-height: 49px; margin-top: 12px; border: 0; border-radius: 13px; background: var(--navy); color: white; padding: 11px 15px; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 950; cursor: pointer; }
-.report-guide-card>button span { color: var(--lime); font-size: 22px; line-height: 1; }
+.app-guide-screen { position: relative; min-height: 337px; margin-top: 16px; border-radius: 18px; overflow: hidden; background: #f4f7f0; padding: 32px 18px 17px; display: flex; flex-direction: column; box-shadow: inset 0 0 0 1px #d8e2d7; }
+.app-guide-progress { position: absolute; inset: 0 0 auto; height: 6px; background: #dce5dc; }
+.app-guide-progress span { display: block; height: 100%; background: var(--coral); transition: width .25s; }
+.app-guide-count { color: #60776e; font-size: 12px; font-weight: 950; letter-spacing: .08em; }
+.app-guide-screen-title { margin-top: 8px; color: var(--ink); font-size: 25px; line-height: 1.14; letter-spacing: -.05em; }
+.app-guide-screen>p { margin: 8px 0 13px; color: var(--muted); font-size: 13px; line-height: 1.45; font-weight: 750; }
+.app-guide-media-options { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.app-guide-media-options>span { min-height: 115px; border: 1.5px dashed #9eb1a5; border-radius: 13px; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.app-guide-media-options img { width: 53px; height: 53px; object-fit: contain; }
+.app-guide-media-options b { margin-top: 2px; font-size: 15px; }
+.app-guide-media-options small { margin-top: 2px; color: var(--muted); font-size: 11px; font-weight: 800; }
+.app-guide-example-button { min-height: 43px; margin-top: auto; border-radius: 11px; background: var(--navy); color: white; padding: 10px 13px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 950; }
+.app-guide-example-button b { color: var(--lime); font-size: 20px; }
+.app-guide-field-label { margin: 14px 0 7px; color: var(--ink); font-size: 12px; font-weight: 950; }
+.app-guide-type-options { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; }
+.app-guide-type-options>* { min-width: 0; border: 1px solid #c9d5cc; border-radius: 8px; background: white; padding: 8px 2px; text-align: center; font-size: 10px; white-space: nowrap; }
+.app-guide-type-options>b { background: var(--navy); border-color: var(--navy); color: white; }
+.app-guide-description-row { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; }
+.app-guide-description-row>span { border: 1px solid #c9d5cc; border-radius: 8px; background: white; padding: 7px 9px; font-weight: 900; }
+.app-guide-textarea { min-height: 60px; margin-top: 6px; border: 1px solid #c9d5cc; border-radius: 9px; background: white; padding: 10px; color: #7a8e86; font-size: 11px; line-height: 1.4; }
+.app-guide-location-options { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 14px 0 9px; }
+.app-guide-location-options>* { border: 1px solid #c9d5cc; border-radius: 9px; background: white; padding: 9px 4px; text-align: center; font-size: 11px; }
+.app-guide-location-options>b { background: var(--navy); border-color: var(--navy); color: white; }
+.app-guide-map { position: relative; height: 142px; border: 1px solid #c9d5cc; border-radius: 12px; overflow: hidden; background: #dfe9dc; }
+.app-guide-map>i { position: absolute; left: -10%; top: 44%; width: 120%; height: 14px; background: white; border: 1px solid #c9d3ca; transform: rotate(-9deg); }
+.app-guide-map>i:nth-child(2) { top: 30%; transform: rotate(34deg); }
+.app-guide-map>span { position: absolute; left: 50%; top: 47%; transform: translate(-50%,-50%); width: 34px; height: 34px; border: 4px solid white; border-radius: 50% 50% 50% 8px; background: var(--coral); color: white; display: grid; place-items: center; rotate: -45deg; box-shadow: 0 5px 12px rgba(16,45,42,.23); }
+.app-guide-map>small { position: absolute; left: 50%; bottom: 9px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 16px); border-radius: 999px; background: rgba(255,255,255,.93); padding: 6px 9px; font-size: 10px; font-weight: 850; }
+.app-guide-review { margin-top: 15px; border: 1px solid #d1dbd0; border-radius: 12px; background: white; padding: 10px 12px; }
+.app-guide-review>b { display: block; margin-bottom: 5px; font-size: 14px; }
+.app-guide-review>span { display: grid; grid-template-columns: 70px 1fr; border-top: 1px solid #dce4dc; padding: 8px 0; font-size: 12px; font-weight: 900; }
+.app-guide-review small { color: var(--muted); font-size: 11px; }
+.report-guide-copy { padding: 17px 2px 2px; }
+.report-guide-copy>span { display: inline-flex; border-radius: 999px; background: #e6f3d5; color: #315c39; padding: 6px 10px; font-size: 12px; font-weight: 950; }
+.report-guide-copy h3 { margin: 10px 0 6px; color: var(--ink); font-size: 23px; letter-spacing: -.04em; }
+.report-guide-copy>p { margin: 0; color: #38564d; font-size: 15px; line-height: 1.55; font-weight: 800; word-break: keep-all; }
+.report-guide-copy>small { margin-top: 11px; border-radius: 11px; background: #eff5e9; padding: 10px 11px; display: flex; align-items: flex-start; gap: 7px; color: #526c62; font-size: 12px; line-height: 1.45; font-weight: 800; word-break: keep-all; }
+.report-guide-copy>small b { flex: 0 0 auto; color: #3f8443; }
+.report-guide-tabs { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-top: 14px; }
+.report-guide-tabs button { min-width: 0; min-height: 68px; border: 1px solid #ccd7ce; border-radius: 12px; background: white; color: var(--ink); padding: 7px 3px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; }
+.report-guide-tabs button>b { width: 27px; height: 27px; border-radius: 50%; background: #e7eee5; display: grid; place-items: center; font-size: 13px; }
+.report-guide-tabs button>span { font-size: 10px; line-height: 1.2; font-weight: 900; word-break: keep-all; }
+.report-guide-tabs button.active { background: var(--navy); border-color: var(--navy); color: white; }
+.report-guide-tabs button.active>b { background: var(--lime); color: var(--navy); }
+.report-guide-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 9px; }
+.report-guide-navigation button { min-height: 43px; border: 1px solid #c6d3c9; border-radius: 11px; background: white; color: var(--ink); font-size: 13px; font-weight: 900; cursor: pointer; }
+.report-guide-navigation button:last-child { background: #edf4e8; }
+.report-guide-navigation button:disabled { opacity: .35; cursor: default; }
+.report-guide-card>.report-guide-start { width: 100%; min-height: 51px; margin-top: 12px; border: 0; border-radius: 13px; background: var(--navy); color: white; padding: 11px 15px; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 950; cursor: pointer; }
+.report-guide-card>.report-guide-start span { color: var(--lime); font-size: 22px; line-height: 1; }
 
 .report-type { padding: 8px 10px; border-radius: 999px; background: #ffe2dc; color: #ba4134; font-size: 14px; font-weight: 950; white-space: nowrap; }
 .flow-heading { display: grid; grid-template-columns: 48px 1fr; align-items: start; gap: 12px; margin-bottom: 15px; }
@@ -560,11 +601,12 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
   .home-main .hero-icon { width: 38px; height: 38px; }
   .home-main .report-hero h2 { font-size: 22px; }
   .home-main .report-guide-card { padding: 15px; }
-  .report-guide-steps { gap: 6px; }
-  .report-guide-steps li { min-height: 80px; padding: 10px 8px; gap: 7px; }
-  .report-guide-steps b { width: 31px; height: 31px; font-size: 15px; }
-  .report-guide-steps strong { font-size: 15px; }
-  .report-guide-steps small { font-size: 12px; white-space: normal; word-break: keep-all; }
+  .app-guide-screen { min-height: 325px; padding-left: 14px; padding-right: 14px; }
+  .app-guide-screen-title { font-size: 23px; }
+  .report-guide-copy h3 { font-size: 21px; }
+  .report-guide-tabs { gap: 4px; }
+  .report-guide-tabs button { min-height: 65px; }
+  .report-guide-tabs button>span { font-size: 9px; }
   .app-header { gap: 7px; padding-left: 10px; padding-right: 8px; }
   .brand-button { gap: 7px; }
   .brand-button strong { font-size: 21px; }
@@ -581,8 +623,8 @@ html[data-contrast="high"] .history-list article { border-width: 2px; }
 }
 
 @media (max-width: 320px) {
-  .report-guide-steps { grid-template-columns: 1fr; }
-  .report-guide-steps li { min-height: 62px; }
+  .report-guide-tabs { grid-template-columns: repeat(2,1fr); }
+  .report-guide-tabs button { min-height: 58px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

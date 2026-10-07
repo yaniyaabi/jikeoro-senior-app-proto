@@ -77,6 +77,83 @@ const riskDetails: Record<string, { name: string; help: string }[]> = {
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
 const appIconPath = `${import.meta.env.BASE_URL}icon-v2-192.png`;
 
+const reportGuideSteps = [
+  {
+    shortTitle: "사진·영상",
+    title: "위험 모습을 남겨요",
+    description: "사진이나 영상이 있다면 촬영하거나 기기에서 골라주세요.",
+    tip: "자료가 없어도 바로 다음 단계로 넘어갈 수 있어요.",
+  },
+  {
+    shortTitle: "위험한 이유",
+    title: "위험한 이유를 알려줘요",
+    description: "위험 종류를 고르고, 편한 방법으로 상황을 설명해주세요.",
+    tip: "직접 쓰거나 ‘말로 글쓰기’를 이용할 수 있어요.",
+  },
+  {
+    shortTitle: "위치 확인",
+    title: "위험한 장소를 확인해요",
+    description: "현재 위치를 불러온 뒤 지도에서 정확한 장소를 확인해주세요.",
+    tip: "GPS가 어렵다면 장소 이름을 직접 적어도 돼요.",
+  },
+  {
+    shortTitle: "내용 보내기",
+    title: "내용을 확인하고 보내요",
+    description: "위험유형과 위치가 맞는지 마지막으로 확인하면 끝이에요.",
+    tip: "틀린 내용이 있으면 이전 단계로 돌아가 고칠 수 있어요.",
+  },
+] as const;
+
+function ReportGuidePreview({ step }: { step: number }) {
+  return (
+    <div className="app-guide-screen" aria-label={`${step}단계 제보 화면 예시`}>
+      <div className="app-guide-progress"><span style={{ width: `${step * 25}%` }} /></div>
+      <span className="app-guide-count">{step} / 4</span>
+      {step === 1 && (
+        <>
+          <strong className="app-guide-screen-title">위험 모습을<br />남겨주세요.</strong>
+          <p>사진이나 영상을 촬영하거나 선택해주세요.</p>
+          <div className="app-guide-media-options">
+            <span><img src={iconPath("camera.png")} alt="" /><b>사진</b><small>촬영·선택</small></span>
+            <span><img src={iconPath("video.png")} alt="" /><b>영상</b><small>촬영·선택</small></span>
+          </div>
+          <div className="app-guide-example-button">위험요소 선택하기 <b>→</b></div>
+        </>
+      )}
+      {step === 2 && (
+        <>
+          <strong className="app-guide-screen-title">위험한 이유를<br />알려주세요.</strong>
+          <small className="app-guide-field-label">위험요소 유형</small>
+          <div className="app-guide-type-options"><b>인도</b><span>횡단보도</span><span>조도</span><span>날씨</span><span>기타</span></div>
+          <div className="app-guide-description-row"><b>설명</b><span>♬ 말로 글쓰기</span></div>
+          <div className="app-guide-textarea">예: 보도블록이 깨져 있어서 넘어질 것 같아요.</div>
+          <div className="app-guide-example-button">위치 입력하기 <b>→</b></div>
+        </>
+      )}
+      {step === 3 && (
+        <>
+          <strong className="app-guide-screen-title">위험한 장소를<br />확인해주세요.</strong>
+          <div className="app-guide-location-options"><b>● 현재 위치 사용</b><span>⌨ 직접 입력</span></div>
+          <div className="app-guide-map"><i /><i /><span>●</span><small>지도를 움직여 핀을 맞춰주세요</small></div>
+          <div className="app-guide-example-button">제보내용 확인하기 <b>→</b></div>
+        </>
+      )}
+      {step === 4 && (
+        <>
+          <strong className="app-guide-screen-title">제보내용을<br />확인해주세요.</strong>
+          <div className="app-guide-review">
+            <b>제보내용 확인</b>
+            <span><small>위험유형</small> 인도</span>
+            <span><small>위치</small> 지도에서 선택한 위치</span>
+            <span><small>첨부</small> 사진 1장</span>
+          </div>
+          <div className="app-guide-example-button">제보 완료하기 <b>→</b></div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function BrandName() {
   return <>지켜<span className="brand-hanja">路</span></>;
 }
@@ -248,6 +325,7 @@ function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [view, setView] = useState<View>("home");
   const [step, setStep] = useState(1);
+  const [guideStep, setGuideStep] = useState(1);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [riskType, setRiskType] = useState("");
   const [riskDetail, setRiskDetail] = useState("");
@@ -906,15 +984,33 @@ function App() {
                 <div className="report-guide-heading">
                   <span>처음이어도 괜찮아요</span>
                   <h2 id="report-guide-title">위험요소 제보 방법</h2>
-                  <p>화면의 큰 버튼을 순서대로 누르면 됩니다.</p>
+                  <p>실제 화면을 보면서 한 단계씩 익혀보세요.</p>
                 </div>
-                <ol className="report-guide-steps">
-                  <li><b>1</b><span><strong>사진·영상</strong><small>찍거나 선택해요</small></span></li>
-                  <li><b>2</b><span><strong>위험한 이유</strong><small>말하거나 골라요</small></span></li>
-                  <li><b>3</b><span><strong>위치 확인</strong><small>지도를 확인해요</small></span></li>
-                  <li><b>4</b><span><strong>내용 보내기</strong><small>확인하고 제출해요</small></span></li>
-                </ol>
-                <button onClick={openReport}>1단계부터 시작하기 <span>→</span></button>
+                <ReportGuidePreview step={guideStep} />
+                <div className="report-guide-copy" aria-live="polite">
+                  <span>{guideStep}단계</span>
+                  <h3>{reportGuideSteps[guideStep - 1].title}</h3>
+                  <p>{reportGuideSteps[guideStep - 1].description}</p>
+                  <small><b>✓</b>{reportGuideSteps[guideStep - 1].tip}</small>
+                </div>
+                <div className="report-guide-tabs" role="group" aria-label="제보 방법 단계 선택">
+                  {reportGuideSteps.map((item, index) => (
+                    <button
+                      type="button"
+                      className={guideStep === index + 1 ? "active" : ""}
+                      aria-pressed={guideStep === index + 1}
+                      onClick={() => setGuideStep(index + 1)}
+                      key={item.shortTitle}
+                    >
+                      <b>{index + 1}</b><span>{item.shortTitle}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="report-guide-navigation">
+                  <button type="button" onClick={() => setGuideStep((value) => Math.max(1, value - 1))} disabled={guideStep === 1}>← 이전</button>
+                  <button type="button" onClick={() => setGuideStep((value) => Math.min(4, value + 1))} disabled={guideStep === 4}>다음 →</button>
+                </div>
+                <button className="report-guide-start" onClick={openReport}>직접 제보해보기 <span>→</span></button>
               </section>
 
             </>
