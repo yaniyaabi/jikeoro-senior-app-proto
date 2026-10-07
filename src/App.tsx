@@ -1504,7 +1504,7 @@ function App() {
 
         <nav className="bottom-nav" aria-label="앱 주요 메뉴">
           <button className={view === "home" ? "active" : ""} onClick={() => navigate("home")}><span><NavIcon name="home" /></span><strong>홈</strong></button>
-          <button aria-label="새로운 위험요소 제보하기" className={view === "report" ? "active report-nav" : "report-nav"} onClick={() => navigate("report")}><span><NavIcon name="report" /></span><strong>제보</strong></button>
+          <button aria-label="새로운 위험요소 제보하기" className={view === "report" ? "active" : ""} onClick={() => navigate("report")}><span><NavIcon name="report" /></span><strong>제보</strong></button>
           <button className={view === "history" ? "active" : ""} onClick={() => navigate("history")}><span><NavIcon name="history" /></span><strong>내 기록</strong></button>
           <button className={view === "rewards" ? "active" : ""} onClick={() => navigate("rewards")}><span><NavIcon name="reward" /></span><strong>참여</strong></button>
         </nav>
