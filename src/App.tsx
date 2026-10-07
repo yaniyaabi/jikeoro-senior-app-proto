@@ -376,7 +376,12 @@ function App() {
   const [showLaunch, setShowLaunch] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(() => new URLSearchParams(window.location.search).get("onboarding-preview") === "1" || localStorage.getItem(ONBOARDING_STORAGE_KEY) !== "complete");
   const [onboardingStep, setOnboardingStep] = useState(0);
-  const [currentUser, setCurrentUser] = useState<PrototypeUser | null>(() => readPrototypeSession());
+  const [currentUser, setCurrentUser] = useState<PrototypeUser | null>(() => {
+    if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("design-preview") === "1") {
+      return { id: "design-preview", name: "지킴이", email: "preview@jikeoro.local" };
+    }
+    return readPrototypeSession();
+  });
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [authName, setAuthName] = useState("");
   const [authEmail, setAuthEmail] = useState("");
@@ -981,7 +986,7 @@ function App() {
     if (next === "report") openReport();
     else {
       setView(next);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0 });
     }
   };
 
@@ -1210,22 +1215,39 @@ function App() {
               <section className="hello-card">
                 <div>
                   <div className="hello-greeting"><p>안녕하세요, {currentUser.name}님</p><button className="logout-link" type="button" onClick={logout}>로그아웃</button></div>
-                  <h1>오늘도 안전하게<br />걸어요.</h1>
+                  <h1>오늘도 우리 동네를<br />안전하게 지켜요.</h1>
                 </div>
-                <div className="points-pill"><span>나의 마일리지</span><strong>{participation.points.toLocaleString()}P</strong><small>동네지킴이 Lv.{participation.level}</small></div>
               </section>
 
-              <section className="report-hero">
-                <span className="hero-icon">!</span>
-                <div><p>길에서 불편하거나 위험한 곳을 발견하셨나요?</p><h2>60초면 제보할 수 있어요</h2></div>
-                <button onClick={openReport}><span>＋</span> 위험요소 제보하기</button>
+              <section className="home-feature-grid" aria-label="주요 기능">
+                <button className="home-feature-card home-feature-report" type="button" onClick={openReport}>
+                  <span className="home-feature-label">빠른 제보</span>
+                  <span className="home-feature-icon"><NavIcon name="report" /></span>
+                  <strong>위험요소<br />제보하기</strong>
+                  <small>60초면 남길 수 있어요</small>
+                  <b aria-hidden="true">→</b>
+                </button>
+                <button className="home-feature-card home-feature-history" type="button" onClick={() => navigate("history")}>
+                  <span className="home-feature-label">처리 현황</span>
+                  <span className="home-feature-icon"><NavIcon name="history" /></span>
+                  <strong>내 기록</strong>
+                  <small>{reports.length}건의 제보</small>
+                  <b aria-hidden="true">→</b>
+                </button>
+                <button className="home-feature-card home-feature-rewards" type="button" onClick={() => navigate("rewards")}>
+                  <span className="home-feature-label">동네지킴이 Lv.{participation.level}</span>
+                  <span className="home-feature-icon"><NavIcon name="reward" /></span>
+                  <strong>마일리지</strong>
+                  <small>{participation.points.toLocaleString()}P</small>
+                  <b aria-hidden="true">→</b>
+                </button>
               </section>
 
               <section className="report-guide-card" aria-labelledby="report-guide-title">
                 <div className="report-guide-heading">
                   <div className="report-guide-heading-row"><span>처음이어도 괜찮아요</span><button type="button" onClick={openOnboarding}>처음 안내 다시 보기</button></div>
                   <h2 id="report-guide-title">위험요소 제보 방법</h2>
-                  <p>실제 화면을 보면서 한 단계씩 익혀보세요.</p>
+                  <p>아래 단계를 차례로 누르며 쉽게 확인해보세요.</p>
                 </div>
                 <div className="report-guide-copy" aria-live="polite">
                   <span>{guideStep}단계</span>
