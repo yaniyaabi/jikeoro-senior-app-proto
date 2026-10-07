@@ -983,39 +983,7 @@ function App() {
     <div className="launch-screen" role="status" aria-label="지켜로 앱을 시작합니다">
       <div className="launch-brand">
         <div className="launch-character" aria-hidden="true">
-          <svg viewBox="0 0 320 280">
-            <defs>
-              <linearGradient id="launch-character-green" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#d7ff92" />
-                <stop offset="1" stopColor="#9de950" />
-              </linearGradient>
-            </defs>
-            <ellipse className="launch-character-shadow" cx="160" cy="244" rx="91" ry="17" />
-            <g className="launch-character-body">
-              <path className="launch-character-shape" d="M83 112c0-51 34-82 77-82s77 31 77 82v66c0 41-31 67-77 67s-77-26-77-67Z" />
-              <ellipse className="launch-character-foot" cx="114" cy="226" rx="34" ry="19" />
-              <ellipse className="launch-character-foot" cx="206" cy="226" rx="34" ry="19" />
-              <ellipse className="launch-character-eye" cx="132" cy="113" rx="23" ry="29" />
-              <ellipse className="launch-character-eye" cx="188" cy="113" rx="23" ry="29" />
-              <g className="launch-character-pupils">
-                <ellipse className="launch-character-pupil" cx="138" cy="117" rx="8" ry="12" />
-                <ellipse className="launch-character-pupil" cx="194" cy="117" rx="8" ry="12" />
-              </g>
-              <path className="launch-character-smile" d="M143 160c10 10 24 10 34 0" />
-              <path className="launch-character-arm left" d="M91 151c-25 8-34 24-31 44" />
-              <path className="launch-character-arm right" d="M227 151c18 5 28 16 33 31" />
-            </g>
-            <g className="launch-character-magnifier">
-              <circle className="launch-magnifier-glass" cx="203" cy="109" r="40" />
-              <circle className="launch-magnifier-shine" cx="191" cy="96" r="10" />
-              <path className="launch-magnifier-handle" d="m231 138 38 40" />
-            </g>
-            <g className="launch-character-sparks">
-              <path d="M65 85h18M74 76v18" />
-              <circle cx="258" cy="76" r="6" />
-              <circle cx="274" cy="94" r="3" />
-            </g>
-          </svg>
+          <img src={`${import.meta.env.BASE_URL}splash-mascot-3d.png`} alt="" />
         </div>
         <div className="launch-name"><strong><BrandName /></strong><span>JIKEORO</span></div>
         <i aria-hidden="true" />
