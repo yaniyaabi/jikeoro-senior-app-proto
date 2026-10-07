@@ -478,7 +478,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .member-report-open-hint b { color: var(--coral); font-size:calc(18px + var(--text-bump)); }
 .empty-member-reports { margin: 0; padding: 32px 12px; color: var(--muted); font-size:calc(15px + var(--text-bump)); text-align: center; }
 .history-list { display: grid; gap: 12px; }
-.history-list article { border: 1px solid var(--line); border-radius: 21px; background: white; padding: 19px; box-shadow: 0 9px 26px rgba(18, 59, 68, .06); }
+.history-list article { border: 2px solid #f0c84b; border-radius: 21px; background: white; padding: 18px; box-shadow: 0 9px 26px rgba(205,155,28,.11); }
 .history-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .history-top time { color: var(--muted); font-size:calc(13px + var(--text-bump)); }
 .history-list h2 { margin: 16px 0 8px; font-size:calc(21px + var(--text-bump)); line-height: 1.4; }
