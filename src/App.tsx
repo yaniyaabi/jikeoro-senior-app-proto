@@ -14,7 +14,6 @@ type MediaPreview = StoredMedia & { url: string };
 type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
-type ColorTheme = "light" | "dark";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -289,12 +288,6 @@ function App() {
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
   const [selectedReport, setSelectedReport] = useState<StoredReport | null>(null);
   const [detailMedia, setDetailMedia] = useState<MediaPreview[]>([]);
-  const [theme, setTheme] = useState<ColorTheme>(() => {
-    const saved = localStorage.getItem("jikeoro-senior-theme");
-    if (saved === "light" || saved === "dark") return saved;
-    const mobileDevice = window.matchMedia("(max-width: 768px)").matches || window.matchMedia("(pointer: coarse)").matches;
-    return mobileDevice && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
   const [contrast, setContrast] = useState(() => localStorage.getItem("jikeoro-senior-contrast") === "true");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -334,12 +327,6 @@ function App() {
     }
     getReports(currentUser.id).then(setReports).catch(() => setReports([]));
   }, [currentUser]);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    localStorage.setItem("jikeoro-senior-theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     document.documentElement.dataset.contrast = contrast ? "high" : "normal";
@@ -882,10 +869,7 @@ function App() {
         {launchScreen}
         <div className="phone-app auth-phone">
           <main className="app-auth-page">
-            <div className="app-auth-top">
-              <div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div>
-              <button className="app-theme-toggle" type="button" onClick={() => setTheme((value) => value === "light" ? "dark" : "light")} aria-label={theme === "light" ? "다크 모드로 전환" : "라이트 모드로 전환"}><span aria-hidden="true">{theme === "light" ? "☾" : "☀"}</span>{theme === "light" ? "다크" : "라이트"}</button>
-            </div>
+            <div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div>
             <section className="app-auth-intro">
               <p>나의 기록을 한곳에서</p>
               <h1>함께 안전한 길을<br />만들어가요.</h1>
@@ -925,7 +909,6 @@ function App() {
           </button>
           <div className="header-tools">
             <button onClick={speakPage} aria-label={speaking ? "읽어주기 중지" : "현재 화면 전체 읽어주기"}><span>{speaking ? "■" : "♬"}</span> {speaking ? "읽기 중지" : "읽어주기"}</button>
-            <button onClick={() => setTheme((value) => value === "light" ? "dark" : "light")} aria-label={theme === "light" ? "다크 모드로 전환" : "라이트 모드로 전환"}><span>{theme === "light" ? "☾" : "☀"}</span> {theme === "light" ? "다크" : "라이트"}</button>
             <button onClick={() => setContrast((value) => !value)} aria-label="고대비 화면 전환"><span>◐</span> 고대비</button>
           </div>
         </header>
