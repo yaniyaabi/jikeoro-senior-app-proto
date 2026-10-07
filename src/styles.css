@@ -798,7 +798,8 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .risk-grid button { min-height:122px; border:2px solid #d3ddd3; border-radius:23px; background:#eff3ef; }
 .risk-grid button:last-child { background:#eff3ef; }
 .risk-grid button:hover { border-color:#b9c9b9; background:#e7ede6; }
-.risk-grid button.selected { border:4px solid #3f6d4d; background:#bad8b7; }
+.risk-grid button.selected { border:4px solid #69a968; background:#def5cc; }
+.risk-grid button:focus-visible { outline-color:#a4e563; }
 .risk-grid button>span { border-radius:17px; background:rgba(255,255,255,.75); color:var(--ink); }
 .risk-grid button small { color:#395d52; }
 .risk-grid .risk-type-icon { filter:grayscale(1) saturate(0) brightness(.92) contrast(.9); opacity:.78; }
