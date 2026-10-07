@@ -983,7 +983,7 @@ function App() {
     <div className="launch-screen" role="status" aria-label="지켜로 앱을 시작합니다">
       <div className="launch-brand">
         <div className="launch-character" aria-hidden="true">
-          <img src={`${import.meta.env.BASE_URL}mascot-plush-flag-3d.png`} alt="" />
+          <img src={`${import.meta.env.BASE_URL}splash-app-icon.png`} alt="" />
         </div>
         <div className="launch-name"><strong><BrandName /></strong><span>JIKEORO</span></div>
         <i aria-hidden="true" />
