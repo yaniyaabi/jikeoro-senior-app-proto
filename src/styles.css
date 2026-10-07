@@ -788,19 +788,18 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .flow-card { border:0; border-radius:28px; padding:21px; box-shadow:var(--soft-shadow); }
 .lead-text { font-size:calc(16px + var(--text-bump)); }
 .capture-grid { gap:11px; }
-.capture-button { min-height:190px; border:0; border-radius:25px; background:var(--tile-blue); padding:18px 10px; box-shadow:none; }
-.capture-button.primary-capture { border:0; background:#e5f2dc; }
+.capture-button { min-height:190px; border:2px solid #d9e0d7; border-radius:25px; background:#eef3ed; padding:18px 10px; box-shadow:none; }
+.capture-button.primary-capture { border:2px solid #d9e0d7; background:#eef3ed; }
 .capture-button .provided-media-icon { width:70px; height:70px; margin-bottom:15px; border-radius:24px; background:rgba(255,255,255,.76); padding:12px; object-fit:contain; }
 .capture-button strong { font-size:calc(18px + var(--text-bump)); }
 .capture-button small { color:#29433d; }
 .risk-grid { gap:10px; }
-.risk-grid button { min-height:122px; border:0; border-radius:23px; background:#eaf1e7; }
-.risk-grid button:nth-child(2) { background:#fff0b6; }
-.risk-grid button:nth-child(3) { background:#dcecff; }
-.risk-grid button:nth-child(4) { background:#ffe1dc; }
-.risk-grid button:last-child { background:#e4f3df; }
-.risk-grid button.selected { border:4px solid var(--navy); background:var(--lime); }
+.risk-grid button { min-height:122px; border:2px solid #d9e0d7; border-radius:23px; background:#eef3ed; }
+.risk-grid button:last-child { background:#eef3ed; }
+.risk-grid button.selected { border:4px solid var(--navy); background:#dfeeda; }
 .risk-grid button>span { border-radius:17px; background:rgba(255,255,255,.75); color:var(--ink); }
+.risk-grid .risk-type-icon { filter:grayscale(1) sepia(.18) hue-rotate(95deg) saturate(.65) contrast(.92); opacity:.88; }
+.risk-grid button.selected .risk-type-icon { filter:grayscale(1) sepia(.32) hue-rotate(95deg) saturate(1.15) contrast(1.05); opacity:1; }
 .next-button { min-height:59px; border-radius:19px; background:var(--navy); box-shadow:none; }
 
 .plain-heading { padding:5px 4px 21px; }
