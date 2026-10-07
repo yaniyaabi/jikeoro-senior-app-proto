@@ -848,9 +848,6 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .bottom-nav button.active>span { background:transparent; }
 
 .auth-phone { isolation:isolate; background:#fffdf8; }
-.auth-phone::before,.auth-phone::after { content:""; position:absolute; z-index:-1; border-radius:50%; pointer-events:none; }
-.auth-phone::before { width:210px; height:210px; left:-111px; top:81px; background:#dfeeda; }
-.auth-phone::after { width:160px; height:160px; right:-92px; top:188px; background:#3156a4; }
 .app-auth-page { position:relative; z-index:1; }
 .app-auth-top { background:rgba(255,253,248,.78); border-radius:22px; backdrop-filter:blur(10px); }
 .app-readability-launch { border:0; border-radius:18px; background:#eef2ed; }
