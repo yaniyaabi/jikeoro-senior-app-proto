@@ -269,7 +269,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .report-guide-navigation button { min-height: 43px; border: 1px solid #c6d3c9; border-radius: 11px; background: white; color: var(--ink); font-size:calc(13px + var(--text-bump)); font-weight: 900; cursor: pointer; }
 .report-guide-navigation button:last-child { background: #edf4e8; }
 .report-guide-navigation button:disabled { opacity: .35; cursor: default; }
+.report-guide-card>.report-guide-replay { width:100%; min-height:58px; margin-top:12px; border:1px solid #d3ddd5; border-radius:18px; background:#f2f4f0; color:var(--navy); padding:12px 15px; display:flex; align-items:center; justify-content:space-between; font-size:calc(16px + var(--text-bump)); font-weight:950; cursor:pointer; }
+.report-guide-card>.report-guide-replay span { color:#5f9b47; font-size:calc(23px + var(--text-bump)); line-height:1; }
 .report-guide-card>.report-guide-start { width: 100%; min-height: 51px; margin-top: 12px; border: 0; border-radius: 13px; background: var(--navy); color: white; padding: 11px 15px; display: flex; align-items: center; justify-content: space-between; font-size:calc(16px + var(--text-bump)); font-weight: 950; cursor: pointer; }
+.report-guide-card>.report-guide-replay + .report-guide-start { margin-top:8px; }
 .report-guide-card>.report-guide-start span { color: var(--lime); font-size:calc(22px + var(--text-bump)); line-height: 1; }
 
 .report-type { padding: 8px 10px; border-radius: 999px; background: #ffe2dc; color: #ba4134; font-size:calc(14px + var(--text-bump)); font-weight: 950; white-space: nowrap; }

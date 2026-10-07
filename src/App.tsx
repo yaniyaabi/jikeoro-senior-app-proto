@@ -1172,7 +1172,7 @@ function App() {
 
               <section className="report-guide-card" aria-labelledby="report-guide-title">
                 <div className="report-guide-heading">
-                  <div className="report-guide-heading-row"><span>처음이어도 괜찮아요</span><button type="button" onClick={openOnboarding}>처음 안내 다시 보기</button></div>
+                  <div className="report-guide-heading-row"><span>처음이어도 괜찮아요</span></div>
                   <h2 id="report-guide-title">위험요소 제보 방법</h2>
                   <p>아래 단계를 차례로 누르며 쉽게 확인해보세요.</p>
                 </div>
@@ -1186,6 +1186,7 @@ function App() {
                   <button type="button" onClick={() => setGuideStep((value) => Math.max(1, value - 1))} disabled={guideStep === 1}>← 이전</button>
                   <button type="button" onClick={() => setGuideStep((value) => Math.min(4, value + 1))} disabled={guideStep === 4}>다음 →</button>
                 </div>
+                <button className="report-guide-replay" type="button" onClick={openOnboarding}>처음 안내 다시 보기 <span>↻</span></button>
                 <button className="report-guide-start" onClick={openReport}>직접 제보해보기 <span>→</span></button>
               </section>
 
