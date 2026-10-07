@@ -30,7 +30,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .launch-screen::before { width:260px; height:260px; left:-120px; top:-105px; }
 .launch-screen::after { width:210px; height:210px; right:-92px; bottom:-76px; animation-direction:alternate-reverse; }
 .launch-brand { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
-.launch-character { width:min(48vw,184px); opacity:0; transform:translateY(20px) scale(.8); animation:launch-character-in .55s .08s cubic-bezier(.2,.9,.28,1.18) forwards; }
+.launch-character { width:min(43vw,166px); opacity:0; transform:translateY(20px) scale(.8); animation:launch-character-in .55s .08s cubic-bezier(.2,.9,.28,1.18) forwards; }
 .launch-character img { width:100%; height:auto; display:block; border-radius:27%; filter:drop-shadow(0 16px 18px rgba(0,0,0,.2)); animation:launch-character-bob 1.35s .55s ease-in-out infinite; }
 .launch-name { height:57px; margin-top:4px; overflow:hidden; display:flex; flex-direction:column; align-items:center; gap:2px; }
 .launch-name strong { font-size:calc(29px + var(--text-bump)); line-height:1.1; letter-spacing:-.05em; transform:translateY(54px); animation:launch-rise .5s .48s cubic-bezier(.2,.8,.25,1) forwards; }
