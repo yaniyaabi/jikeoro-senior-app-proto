@@ -1036,14 +1036,17 @@ html[data-contrast="high"] .app-reward-exchange { box-shadow:inset 0 0 0 3px #00
 .onboarding-screen-permissions .onboarding-copy p { font-size:calc(13px + var(--text-bump)); }
 .onboarding-screen-permissions .onboarding-actions { height:56px; align-self:end; }
 .onboarding-screen-permissions .onboarding-actions button { height:56px; min-height:56px; max-height:56px; padding-top:0; padding-bottom:0; }
-.onboarding-permissions { gap:7px; margin-top:13px; text-align:left; }
-.onboarding-permissions article { min-height:52px; border:0; border-radius:16px; background:#fff; }
+.onboarding-permissions { gap:9px; margin-top:15px; text-align:left; }
+.onboarding-permissions article { min-height:66px; border:0; border-radius:17px; background:#fff; padding:10px 11px; grid-template-columns:42px 1fr auto; gap:10px; }
+.onboarding-permissions article>span { width:42px; height:42px; border-radius:12px; font-size:calc(22px + var(--text-bump)); }
+.onboarding-permissions article strong { font-size:calc(16px + var(--text-bump)); }
+.onboarding-permissions article small { font-size:calc(12px + var(--text-bump)); line-height:1.35; }
 .onboarding-permissions article:nth-child(1)>span { background:#e5f2dc; color:#41724a; }
 .onboarding-permissions article:nth-child(2)>span { background:#ffe5df; color:#a84235; }
-.onboarding-permissions article button { border-radius:12px; background:var(--onboarding-ink); }
+.onboarding-permissions article button { min-width:84px; min-height:44px; border-radius:13px; background:var(--onboarding-ink); font-size:calc(13px + var(--text-bump)); }
 .onboarding-permissions article button.granted { background:#e5f2dc; color:#315f39; }
 .onboarding-permissions article button.denied { background:#ffe7e3; color:#b13b2e; }
-.onboarding-permissions>small { color:#9aa1aa; }
+.onboarding-permissions>small { color:#7f8d87; font-size:calc(12px + var(--text-bump)); line-height:1.5; }
 
 @media (max-width:365px) {
   .onboarding-screen { grid-template-rows:auto minmax(218px,1fr) auto auto auto; padding-left:20px; padding-right:20px; }
@@ -1054,8 +1057,10 @@ html[data-contrast="high"] .app-reward-exchange { box-shadow:inset 0 0 0 3px #00
   .onboarding-screen-permissions .onboarding-artwork svg,.onboarding-screen-permissions .onboarding-artwork img { width:min(43vw,160px); max-height:160px; }
   .onboarding-screen-permissions .onboarding-copy h1 { font-size:calc(25px + var(--text-bump)); }
   .onboarding-screen-permissions .onboarding-copy p { font-size:calc(12px + var(--text-bump)); }
-  .onboarding-permissions { margin-top:9px; gap:5px; }
-  .onboarding-permissions article { min-height:48px; }
+  .onboarding-permissions { margin-top:9px; gap:7px; }
+  .onboarding-permissions article { min-height:60px; padding:8px; grid-template-columns:38px 1fr auto; gap:7px; }
+  .onboarding-permissions article>span { width:38px; height:38px; }
+  .onboarding-permissions article button { min-width:76px; min-height:40px; }
   .onboarding-dots { padding-top:14px; padding-bottom:13px; }
 }
 
