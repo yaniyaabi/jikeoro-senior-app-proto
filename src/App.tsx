@@ -1480,7 +1480,6 @@ function App() {
               <header className="member-detail-heading">
                 <div className="report-meta"><span className={`status-chip status-${selectedReport.status}`}>{reportStatus[selectedReport.status].label}</span><small>{selectedReport.riskType} · {formatDate(selectedReport.createdAt)}</small></div>
                 <h2 id="member-detail-title">{reportTitle(selectedReport)}</h2>
-                <p>내가 남긴 위험 기록의 내용과 첨부자료를 확인할 수 있어요.</p>
               </header>
               <div className="member-detail-grid">
                 <div className="member-detail-main">
