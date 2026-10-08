@@ -1073,3 +1073,52 @@ html[data-contrast="high"] .app-reward-exchange { box-shadow:inset 0 0 0 3px #00
 
 html[data-contrast="high"] .onboarding-screen { background:#fff; color:#001e1a; }
 html[data-contrast="high"] .onboarding-next { background:#005f4a; }
+
+/* Keep the app's visual scale consistent across phone sizes. */
+@media (max-width:560px) {
+  .launch-character { width:min(166px,calc(100vw - 60px)); }
+  .app-header { height:88px; padding:15px 17px; gap:12px; }
+  .brand-button { gap:10px; }
+  .brand-symbol { width:50px; height:50px; }
+  .brand-button strong { font-size:calc(23px + var(--text-bump)); }
+  .brand-button small { display:block; font-size:calc(13px + var(--text-bump)); }
+  .header-tools { gap:6px; }
+  .header-tools button { min-width:61px; min-height:56px; padding:5px 6px; font-size:calc(12px + var(--text-bump)); }
+  .app-main { padding:23px 17px 40px; }
+
+  .home-main .hello-card { display:block; }
+  .home-main .hello-card h1 { font-size:calc(33px + var(--text-bump)); }
+  .home-feature-card { padding:20px; }
+  .home-feature-report { min-height:218px; padding:23px; }
+  .home-feature-history,
+  .home-feature-rewards { min-height:192px; }
+  .home-feature-icon { right:14px; top:10px; width:92px; height:92px; }
+  .home-feature-icon svg { width:42px; height:42px; }
+  .home-feature-card>strong { left:20px; font-size:calc(24px + var(--text-bump)); }
+  .home-feature-report>strong { left:23px; font-size:calc(32px + var(--text-bump)); }
+  .home-feature-card>small { left:20px; font-size:calc(13px + var(--text-bump)); }
+  .home-feature-report>small { left:23px; font-size:calc(14px + var(--text-bump)); }
+
+  .home-main .report-guide-card { padding:22px; }
+  .report-guide-copy { grid-template-columns:minmax(0,1fr) 118px; column-gap:12px; padding:18px; }
+  .report-guide-copy h3 { font-size:calc(24px + var(--text-bump)); }
+  .report-guide-illustration { width:118px; height:118px; }
+
+  .onboarding-screen {
+    height:auto;
+    min-height:100dvh;
+    overflow-y:auto;
+    padding:max(18px,env(safe-area-inset-top)) 22px max(50px,calc(env(safe-area-inset-bottom) + 38px));
+    grid-template-rows:auto minmax(235px,1fr) auto auto auto;
+  }
+  .onboarding-artwork svg { width:min(calc(100vw - 44px),300px); max-height:290px; }
+  .onboarding-artwork img { width:min(calc(100vw - 44px),320px); max-height:300px; }
+  .onboarding-copy h1 { margin:12px auto 10px; font-size:calc(34px + var(--text-bump)); }
+  .onboarding-copy p { font-size:calc(15px + var(--text-bump)); line-height:1.55; }
+  .onboarding-screen .onboarding-dots { padding:26px 0 18px; }
+  .onboarding-actions button { min-height:60px; }
+  .onboarding-permissions { margin-top:15px; gap:9px; }
+  .onboarding-permissions article { min-height:66px; padding:10px 11px; grid-template-columns:42px 1fr auto; gap:10px; }
+  .onboarding-permissions article>span { width:42px; height:42px; }
+  .onboarding-permissions article button { min-width:84px; min-height:44px; }
+}
