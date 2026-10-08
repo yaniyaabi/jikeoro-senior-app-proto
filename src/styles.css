@@ -1156,3 +1156,85 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
   .location-methods button { gap:5px; min-height:58px; padding:8px 5px; }
   .location-methods button strong { width:auto; min-width:0; font-size:calc(14px + var(--text-bump)); }
 }
+
+/* Keep every text button inside narrow phone layouts. */
+@media (max-width:560px) {
+  .app-auth-card button,
+  .report-guide-card button,
+  .report-flow button,
+  .report-flow .report-audio-action,
+  .plain-page button,
+  .member-detail-sheet button,
+  .app-detail-sheet button,
+  .app-reward-form-sheet button {
+    box-sizing:border-box;
+    min-width:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:keep-all;
+  }
+
+  .report-guide-navigation,
+  .media-source-actions,
+  .member-detail-actions,
+  .app-detail-actions,
+  .app-auth-tabs {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .section-title>div { min-width:0; }
+  .section-title>button {
+    min-width:0;
+    max-width:45%;
+    white-space:normal;
+    line-height:1.3;
+    text-align:center;
+  }
+
+  .risk-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .risk-grid button {
+    min-width:0;
+    grid-template-columns:44px minmax(0,1fr);
+    column-gap:7px;
+    padding:10px 8px;
+    overflow:hidden;
+  }
+  .risk-grid button.selected { padding:8px 6px; }
+  .risk-grid button strong,
+  .risk-grid button small {
+    min-width:0;
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+
+  .gps-map-meta { grid-template-columns:minmax(0,1fr) auto; }
+  .gps-map-meta strong,
+  .gps-map-meta small { min-width:0; overflow-wrap:anywhere; }
+  .gps-map-meta button { white-space:normal; line-height:1.3; text-align:center; }
+}
+
+@media (max-width:365px) {
+  .risk-grid button { grid-template-columns:38px minmax(0,1fr); column-gap:5px; }
+  .risk-grid button strong { font-size:calc(16px + var(--text-bump)); }
+  .risk-grid button:nth-child(4) strong { font-size:calc(15px + var(--text-bump)); }
+  .risk-grid button small { font-size:calc(11px + var(--text-bump)); }
+  .risk-type-icon { width:40px; height:56px; }
+}
+
+@media (max-width:340px) {
+  .risk-grid { grid-template-columns:minmax(0,1fr); }
+  .risk-grid button,
+  .risk-grid button:last-child {
+    grid-column:1;
+    min-height:82px;
+    grid-template-columns:44px minmax(0,1fr);
+    padding:8px 10px;
+  }
+  .risk-grid button.selected { padding:6px 8px; }
+  .risk-type-icon { width:42px; height:58px; }
+
+  .gps-map-meta { grid-template-columns:minmax(0,1fr); }
+  .gps-map-meta small,
+  .gps-map-meta button { grid-column:1; }
+  .gps-map-meta button { grid-row:auto; width:100%; margin-top:5px; }
+}
