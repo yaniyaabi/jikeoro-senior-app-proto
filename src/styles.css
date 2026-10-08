@@ -817,7 +817,7 @@ html[data-contrast="high"] :is(.onboarding-readability-controls button,.onboardi
 .plain-heading { padding:5px 4px 21px; }
 .plain-heading h1 { font-size:calc(35px + var(--text-bump)); }
 .activity-board { border:0; border-radius:0; background:transparent; padding:0; box-shadow:none; }
-.activity-heading { padding:4px 3px 17px; }
+.activity-heading { padding:4px 3px 17px; border-bottom:0; }
 .activity-filters { gap:7px; }
 .activity-filters button { border:0; border-radius:999px; background:white; box-shadow:0 4px 12px rgba(16,45,42,.06); }
 .activity-filters button.active { background:var(--navy); color:white; }
