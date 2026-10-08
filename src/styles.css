@@ -15,7 +15,7 @@
   --line: #d5ddd5;
   --surface: #ffffff;
   --canvas: #fbf8ef;
-  --text-bump: 2px;
+  --text-bump: 0px;
 }
 
 * { box-sizing: border-box; }
@@ -633,7 +633,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .app-detail-facts { margin: 11px 0 0; border: 1px solid var(--line); border-radius: 15px; background: white; padding: 3px 13px; }.app-detail-facts>div { display: grid; grid-template-columns: 82px 1fr; align-items:center; gap: 8px; padding: 9px 0; border-bottom: 1px solid #e4eaeb; }.app-detail-facts>div:last-child { border-bottom: 0; }.app-detail-facts dt { color: var(--muted); font-size:calc(12px + var(--text-bump)); }.app-detail-facts dd { margin: 0; font-size:calc(13px + var(--text-bump)); line-height: 1.35; font-weight: 900; overflow-wrap: anywhere; }.app-detail-facts dd small{display:block;margin-top:2px;color:var(--muted);font-size:calc(10px + var(--text-bump));font-weight:750}
 .app-detail-actions{display:grid;grid-template-columns:.82fr 1.18fr;gap:9px;margin-top:11px}.app-detail-actions .next-button,.app-detail-actions .app-detail-delete{min-height:49px;margin:0;box-shadow:none;font-size:calc(15px + var(--text-bump))}.app-detail-delete { width: 100%; border: 1px solid #edb9b2; border-radius: 14px; background: #fff4f2; color: #a33428; font-weight: 900; cursor: pointer; }
 
-html[data-text-size="large"] { --text-bump: 4px; }
+html[data-text-size="large"] { --text-bump: 2px; }
 
 html[data-contrast="high"] {
   --navy: #001f1b;
