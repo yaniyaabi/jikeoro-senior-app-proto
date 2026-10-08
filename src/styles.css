@@ -366,11 +366,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .speech-write-icon svg path:last-child { fill: none; stroke: #eef4ea; stroke-width: 1.6; stroke-linecap: round; }
 .report-audio-action.active .speech-write-icon svg path:first-child { fill: var(--lime); stroke: var(--lime); }
 .report-audio-action.active .speech-write-icon svg path:last-child { stroke: var(--navy); }
-.voice-recorder { margin-top: 14px; border: 1px solid #d2dbd2; border-radius: 16px; background: white; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 10px; }
+.voice-recorder { margin-top: 14px; border: 1px solid #d2dbd2; border-radius: 16px; background: white; padding: 15px; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: center; gap: 9px; }
 .voice-recorder>div { grid-column: 1/-1; display: flex; flex-direction: column; gap: 4px; }
 .voice-recorder>div strong { font-size:calc(19px + var(--text-bump)); }
 .voice-recorder>div small { color: var(--muted); font-size:calc(14px + var(--text-bump)); line-height: 1.45; }
-.voice-recorder>.report-audio-action { width: 100%; min-width: 0; }
+.voice-recorder>.report-audio-action { width: 100%; min-width: 0; height:auto; min-height:58px; padding:8px 6px; gap:6px; overflow:hidden; font-size:calc(14px + var(--text-bump)); line-height:1.25; white-space:normal; text-align:center; }
+.voice-recorder .audio-action-label { min-width:0; max-width:100%; white-space:normal; word-break:keep-all; overflow-wrap:anywhere; text-align:center; }
 .voice-recorder button.recording { background: var(--coral); border-color: var(--coral); color: white; }
 .record-action-icon { width: 21px; color: var(--coral); display: inline-grid; place-items: center; flex: 0 0 auto; font-size:calc(15px + var(--text-bump)); }
 .voice-recorder button.recording .record-action-icon { color: white; }

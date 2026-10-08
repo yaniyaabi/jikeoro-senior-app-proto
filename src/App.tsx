@@ -1259,11 +1259,11 @@ function App() {
                     </div>
                     <button type="button" className={`report-audio-action${recording ? " recording" : ""}`} onClick={recording ? stopAudioRecording : startAudioRecording}>
                       <span className="record-action-icon" aria-hidden="true">{recording ? "■" : "●"}</span>
-                      {recording ? "녹음 끝내기" : "현장음 녹음"}
+                      <span className="audio-action-label">{recording ? "녹음 끝내기" : "현장음 녹음"}</span>
                     </button>
                     <label className="audio-file-button report-audio-action">
                       <input type="file" accept="audio/*" onChange={addFiles} />
-                      녹음 파일 선택
+                      <span className="audio-action-label">녹음 파일 선택</span>
                     </label>
                   </div>
                   {attachments.some((item) => item.kind === "audio") && (
