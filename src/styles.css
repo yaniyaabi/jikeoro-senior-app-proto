@@ -470,9 +470,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .status-track li::before { content: ""; position: absolute; height: 3px; background: #dbe2da; left: -50%; right: 50%; top: 16px; }
 .status-track li:first-child::before { display: none; }
 .status-track li.done::before { background: var(--lime); }
-.status-track i { position: relative; z-index: 1; width: 36px; height: 36px; border-radius: 50%; background: #e5eae4; color: #71827a; display: grid; place-items: center; font-size:calc(16px + var(--text-bump)); font-weight: 950; font-style: normal; }
+.status-track i { position: relative; z-index: 1; width: 34px; height: 34px; border-radius: 50%; background: #e5eae4; color: #71827a; display: grid; place-items: center; font-size:calc(14px + var(--text-bump)); font-weight: 950; font-style: normal; }
 .status-track li.done i { background: var(--lime); color: var(--ink); }
-.status-track span { color: #647970; font-size:calc(15px + var(--text-bump)); line-height: 1.35; text-align: center; }
+.status-track span { color: #647970; font-size:calc(13px + var(--text-bump)); line-height: 1.35; text-align: center; }
 .member-report-open-hint { display: block; margin-top: 16px; color: #415f55; font-size:calc(15px + var(--text-bump)); font-weight: 950; text-align: right; }
 .member-report-open-hint b { color: var(--coral); font-size:calc(20px + var(--text-bump)); }
 .empty-member-reports { margin: 0; padding: 32px 12px; color: var(--muted); font-size:calc(15px + var(--text-bump)); text-align: center; }
