@@ -450,7 +450,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .activity-filters button { min-height: 46px; border: 1px solid #d2dbd2; border-radius: 999px; background: white; color: var(--ink); padding: 10px 15px; font-size:calc(15px + var(--text-bump)); font-weight: 900; white-space: nowrap; cursor: pointer; }
 .activity-filters button.active { border-color: var(--navy); background: var(--navy); color: white; }
 .member-report-list { display: flex; flex-direction: column; }
-.member-report { position: relative; padding: 22px 2px 19px; border-bottom: 1px solid #e6ebe5; cursor: pointer; }
+.member-report { position: relative; padding: 22px 2px 19px; border-bottom: 1px solid #e6ebe5; }
 .member-report:last-child { border-bottom: 0; }
 .member-report:hover,.member-report:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 4px; border-radius: 12px; }
 .report-meta { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
@@ -463,6 +463,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .report-main h2 { margin: 14px 0 7px; font-size:calc(22px + var(--text-bump)); line-height: 1.35; letter-spacing: -.035em; }
 .report-main>p { margin: 0; color: #637871; font-size:calc(16px + var(--text-bump)); line-height:1.5; }
 .report-media-count { display: inline-block; margin-top: 12px; border-radius: 999px; background: #e9f0df; color: #3f6155; padding: 8px 11px; font-size:calc(14px + var(--text-bump)); font-weight: 900; }
+.report-media-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-top:15px; }
+.report-media-summary>span { min-width:0; border-radius:12px; background:#eef3e9; color:#536a61; padding:10px 7px; display:flex; align-items:center; justify-content:center; gap:5px; font-size:calc(13px + var(--text-bump)); font-weight:850; }
+.report-media-summary b { color:var(--ink); font-size:calc(16px + var(--text-bump)); }
 .response-box { margin-top: 18px; border-left: 3px solid var(--lime); padding: 2px 0 2px 13px; }
 .response-box small { color: #536f65; font-size:calc(16px + var(--text-bump)); font-weight: 950; }
 .response-box p { margin: 8px 0 0; color: #3e5c53; font-size:calc(18px + var(--text-bump)); line-height: 1.65; }
@@ -476,6 +479,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .status-track span { color: #647970; font-size:calc(13px + var(--text-bump)); line-height: 1.35; text-align: center; }
 .member-report-open-hint { display: block; margin-top: 16px; color: #415f55; font-size:calc(15px + var(--text-bump)); font-weight: 950; text-align: right; }
 .member-report-open-hint b { color: var(--coral); font-size:calc(20px + var(--text-bump)); }
+.member-report-footer { margin-top:18px; padding-top:16px; border-top:1px solid #e1e8e1; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:12px; }
+.member-report-footer p { margin:0; color:#687c74; font-size:calc(13px + var(--text-bump)); line-height:1.45; font-weight:750; word-break:keep-all; }
+.member-report-delete { min-height:42px; border:1px solid var(--coral); border-radius:12px; background:#fff; color:#b13b2e; padding:8px 12px; font-size:calc(13px + var(--text-bump)); font-weight:950; cursor:pointer; white-space:nowrap; }
 .empty-member-reports { margin: 0; padding: 32px 12px; color: var(--muted); font-size:calc(15px + var(--text-bump)); text-align: center; }
 .history-list { display: grid; gap: 12px; }
 .history-list article { border: 3px solid #dfa91f; border-radius: 21px; background: white; padding: 17px; box-shadow: 0 9px 26px rgba(190,137,12,.16); }
@@ -1219,6 +1225,11 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
   .risk-grid button:nth-child(4) strong { font-size:calc(15px + var(--text-bump)); }
   .risk-grid button small { font-size:calc(11px + var(--text-bump)); }
   .risk-type-icon { width:40px; height:56px; }
+}
+
+@media (max-width:400px) {
+  .member-report-footer { grid-template-columns:minmax(0,1fr); }
+  .member-report-delete { width:100%; }
 }
 
 @media (max-width:340px) {
