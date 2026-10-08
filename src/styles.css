@@ -1076,7 +1076,9 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
 
 /* Keep the app's visual scale consistent across phone sizes. */
 @media (max-width:560px) {
+  html,body,#root { width:100%; max-width:100%; overflow-x:hidden; }
   .launch-character { width:min(166px,calc(100vw - 60px)); }
+  .app-stage,.phone-app,.app-header,.app-main { min-width:0; max-width:100%; }
   .app-header { height:88px; padding:15px 17px; gap:12px; }
   .brand-button { gap:10px; }
   .brand-symbol { width:50px; height:50px; }
@@ -1105,20 +1107,50 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
   .report-guide-illustration { width:118px; height:118px; }
 
   .onboarding-screen {
+    width:100%;
+    max-width:100%;
+    min-width:0;
     height:auto;
     min-height:100dvh;
     overflow-y:auto;
+    overflow-x:hidden;
     padding:max(18px,env(safe-area-inset-top)) 22px max(50px,calc(env(safe-area-inset-bottom) + 38px));
     grid-template-rows:auto minmax(235px,1fr) auto auto auto;
   }
-  .onboarding-artwork svg { width:min(calc(100vw - 44px),300px); max-height:290px; }
-  .onboarding-artwork img { width:min(calc(100vw - 44px),320px); max-height:300px; }
-  .onboarding-copy h1 { margin:12px auto 10px; font-size:calc(34px + var(--text-bump)); }
-  .onboarding-copy p { font-size:calc(15px + var(--text-bump)); line-height:1.55; }
+  .onboarding-header,
+  .onboarding-artwork,
+  .onboarding-copy,
+  .onboarding-dots,
+  .onboarding-actions { width:100%; max-width:100%; min-width:0; }
+  .onboarding-header>span { flex:1 1 auto; overflow:hidden; }
+  .onboarding-header>button { max-width:40%; }
+  .onboarding-artwork svg { width:min(100%,300px); max-height:290px; }
+  .onboarding-artwork img { width:min(100%,320px); max-height:300px; }
+  .onboarding-copy h1 {
+    width:100%;
+    max-width:100%;
+    margin:12px auto 10px;
+    font-size:calc(34px + var(--text-bump));
+    overflow-wrap:anywhere;
+  }
+  .onboarding-copy p {
+    width:100%;
+    max-width:100%;
+    font-size:calc(15px + var(--text-bump));
+    line-height:1.55;
+    overflow-wrap:anywhere;
+  }
   .onboarding-screen .onboarding-dots { padding:26px 0 18px; }
   .onboarding-actions button { min-height:60px; }
   .onboarding-permissions { margin-top:15px; gap:9px; }
   .onboarding-permissions article { min-height:66px; padding:10px 11px; grid-template-columns:42px 1fr auto; gap:10px; }
   .onboarding-permissions article>span { width:42px; height:42px; }
   .onboarding-permissions article button { min-width:84px; min-height:44px; }
+
+  .capture-button { min-height:190px; padding:18px 10px; }
+  .capture-button .provided-media-icon { width:70px; height:70px; margin-bottom:15px; }
+  .capture-button strong { font-size:calc(18px + var(--text-bump)); }
+  .capture-button small { font-size:calc(13px + var(--text-bump)); }
+  .location-methods button { gap:8px; padding:10px 8px; }
+  .location-methods button strong { width:108px; font-size:calc(17px + var(--text-bump)); }
 }
