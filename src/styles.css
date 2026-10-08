@@ -261,7 +261,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .report-guide-copy { margin-top: 15px; border-radius: 16px; background: #f4f7f0; padding: 16px; box-shadow: inset 0 0 0 1px #d8e2d7; }
 .report-guide-copy>span { display: inline-flex; border-radius: 999px; background: #e6f3d5; color: #315c39; padding: 6px 10px; font-size:calc(12px + var(--text-bump)); font-weight: 950; }
 .report-guide-copy h3 { margin: 10px 0 6px; color: var(--ink); font-size:calc(23px + var(--text-bump)); letter-spacing: -.04em; }
-.report-guide-copy>p { margin: 0; color: #38564d; font-size:calc(15px + var(--text-bump)); line-height: 1.55; font-weight: 800; word-break: keep-all; }
+.report-guide-copy>p { margin: 0; color: #71807a; font-size:calc(15px + var(--text-bump)); line-height: 1.55; font-weight: 800; word-break: keep-all; }
 .report-guide-copy>small { margin-top: 11px; border-radius: 11px; background: #eff5e9; padding: 10px 11px; display: flex; align-items: flex-start; gap: 7px; color: #526c62; font-size:calc(12px + var(--text-bump)); line-height: 1.45; font-weight: 800; word-break: keep-all; }
 .report-guide-copy>small b { flex: 0 0 auto; color: #3f8443; }
 .report-guide-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 9px; }
