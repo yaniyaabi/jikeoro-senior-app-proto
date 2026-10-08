@@ -86,7 +86,7 @@ const riskDetails: Record<string, { name: string; help: string }[]> = {
 };
 
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
-const appIconPath = `${import.meta.env.BASE_URL}icon-v4.png`;
+const appIconPath = `${import.meta.env.BASE_URL}icon-192.png?v=5`;
 const ONBOARDING_STORAGE_KEY = "jikeoro-senior-onboarding-v1";
 
 const onboardingSlides: { eyebrow: string; title: [string, string]; description: string; kind: OnboardingArtworkKind }[] = [
