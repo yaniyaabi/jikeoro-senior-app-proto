@@ -8,11 +8,12 @@
   --blue: #4f7767;
   --sky: #edf3e9;
   --lime: #b7f06b;
-  --focus-ring: #5e9ee6;
-  --coral: #ff6654;
+  --focus-ring: #005fcc;
+  --coral: #ce3b30;
   --ink: #102d2a;
-  --muted: #637871;
+  --muted: #526b62;
   --line: #d5ddd5;
+  --control-line: #6b8078;
   --surface: #ffffff;
   --canvas: #fbf8ef;
   --text-bump: 0px;
@@ -24,6 +25,7 @@ body { margin: 0; min-width: 280px; min-height: 100vh; background: radial-gradie
 button, input, textarea { font: inherit; }
 button, label { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px solid var(--focus-ring); outline-offset: 2px; }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 
 .launch-screen { position: fixed; inset: 0; z-index: 9999; overflow: hidden; display: grid; place-items: center; background: radial-gradient(circle at 18% 15%,rgba(183,240,107,.12),transparent 29%),radial-gradient(circle at 85% 82%,rgba(255,101,79,.09),transparent 27%),#082925; color: white; animation: launch-exit 2.3s ease both; }
 .launch-screen::before, .launch-screen::after { content: ""; position: absolute; border-radius: 48% 52% 61% 39% / 43% 39% 61% 57%; background:rgba(183,240,107,.06); animation:launch-blob-float 3s ease-in-out infinite alternate; }
@@ -657,10 +659,12 @@ html[data-contrast="high"] {
   --blue: #005f4a;
   --sky: #e6f6e9;
   --lime: #d4ff33;
-  --coral: #d83a2e;
+  --coral: #ce281e;
   --ink: #001e1a;
   --muted: #294f45;
-  --line: #607970;
+  --line: #4e625c;
+  --control-line: #294f45;
+  --focus-ring: #ce281e;
   --canvas: #ffffff;
 }
 html[data-contrast="high"] .phone-app { box-shadow: 0 0 0 3px #001e27; }
@@ -1353,4 +1357,75 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
 
 @media (max-width:350px) {
   .report-draft-actions { grid-template-columns:minmax(0,1fr); }
+}
+
+/* WCAG AA contrast layer: readable text, visible controls, and a stronger high-contrast mode. */
+:where(.app-auth-form input,.description-field textarea,.manual-location-fields input,.app-reward-form-sheet input) {
+  border-color:var(--control-line);
+}
+:where(.onboarding-readability-controls button,.onboarding-permissions article,.readability-sheet fieldset button,.app-readability-launch,.header-tools button,.report-guide-navigation button,.capture-button,.media-source-actions button,.media-source-cancel,.risk-grid button,.risk-detail-grid button,.location-button,.manual-location-button,.audio-actions button,.report-draft-actions button) {
+  border-color:var(--control-line);
+}
+
+html[data-contrast="high"] {
+  accent-color:#005f4a;
+}
+html[data-contrast="high"] :where(input,textarea,select) {
+  border:2px solid var(--control-line);
+  background:#fff;
+  color:var(--ink);
+  caret-color:var(--ink);
+}
+html[data-contrast="high"] :where(input,textarea)::placeholder {
+  color:var(--muted);
+  opacity:1;
+}
+html[data-contrast="high"] :where(
+  .section-block,.flow-card,.report-guide-card,.history-list article,.app-detail-sheet,
+  .app-detail-media,.app-detail-facts,.report-draft-sheet,.report-draft-summary,
+  .app-auth-card,.media-source-sheet,.risk-detail-panel,.location-map-card
+) {
+  border-color:var(--line);
+}
+html[data-contrast="high"] :where(
+  .onboarding-readability-controls button,.onboarding-permissions article,
+  .readability-sheet fieldset button,.app-readability-launch,.header-tools button,
+  .report-guide-navigation button,.capture-button,.media-source-actions button,
+  .media-source-cancel,.risk-grid button,.risk-detail-grid button,.location-button,
+  .manual-location-button,.audio-actions button,.member-report-delete,
+  .app-detail-delete,.report-draft-actions button
+) {
+  border-color:var(--control-line);
+}
+html[data-contrast="high"] :where(
+  .app-auth-intro>span,.app-auth-tabs button,.app-auth-note,
+  .report-guide-copy>p,.report-guide-copy>small,.description-field-heading>label small,
+  .report-meta small,.report-main>p,.report-media-summary>span,
+  .status-track span,.member-report-footer p,.app-detail-facts dt,
+  .app-detail-facts dd small,.app-detail-media figcaption,.app-detail-media>p,
+  .onboarding-copy p,.onboarding-copy>span,.onboarding-permissions article small,
+  .onboarding-permissions>small,.report-draft-sheet>p,.report-draft-summary span
+) {
+  color:var(--muted);
+}
+html[data-contrast="high"] :where(.status-review,.status-action,.status-completed) {
+  border:2px solid currentColor;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --ink:#001e1a;
+    --muted:#294f45;
+    --line:#4e625c;
+    --control-line:#294f45;
+    --focus-ring:#ce281e;
+  }
+}
+
+@media (forced-colors: active) {
+  * { forced-color-adjust:auto; }
+  button,input,textarea,select { border:2px solid ButtonText; }
+  button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible {
+    outline:3px solid Highlight;
+  }
 }
