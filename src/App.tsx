@@ -25,6 +25,7 @@ type ReportDraft = {
   description: string;
   location: LocationPoint | null;
   locationMode: LocationMode;
+  locationConfirmed: boolean;
   place: string;
   updatedAt: string;
   attachmentCount: number;
@@ -123,7 +124,14 @@ function readReportDraft(userId: string): ReportDraft | null {
       localStorage.removeItem(reportDraftKey(userId));
       return null;
     }
-    return { ...draft, step: Math.max(1, Math.min(4, Number(draft.step) || 1)) };
+    const locationConfirmed = Boolean(draft.locationConfirmed);
+    let restoredStep = Math.max(1, Math.min(4, Number(draft.step) || 1));
+    if (restoredStep >= 4 && draft.locationMode === "gps" && draft.location && !locationConfirmed) restoredStep = 3;
+    return {
+      ...draft,
+      step: restoredStep,
+      locationConfirmed,
+    };
   } catch {
     localStorage.removeItem(reportDraftKey(userId));
     return null;
@@ -287,15 +295,34 @@ function calculateParticipation(reports: StoredReport[]) {
   };
 }
 
-function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange: (point: LocationPoint) => void }) {
+function LocationPickerMap({ point, onChange, editable, confirmed }: {
+  point: LocationPoint;
+  onChange: (point: LocationPoint) => void;
+  editable: boolean;
+  confirmed: boolean;
+}) {
   const mapElementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const pointRef = useRef(point);
   const onChangeRef = useRef(onChange);
+  const editableRef = useRef(editable);
   const [mapError, setMapError] = useState("");
 
   useEffect(() => { pointRef.current = point; }, [point]);
   useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+  useEffect(() => {
+    editableRef.current = editable;
+    const map = mapRef.current;
+    if (!map) return;
+    const controls = [map.dragPan, map.scrollZoom, map.boxZoom, map.dragRotate, map.keyboard, map.doubleClickZoom, map.touchZoomRotate];
+    controls.forEach((control) => editable ? control.enable() : control.disable());
+  }, [editable]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || editable) return;
+    map.setCenter([point.longitude, point.latitude]);
+  }, [editable, point.latitude, point.longitude]);
 
   useEffect(() => {
     if (!mapElementRef.current || mapRef.current) return;
@@ -325,8 +352,18 @@ function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange
           attributionControl: {},
         });
         map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+        if (!editableRef.current) {
+          map.dragPan.disable();
+          map.scrollZoom.disable();
+          map.boxZoom.disable();
+          map.dragRotate.disable();
+          map.keyboard.disable();
+          map.doubleClickZoom.disable();
+          map.touchZoomRotate.disable();
+        }
         map.on("load", () => { setMapError(""); map.resize(); });
         map.on("moveend", () => {
+          if (!editableRef.current) return;
           const center = map.getCenter();
           onChangeRef.current({ ...pointRef.current, latitude: center.lat, longitude: center.lng });
         });
@@ -344,9 +381,14 @@ function LocationPickerMap({ point, onChange }: { point: LocationPoint; onChange
   }, []);
 
   return (
-    <div className="location-picker-map" aria-label="위험 장소 선택 지도">
+    <div className={`location-picker-map ${editable ? "is-editing" : "is-locked"}`} aria-label={editable ? "핀 위치를 조정하는 지도" : "스크롤할 때 움직이지 않는 위치 지도"}>
       <div ref={mapElementRef} className="location-map-canvas" />
-      {!mapError && <><span className="location-center-pin" aria-hidden="true">●</span><p className="location-map-guide">지도를 움직여 핀을 위험한 곳에 맞춰주세요.</p></>}
+      {!mapError && <>
+        <span className="location-center-pin" aria-hidden="true">●</span>
+        <p className={`location-map-guide ${confirmed && !editable ? "confirmed" : ""}`}>
+          {editable ? "지도를 움직여 핀을 위험한 곳에 맞춰주세요." : confirmed ? "✓ 이 위치로 고정됐어요." : "지도를 움직이려면 아래 버튼을 눌러주세요."}
+        </p>
+      </>}
       {mapError && <p className="location-map-error" role="alert">{mapError}</p>}
     </div>
   );
@@ -379,6 +421,8 @@ function App() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState<LocationPoint | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>(null);
+  const [locationConfirmed, setLocationConfirmed] = useState(false);
+  const [locationEditing, setLocationEditing] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
   const [place, setPlace] = useState("");
   const [reports, setReports] = useState<StoredReport[]>([]);
@@ -475,13 +519,14 @@ function App() {
       description,
       location,
       locationMode,
+      locationConfirmed,
       place,
       updatedAt: new Date().toISOString(),
       attachmentCount: attachments.length,
     };
     if (hasReportDraftContent(draft)) localStorage.setItem(reportDraftKey(currentUser.id), JSON.stringify(draft));
     else localStorage.removeItem(reportDraftKey(currentUser.id));
-  }, [attachments.length, currentUser, description, location, locationMode, place, riskDetail, riskType, step, view]);
+  }, [attachments.length, currentUser, description, location, locationConfirmed, locationMode, place, riskDetail, riskType, step, view]);
 
   useEffect(() => {
     if (!currentUser || view !== "report" || step >= 5) return;
@@ -738,6 +783,8 @@ function App() {
     setDescription("");
     setLocation(null);
     setLocationMode(null);
+    setLocationConfirmed(false);
+    setLocationEditing(false);
     setLocationMessage("");
     setPlace("");
     setError("");
@@ -777,6 +824,8 @@ function App() {
     setDescription(draft.description);
     setLocation(draft.location);
     setLocationMode(draft.locationMode);
+    setLocationConfirmed(draft.locationConfirmed);
+    setLocationEditing(false);
     setPlace(draft.place);
     setAttachments(media.map((item) => {
       const file = new File([item.blob], item.name, { type: item.type });
@@ -841,6 +890,10 @@ function App() {
 
   const requestLocation = () => {
     setLocationMode("gps");
+    setLocation(null);
+    setLocationConfirmed(false);
+    setLocationEditing(false);
+    setError("");
     setLocationMessage("현재 위치를 확인하고 있습니다.");
     if (!("geolocation" in navigator)) {
       setLocationMessage("위치 기능을 사용할 수 없습니다. 장소를 직접 적어주세요.");
@@ -853,7 +906,7 @@ function App() {
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
         });
-        setLocationMessage(`현재 위치를 저장했습니다. 오차 약 ${Math.round(position.coords.accuracy)}m`);
+        setLocationMessage(`현재 위치를 찾았습니다. 오차 약 ${Math.round(position.coords.accuracy)}m`);
       },
       () => setLocationMessage("위치를 확인하지 못했습니다. 아래에 장소를 직접 적어주세요."),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
@@ -947,6 +1000,10 @@ function App() {
     } else if (step === 3) {
       if (!location && !place.trim()) {
         setError("현재 위치를 확인하거나 장소를 직접 적어주세요.");
+        return;
+      }
+      if (locationMode === "gps" && location && !locationConfirmed) {
+        setError("지도 아래의 ‘이 위치로 고정’ 버튼을 눌러주세요.");
         return;
       }
       setStep(4);
@@ -1405,19 +1462,31 @@ function App() {
                 <div className="flow-card">
                   <fieldset className="location-fieldset">
                     <legend>위치</legend>
-                    <p className="location-guide">GPS 지도의 핀을 맞추거나 알고 있는 장소를 직접 적어주세요.</p>
+                    <p className="location-guide">핀 위치를 조정한 뒤 고정하거나, 알고 있는 장소를 직접 적어주세요.</p>
                     <div className="location-methods">
                       <button type="button" className={locationMode === "gps" ? "selected" : ""} onClick={requestLocation} aria-pressed={locationMode === "gps"}><LocationPinIcon /><strong>현재 위치 사용</strong></button>
-                      <button type="button" className={locationMode === "manual" ? "selected" : ""} onClick={() => { setLocationMode("manual"); setLocation(null); setLocationMessage(""); }} aria-pressed={locationMode === "manual"}><ManualInputIcon /><strong>직접 입력</strong></button>
+                      <button type="button" className={locationMode === "manual" ? "selected" : ""} onClick={() => { setLocationMode("manual"); setLocation(null); setLocationConfirmed(false); setLocationEditing(false); setLocationMessage(""); setError(""); }} aria-pressed={locationMode === "manual"}><ManualInputIcon /><strong>직접 입력</strong></button>
                     </div>
                     {locationMode === "gps" && !location && locationMessage && <p className="location-message">{locationMessage}</p>}
                     {locationMode === "gps" && location && (
                       <div className="gps-map-block">
-                        <LocationPickerMap point={location} onChange={setLocation} />
+                        <LocationPickerMap
+                          point={location}
+                          editable={locationEditing}
+                          confirmed={locationConfirmed}
+                          onChange={(point) => { setLocation(point); setLocationConfirmed(false); }}
+                        />
                         <div className="gps-map-meta">
-                          <strong><span>●</span> 선택한 위치</strong>
+                          <strong><span>{locationConfirmed ? "✓" : "●"}</span> {locationConfirmed ? "고정한 위치" : locationEditing ? "핀 위치 조정 중" : "현재 위치"}</strong>
                           <small>위도 {location.latitude.toFixed(5)} · 경도 {location.longitude.toFixed(5)}</small>
-                          <button type="button" onClick={requestLocation}>현재 위치로 돌아가기</button>
+                        </div>
+                        <div className="location-pin-actions">
+                          {locationEditing ? (
+                            <button className="location-pin-confirm" type="button" onClick={() => { setLocationEditing(false); setLocationConfirmed(true); setLocationMessage("선택한 위치를 고정했습니다."); setError(""); }}>이 위치로 고정 <span>✓</span></button>
+                          ) : (
+                            <button className={locationConfirmed ? "location-pin-adjust" : "location-pin-start"} type="button" onClick={() => { setLocationEditing(true); setLocationConfirmed(false); setError(""); }}>{locationConfirmed ? "위치 다시 조정" : "핀 위치 조정하기"}</button>
+                          )}
+                          <button className="location-pin-current" type="button" onClick={requestLocation}>현재 위치 다시 찾기</button>
                         </div>
                       </div>
                     )}

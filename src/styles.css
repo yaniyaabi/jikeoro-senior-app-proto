@@ -404,14 +404,23 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 4px
 .gps-map-block { margin-top: 13px; }
 .location-picker-map { position: relative; height: 280px; border: 2px solid #c4d3d6; border-radius: 17px; overflow: hidden; background: #dfe8e8; isolation: isolate; }
 .location-map-canvas { position: absolute; inset: 0; }
+.location-picker-map.is-locked .location-map-canvas { pointer-events:none; touch-action:pan-y; }
+.location-picker-map.is-editing { border-color:var(--navy); box-shadow:0 0 0 4px rgba(16,45,42,.1); }
+.location-picker-map.is-editing .location-map-canvas { touch-action:none; }
 .location-center-pin { position: absolute; z-index: 5; left: 50%; top: 50%; width: 44px; height: 44px; border: 4px solid white; border-radius: 50% 50% 50% 8px; background: var(--coral); color: white; display: grid; place-items: center; font-size:calc(14px + var(--text-bump)); transform: translate(-50%,-100%) rotate(-45deg); box-shadow: 0 8px 18px rgba(16,47,55,.32); pointer-events: none; }
 .location-map-guide { position: absolute; z-index: 5; left: 50%; bottom: 12px; width: max-content; max-width: calc(100% - 28px); margin: 0; transform: translateX(-50%); border-radius: 999px; background: rgba(255,255,255,.94); color: var(--ink); padding: 8px 12px; box-shadow: 0 5px 18px rgba(16,47,55,.16); font-size:calc(12px + var(--text-bump)); line-height: 1.35; font-weight: 900; text-align: center; pointer-events: none; }
+.location-map-guide.confirmed { background:#e8f6d6; color:#285313; }
 .location-map-error { position: absolute; inset: 0; margin: 0; padding: 24px; display: grid; place-items: center; color: #9d3025; font-size:calc(15px + var(--text-bump)); line-height: 1.55; font-weight: 900; text-align: center; }
-.gps-map-meta { border: 2px solid #d3e0d2; border-top: 0; border-radius: 0 0 15px 15px; background: #f1f7e9; padding: 12px 13px; display: grid; grid-template-columns: 1fr auto; gap: 5px 10px; }
+.gps-map-meta { border: 2px solid #d3e0d2; border-top: 0; border-radius: 0 0 15px 15px; background: #f1f7e9; padding: 12px 13px; display: grid; gap: 5px; }
 .gps-map-meta strong { font-size:calc(15px + var(--text-bump)); }
 .gps-map-meta strong span { color: #4f9d55; }
-.gps-map-meta small { grid-column: 1; color: var(--muted); font-size:calc(12px + var(--text-bump)); }
-.gps-map-meta button { grid-column: 2; grid-row: 1/3; align-self: center; border: 1px solid #acc1b0; border-radius: 999px; background: white; color: var(--navy); padding: 8px 10px; font-size:calc(12px + var(--text-bump)); font-weight: 900; cursor: pointer; }
+.gps-map-meta small { color: var(--muted); font-size:calc(12px + var(--text-bump)); }
+.location-pin-actions { margin-top:10px; display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr); gap:8px; }
+.location-pin-actions button { min-width:0; min-height:55px; border-radius:13px; padding:10px 8px; font-size:calc(14px + var(--text-bump)); line-height:1.25; font-weight:950; word-break:keep-all; cursor:pointer; }
+.location-pin-start,.location-pin-confirm { border:2px solid var(--navy); background:var(--navy); color:white; }
+.location-pin-confirm span { margin-left:5px; color:var(--lime); font-size:calc(18px + var(--text-bump)); }
+.location-pin-adjust { border:2px solid #7da15f; background:#e8f6d6; color:#285313; }
+.location-pin-current { border:2px solid #c8d7dc; background:white; color:var(--ink); }
 .location-privacy { margin: 13px 3px 0; color: var(--muted); font-size:calc(13px + var(--text-bump)); line-height: 1.5; }
 .standalone-review { margin-top: 0; }
 .auto-save-info { margin-top: 13px; border-radius: 14px; background: #f2f6f7; padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -1213,10 +1222,8 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
     overflow-wrap:anywhere;
   }
 
-  .gps-map-meta { grid-template-columns:minmax(0,1fr) auto; }
   .gps-map-meta strong,
   .gps-map-meta small { min-width:0; overflow-wrap:anywhere; }
-  .gps-map-meta button { white-space:normal; line-height:1.3; text-align:center; }
 }
 
 @media (max-width:365px) {
@@ -1244,10 +1251,7 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
   .risk-grid button.selected { padding:6px 8px; }
   .risk-type-icon { width:42px; height:58px; }
 
-  .gps-map-meta { grid-template-columns:minmax(0,1fr); }
-  .gps-map-meta small,
-  .gps-map-meta button { grid-column:1; }
-  .gps-map-meta button { grid-row:auto; width:100%; margin-top:5px; }
+  .location-pin-actions { grid-template-columns:minmax(0,1fr); }
 }
 
 .report-draft-backdrop {
