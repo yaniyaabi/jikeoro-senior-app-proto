@@ -1486,7 +1486,7 @@ function App() {
                           ) : (
                             <button className={locationConfirmed ? "location-pin-adjust" : "location-pin-start"} type="button" onClick={() => { setLocationEditing(true); setLocationConfirmed(false); setError(""); }}>{locationConfirmed ? "위치 다시 조정" : "핀 위치 조정하기"}</button>
                           )}
-                          <button className="location-pin-current" type="button" onClick={requestLocation}>현재 위치 다시 찾기</button>
+                          <button className="location-pin-current" type="button" onClick={requestLocation}>현재 위치<br />다시 찾기</button>
                         </div>
                       </div>
                     )}
