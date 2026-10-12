@@ -14,7 +14,7 @@ type LocationPoint = { latitude: number; longitude: number; accuracy: number };
 type LocationMode = "gps" | "manual" | null;
 type MediaPickerKind = "image" | "video" | null;
 type OnboardingArtworkKind = "welcome" | "report" | "location" | "permissions";
-type TextSize = "100" | "150" | "200";
+type TextSize = "normal" | "large";
 type PermissionStatus = "idle" | "requesting" | "granted" | "denied" | "unsupported";
 
 const permissionStatusLabel: Record<PermissionStatus, string> = {
@@ -343,12 +343,7 @@ function App() {
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
   const [reportMediaCounts, setReportMediaCounts] = useState<Record<string, ReportMediaCounts>>({});
   const [contrast, setContrast] = useState(() => localStorage.getItem("jikeoro-senior-contrast") === "true");
-  const [textSize, setTextSize] = useState<TextSize>(() => {
-    const savedTextSize = localStorage.getItem("jikeoro-senior-text-size");
-    if (savedTextSize === "200") return "200";
-    if (savedTextSize === "150" || savedTextSize === "large") return "150";
-    return "100";
-  });
+  const [textSize, setTextSize] = useState<TextSize>(() => localStorage.getItem("jikeoro-senior-text-size") === "large" ? "large" : "normal");
   const [readabilityOpen, setReadabilityOpen] = useState(false);
   const [mediaPermission, setMediaPermission] = useState<PermissionStatus>("idle");
   const [locationPermission, setLocationPermission] = useState<PermissionStatus>("idle");
@@ -1027,9 +1022,8 @@ function App() {
         <fieldset>
           <legend>글자 크기</legend>
           <div>
-            <button type="button" className={textSize === "100" ? "active" : ""} onClick={() => setTextSize("100")}><b>가</b><span>기본<br />100%</span></button>
-            <button type="button" className={textSize === "150" ? "active" : ""} onClick={() => setTextSize("150")}><b className="medium">가</b><span>크게<br />150%</span></button>
-            <button type="button" className={textSize === "200" ? "active" : ""} onClick={() => setTextSize("200")}><b className="large">가</b><span>아주 크게<br />200%</span></button>
+            <button type="button" className={textSize === "normal" ? "active" : ""} onClick={() => setTextSize("normal")}><b>가</b><span>기본 글씨</span></button>
+            <button type="button" className={textSize === "large" ? "active" : ""} onClick={() => setTextSize("large")}><b className="large">가</b><span>큰 글씨</span></button>
           </div>
         </fieldset>
         <fieldset>
