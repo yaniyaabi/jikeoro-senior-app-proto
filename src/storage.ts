@@ -8,6 +8,16 @@ export type StoredMedia = {
   blob: Blob;
 };
 
+export type StoredDraftMedia = {
+  id: string;
+  userId: string;
+  kind: "image" | "video" | "audio";
+  name: string;
+  type: string;
+  size: number;
+  blob: Blob;
+};
+
 export type ReportStatus = "received" | "review" | "action" | "completed";
 
 export type ReportStatusUpdate = {
@@ -38,7 +48,7 @@ export type StoredReport = {
 };
 
 const DB_NAME = "jikeoro-senior-prototype";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 function normalizeRiskType(value: string) {
   if (value === "단차" || value === "적치물") return "인도";
@@ -103,10 +113,56 @@ function openDatabase() {
         const store = database.createObjectStore("media", { keyPath: "id" });
         store.createIndex("reportId", "reportId");
       }
+      if (!database.objectStoreNames.contains("draftMedia")) {
+        const store = database.createObjectStore("draftMedia", { keyPath: "id" });
+        store.createIndex("userId", "userId");
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+}
+
+export async function getDraftMedia(userId: string): Promise<StoredDraftMedia[]> {
+  const database = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction("draftMedia", "readonly");
+    const request = transaction.objectStore("draftMedia").index("userId").getAll(userId);
+    request.onsuccess = () => {
+      database.close();
+      resolve(request.result as StoredDraftMedia[]);
+    };
+    request.onerror = () => {
+      database.close();
+      reject(request.error);
+    };
+  });
+}
+
+export async function replaceDraftMedia(userId: string, files: StoredDraftMedia[]) {
+  const database = await openDatabase();
+  return new Promise<void>((resolve, reject) => {
+    const transaction = database.transaction("draftMedia", "readwrite");
+    const store = transaction.objectStore("draftMedia");
+    const index = store.index("userId");
+    const keysRequest = index.getAllKeys(userId);
+    keysRequest.onsuccess = () => {
+      keysRequest.result.forEach((key) => store.delete(key));
+      files.forEach((file) => store.put(file));
+    };
+    transaction.oncomplete = () => {
+      database.close();
+      resolve();
+    };
+    transaction.onerror = () => {
+      database.close();
+      reject(transaction.error);
+    };
+  });
+}
+
+export async function deleteDraftMedia(userId: string) {
+  return replaceDraftMedia(userId, []);
 }
 
 export async function getReports(userId: string): Promise<StoredReport[]> {

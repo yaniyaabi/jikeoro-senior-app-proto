@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, readPrototypeSession, registerPrototypeAccount } from "./auth";
-import { deleteReport, getReportMedia, getReports, ReportStatus, saveReport, StoredMedia, StoredReport } from "./storage";
+import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport } from "./storage";
 import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
 
 type View = "home" | "report" | "history" | "rewards";
@@ -16,6 +16,20 @@ type MediaPickerKind = "image" | "video" | null;
 type OnboardingArtworkKind = "welcome" | "report" | "location" | "permissions";
 type TextSize = "normal" | "large";
 type PermissionStatus = "idle" | "requesting" | "granted" | "denied" | "unsupported";
+type ReportDraft = {
+  version: 1;
+  userId: string;
+  step: number;
+  riskType: string;
+  riskDetail: string;
+  description: string;
+  location: LocationPoint | null;
+  locationMode: LocationMode;
+  place: string;
+  updatedAt: string;
+  attachmentCount: number;
+};
+type PendingReportDraft = { draft: ReportDraft; media: StoredDraftMedia[] };
 
 const permissionStatusLabel: Record<PermissionStatus, string> = {
   idle: "허용하기",
@@ -87,6 +101,34 @@ const riskDetails: Record<string, { name: string; help: string }[]> = {
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
 const appIconPath = `${import.meta.env.BASE_URL}icon-192.png?v=5`;
 const ONBOARDING_STORAGE_KEY = "jikeoro-senior-onboarding-v1";
+const REPORT_DRAFT_KEY_PREFIX = "jikeoro-senior-report-draft-v1:";
+const REPORT_DRAFT_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+
+function reportDraftKey(userId: string) {
+  return `${REPORT_DRAFT_KEY_PREFIX}${userId}`;
+}
+
+function hasReportDraftContent(draft: Pick<ReportDraft, "step" | "riskType" | "riskDetail" | "description" | "location" | "place" | "attachmentCount">) {
+  return draft.step > 1
+    || Boolean(draft.riskType || draft.riskDetail || draft.description.trim() || draft.location || draft.place.trim() || draft.attachmentCount);
+}
+
+function readReportDraft(userId: string): ReportDraft | null {
+  try {
+    const saved = localStorage.getItem(reportDraftKey(userId));
+    if (!saved) return null;
+    const draft = JSON.parse(saved) as ReportDraft;
+    const updatedAt = new Date(draft.updatedAt).getTime();
+    if (draft.version !== 1 || draft.userId !== userId || !Number.isFinite(updatedAt) || Date.now() - updatedAt > REPORT_DRAFT_MAX_AGE) {
+      localStorage.removeItem(reportDraftKey(userId));
+      return null;
+    }
+    return { ...draft, step: Math.max(1, Math.min(4, Number(draft.step) || 1)) };
+  } catch {
+    localStorage.removeItem(reportDraftKey(userId));
+    return null;
+  }
+}
 
 const onboardingSlides: { eyebrow: string; title: [string, string]; description: string; kind: OnboardingArtworkKind }[] = [
   {
@@ -359,6 +401,8 @@ function App() {
   const [rewardFormError, setRewardFormError] = useState("");
   const [rewardRequests, setRewardRequests] = useState<RewardRequest[]>([]);
   const [rewardRequestNotice, setRewardRequestNotice] = useState("");
+  const [pendingReportDraft, setPendingReportDraft] = useState<PendingReportDraft | null>(null);
+  const [confirmDraftDiscard, setConfirmDraftDiscard] = useState(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -419,6 +463,39 @@ function App() {
   useEffect(() => {
     attachmentsRef.current = attachments;
   }, [attachments]);
+
+  useEffect(() => {
+    if (!currentUser || view !== "report" || step >= 5) return;
+    const draft: ReportDraft = {
+      version: 1,
+      userId: currentUser.id,
+      step,
+      riskType,
+      riskDetail,
+      description,
+      location,
+      locationMode,
+      place,
+      updatedAt: new Date().toISOString(),
+      attachmentCount: attachments.length,
+    };
+    if (hasReportDraftContent(draft)) localStorage.setItem(reportDraftKey(currentUser.id), JSON.stringify(draft));
+    else localStorage.removeItem(reportDraftKey(currentUser.id));
+  }, [attachments.length, currentUser, description, location, locationMode, place, riskDetail, riskType, step, view]);
+
+  useEffect(() => {
+    if (!currentUser || view !== "report" || step >= 5) return;
+    const media: StoredDraftMedia[] = attachments.map((item) => ({
+      id: item.id,
+      userId: currentUser.id,
+      kind: item.kind,
+      name: item.file.name,
+      type: item.file.type,
+      size: item.file.size,
+      blob: item.file,
+    }));
+    void replaceDraftMedia(currentUser.id, media).catch(() => undefined);
+  }, [attachments, currentUser, step, view]);
 
   useEffect(() => {
     if (!riskType || step !== 2 || view !== "report") return;
@@ -668,10 +745,56 @@ function App() {
     setStep(1);
   };
 
-  const openReport = () => {
+  const startFreshReport = () => {
     resetReport();
     setView("report");
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openReport = async () => {
+    if (!currentUser) return;
+    if (view === "report") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    const draft = readReportDraft(currentUser.id);
+    if (!draft || !hasReportDraftContent(draft)) {
+      startFreshReport();
+      return;
+    }
+    const media = await getDraftMedia(currentUser.id).catch(() => [] as StoredDraftMedia[]);
+    setConfirmDraftDiscard(false);
+    setPendingReportDraft({ draft, media });
+  };
+
+  const resumeReportDraft = () => {
+    if (!pendingReportDraft) return;
+    resetReport();
+    const { draft, media } = pendingReportDraft;
+    setStep(draft.step);
+    setRiskType(draft.riskType);
+    setRiskDetail(draft.riskDetail);
+    setDescription(draft.description);
+    setLocation(draft.location);
+    setLocationMode(draft.locationMode);
+    setPlace(draft.place);
+    setAttachments(media.map((item) => {
+      const file = new File([item.blob], item.name, { type: item.type });
+      return { id: item.id, kind: item.kind, file, url: URL.createObjectURL(file) };
+    }));
+    setPendingReportDraft(null);
+    setConfirmDraftDiscard(false);
+    setView("report");
+    window.scrollTo({ top: 0 });
+  };
+
+  const discardReportDraft = async () => {
+    if (!currentUser) return;
+    localStorage.removeItem(reportDraftKey(currentUser.id));
+    await deleteDraftMedia(currentUser.id).catch(() => undefined);
+    setPendingReportDraft(null);
+    setConfirmDraftDiscard(false);
+    startFreshReport();
   };
 
   const addFiles = (event: ChangeEvent<HTMLInputElement>) => {
@@ -869,6 +992,8 @@ function App() {
     try {
       await saveReport(report, media);
       setReports((current) => [report, ...current]);
+      localStorage.removeItem(reportDraftKey(currentUser!.id));
+      await deleteDraftMedia(currentUser!.id).catch(() => undefined);
       setStep(5);
     } catch {
       setError("이 기기에 기록을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
@@ -1418,6 +1543,41 @@ function App() {
             </section>
           )}
         </main>
+
+        {pendingReportDraft && (
+          <div className="report-draft-backdrop" role="presentation">
+            <section className="report-draft-sheet" role="dialog" aria-modal="true" aria-labelledby="report-draft-title">
+              {!confirmDraftDiscard ? (
+                <>
+                  <button className="report-draft-close" type="button" onClick={() => setPendingReportDraft(null)} aria-label="이어서 작성 안내 닫기">×</button>
+                  <span className="report-draft-icon" aria-hidden="true">↻</span>
+                  <p>작성 중인 제보</p>
+                  <h2 id="report-draft-title">이어서 작성할까요?</h2>
+                  <span className="report-draft-description">이전에 작성하던 내용이 안전하게 남아 있어요.</span>
+                  <div className="report-draft-summary">
+                    <strong>{pendingReportDraft.draft.step} / 4 단계까지 작성</strong>
+                    <span>{pendingReportDraft.draft.attachmentCount > 0 ? `첨부자료 ${pendingReportDraft.draft.attachmentCount}개 · ` : ""}{formatDate(pendingReportDraft.draft.updatedAt)} 저장</span>
+                  </div>
+                  <div className="report-draft-actions">
+                    <button className="report-draft-new" type="button" onClick={() => setConfirmDraftDiscard(true)}>새로 작성하기</button>
+                    <button className="report-draft-resume" type="button" onClick={resumeReportDraft}>이어서 작성하기 <b>→</b></button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span className="report-draft-icon warning" aria-hidden="true">!</span>
+                  <p>작성 내용 삭제</p>
+                  <h2 id="report-draft-title">새로 작성할까요?</h2>
+                  <span className="report-draft-description">저장된 입력 내용과 첨부자료가 삭제됩니다.</span>
+                  <div className="report-draft-actions">
+                    <button className="report-draft-new" type="button" onClick={() => setConfirmDraftDiscard(false)}>취소</button>
+                    <button className="report-draft-discard" type="button" onClick={discardReportDraft}>삭제하고 새로 작성</button>
+                  </div>
+                </>
+              )}
+            </section>
+          </div>
+        )}
 
         {rewardFormOpen && currentUser && (
           <div className="app-reward-form-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setRewardFormOpen(false)}>
