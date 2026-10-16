@@ -61,6 +61,16 @@ async function fetchWeatherSnapshot(point: LocationPoint, signal?: AbortSignal):
   };
 }
 
+function describeWeather(code: number) {
+  if (code === 0) return { icon: "☀", label: "맑음" };
+  if (code <= 3) return { icon: "⛅", label: "구름" };
+  if (code === 45 || code === 48) return { icon: "〰", label: "안개" };
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return { icon: "☂", label: "비" };
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return { icon: "❄", label: "눈" };
+  if (code >= 95) return { icon: "⚡", label: "뇌우" };
+  return { icon: "◌", label: "날씨" };
+}
+
 type SpeechRecognitionLike = {
   lang: string;
   interimResults: boolean;
@@ -1568,12 +1578,11 @@ function App() {
                       <div><dt>세부유형</dt><dd>{riskDetail}</dd></div>
                       <div><dt>위치</dt><dd>{locationMode === "gps" && location ? `지도에서 선택한 위치 (${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)})` : place}</dd></div>
                       <div><dt>첨부</dt><dd>사진 {attachments.filter((item) => item.kind === "image").length} · 영상 {attachments.filter((item) => item.kind === "video").length} · 음성 {attachments.filter((item) => item.kind === "audio").length}</dd></div>
-                      {locationMode === "gps" && <div><dt>날씨</dt><dd>{weatherStatus === "loading" ? "현재 날씨 확인 중" : weatherStatus === "success" && weatherSnapshot ? `${Math.round(weatherSnapshot.temperature)}°C · 자동 저장` : "제보할 때 다시 확인"}</dd></div>}
                     </dl>
                   </div>
                   <div className="auto-save-info">
-                    <span>날짜·시간 자동저장</span>
-                    <strong>{new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date())}</strong>
+                    <span>{locationMode === "gps" ? weatherStatus === "loading" ? "날씨 확인 중" : weatherStatus === "success" && weatherSnapshot ? `${describeWeather(weatherSnapshot.code).icon} ${Math.round(weatherSnapshot.temperature)}°C ${describeWeather(weatherSnapshot.code).label}` : "날씨 확인 불가" : "날짜·시간 자동저장"}</span>
+                    <strong>제보시각 {new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date())}</strong>
                   </div>
                   <label className="consent-check"><input required type="checkbox" /><span>위치와 제보내용을 연구목적으로 수집하는 것에 동의합니다.</span></label>
                   <button className="next-button" disabled={saving} type="submit">{saving ? "저장하고 있습니다…" : "제보 완료하기"}<span>→</span></button>
