@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
-import { loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, readPrototypeSession, registerPrototypeAccount } from "./auth";
+import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, registerPrototypeAccount } from "./auth";
 import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport } from "./storage";
 import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
 
@@ -402,7 +402,7 @@ function App() {
     if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("design-preview") === "1") {
       return { id: "design-preview", name: "지킴이", email: "preview@jikeoro.local" };
     }
-    return readPrototypeSession();
+    return null;
   });
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [authName, setAuthName] = useState("");
@@ -465,6 +465,15 @@ function App() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const timer = window.setTimeout(() => setShowLaunch(false), reducedMotion ? 500 : 2300);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("design-preview") === "1") return;
+    let active = true;
+    getPrototypeSession().then((user) => {
+      if (active) setCurrentUser(user);
+    });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -665,8 +674,8 @@ function App() {
     }
   };
 
-  const logout = () => {
-    logoutPrototypeAccount();
+  const logout = async () => {
+    await logoutPrototypeAccount();
     setCurrentUser(null);
     setReports([]);
     setView("home");
@@ -1015,7 +1024,7 @@ function App() {
     event.preventDefault();
     setSaving(true);
     setError("");
-    const reportId = `report-${crypto.randomUUID()}`;
+    const reportId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
     const initialResponse = reportStatus.received.defaultResponse;
     const report: StoredReport = {
@@ -1053,7 +1062,7 @@ function App() {
       await deleteDraftMedia(currentUser!.id).catch(() => undefined);
       setStep(5);
     } catch {
-      setError("이 기기에 기록을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.");
+      setError("서버에 기록을 저장하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.");
     } finally {
       setSaving(false);
     }

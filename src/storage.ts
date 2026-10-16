@@ -1,3 +1,5 @@
+import { supabase } from "./supabase";
+
 export type StoredMedia = {
   id: string;
   reportId: string;
@@ -47,22 +49,29 @@ export type StoredReport = {
   points: number;
 };
 
+type ReportRow = {
+  id: string;
+  user_id: string;
+  category: string;
+  subcategory: string | null;
+  description: string;
+  latitude: number | null;
+  longitude: number | null;
+  accuracy: number | null;
+  address: string | null;
+  place_description: string | null;
+  created_at: string;
+  updated_at: string;
+  status: ReportStatus;
+  assigned_agency: string | null;
+  response: string | null;
+  points: number;
+  report_media?: Array<{ id: string; kind: StoredMedia["kind"]; original_name: string; mime_type: string; size_bytes: number; storage_path: string }>;
+  report_status_history?: Array<{ status: ReportStatus; note: string | null; created_at: string }>;
+};
+
 const DB_NAME = "jikeoro-senior-prototype";
 const DB_VERSION = 2;
-
-function normalizeRiskType(value: string) {
-  if (value === "단차" || value === "적치물") return "인도";
-  if (value === "포트홀") return "횡단보도";
-  if (["인도", "횡단보도", "조도", "날씨 관련 위험", "기타"].includes(value)) return value;
-  return "기타";
-}
-
-function normalizeStatus(value: unknown): ReportStatus {
-  if (value === "review" || value === "확인 중") return "review";
-  if (value === "action" || value === "조치 중") return "action";
-  if (value === "completed" || value === "완료") return "completed";
-  return "received";
-}
 
 function defaultResponse(status: ReportStatus) {
   if (status === "review") return "담당자가 제보 내용을 검토하고 현장 확인 일정을 준비하고 있어요.";
@@ -71,33 +80,34 @@ function defaultResponse(status: ReportStatus) {
   return "기록이 안전하게 접수됐어요. 위치와 내용을 확인한 뒤 담당 기관을 연결할게요.";
 }
 
-function normalizeReport(report: StoredReport & Record<string, unknown>): StoredReport {
-  const status = normalizeStatus(report.status);
-  const updatedAt = typeof report.updatedAt === "string" ? report.updatedAt : report.createdAt;
-  const department = typeof report.department === "string" && report.department.trim() ? report.department : null;
-  const response = typeof report.response === "string" && report.response.trim() ? report.response : defaultResponse(status);
-  const storedHistory = Array.isArray(report.statusHistory) ? report.statusHistory : [];
-  const statusHistory = storedHistory.length
-    ? storedHistory.map((item) => {
-      const update = item as Partial<ReportStatusUpdate>;
-      return {
-        status: normalizeStatus(update.status),
-        note: typeof update.note === "string" && update.note.trim() ? update.note : defaultResponse(normalizeStatus(update.status)),
-        createdAt: typeof update.createdAt === "string" ? update.createdAt : updatedAt,
-        department: typeof update.department === "string" && update.department.trim() ? update.department : null,
-      };
-    })
-    : [{ status, note: response, createdAt: updatedAt, department }];
-
+function mapReport(row: ReportRow): StoredReport {
+  const response = row.response?.trim() || defaultResponse(row.status);
+  const history = [...(row.report_status_history ?? [])]
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    .map((item) => ({
+      status: item.status,
+      note: item.note?.trim() || defaultResponse(item.status),
+      createdAt: item.created_at,
+      department: row.assigned_agency,
+    }));
   return {
-    ...report,
-    description: report.description === "현장에서 발견한 위험요소입니다." ? "" : report.description,
-    riskType: normalizeRiskType(report.riskType),
-    status,
-    updatedAt,
-    department,
+    id: row.id,
+    userId: row.user_id,
+    riskType: row.category,
+    riskDetail: row.subcategory ?? undefined,
+    description: row.description,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    accuracy: row.accuracy,
+    place: row.address?.trim() || row.place_description?.trim() || "위치정보 없음",
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    status: row.status,
+    department: row.assigned_agency,
     response,
-    statusHistory,
+    statusHistory: history.length ? history : [{ status: row.status, note: response, createdAt: row.updated_at, department: row.assigned_agency }],
+    mediaCount: row.report_media?.length ?? 0,
+    points: row.points ?? 100,
   };
 }
 
@@ -106,9 +116,7 @@ function openDatabase() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onupgradeneeded = () => {
       const database = request.result;
-      if (!database.objectStoreNames.contains("reports")) {
-        database.createObjectStore("reports", { keyPath: "id" });
-      }
+      if (!database.objectStoreNames.contains("reports")) database.createObjectStore("reports", { keyPath: "id" });
       if (!database.objectStoreNames.contains("media")) {
         const store = database.createObjectStore("media", { keyPath: "id" });
         store.createIndex("reportId", "reportId");
@@ -128,14 +136,8 @@ export async function getDraftMedia(userId: string): Promise<StoredDraftMedia[]>
   return new Promise((resolve, reject) => {
     const transaction = database.transaction("draftMedia", "readonly");
     const request = transaction.objectStore("draftMedia").index("userId").getAll(userId);
-    request.onsuccess = () => {
-      database.close();
-      resolve(request.result as StoredDraftMedia[]);
-    };
-    request.onerror = () => {
-      database.close();
-      reject(request.error);
-    };
+    request.onsuccess = () => { database.close(); resolve(request.result as StoredDraftMedia[]); };
+    request.onerror = () => { database.close(); reject(request.error); };
   });
 }
 
@@ -144,20 +146,13 @@ export async function replaceDraftMedia(userId: string, files: StoredDraftMedia[
   return new Promise<void>((resolve, reject) => {
     const transaction = database.transaction("draftMedia", "readwrite");
     const store = transaction.objectStore("draftMedia");
-    const index = store.index("userId");
-    const keysRequest = index.getAllKeys(userId);
+    const keysRequest = store.index("userId").getAllKeys(userId);
     keysRequest.onsuccess = () => {
       keysRequest.result.forEach((key) => store.delete(key));
       files.forEach((file) => store.put(file));
     };
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onerror = () => {
-      database.close();
-      reject(transaction.error);
-    };
+    transaction.oncomplete = () => { database.close(); resolve(); };
+    transaction.onerror = () => { database.close(); reject(transaction.error); };
   });
 }
 
@@ -166,74 +161,95 @@ export async function deleteDraftMedia(userId: string) {
 }
 
 export async function getReports(userId: string): Promise<StoredReport[]> {
-  const database = await openDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = database.transaction("reports", "readonly");
-    const request = transaction.objectStore("reports").getAll();
-    request.onsuccess = () => {
-      database.close();
-      resolve((request.result as StoredReport[])
-        .filter((report) => report.userId === userId)
-        .map((report) => normalizeReport(report as StoredReport & Record<string, unknown>))
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
-    };
-    request.onerror = () => {
-      database.close();
-      reject(request.error);
-    };
-  });
+  const { data, error } = await supabase
+    .from("reports")
+    .select("*, report_media(id,kind,original_name,mime_type,size_bytes,storage_path), report_status_history(status,note,created_at)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as ReportRow[]).map(mapReport);
 }
 
 export async function getReportMedia(reportId: string): Promise<StoredMedia[]> {
-  const database = await openDatabase();
-  return new Promise((resolve, reject) => {
-    const transaction = database.transaction("media", "readonly");
-    const request = transaction.objectStore("media").index("reportId").getAll(reportId);
-    request.onsuccess = () => {
-      database.close();
-      resolve(request.result as StoredMedia[]);
-    };
-    request.onerror = () => {
-      database.close();
-      reject(request.error);
-    };
-  });
+  const { data, error } = await supabase
+    .from("report_media")
+    .select("id,report_id,kind,original_name,mime_type,size_bytes")
+    .eq("report_id", reportId);
+  if (error) throw error;
+  return (data ?? []).map((item) => ({
+    id: item.id,
+    reportId: item.report_id,
+    kind: item.kind as StoredMedia["kind"],
+    name: item.original_name,
+    type: item.mime_type,
+    size: item.size_bytes,
+    blob: new Blob([], { type: item.mime_type }),
+  }));
+}
+
+function fileExtension(name: string) {
+  const match = name.match(/\.[a-z0-9]{1,8}$/i);
+  return match?.[0].toLowerCase() ?? "";
 }
 
 export async function saveReport(report: StoredReport, files: StoredMedia[]) {
-  const database = await openDatabase();
-  return new Promise<void>((resolve, reject) => {
-    const transaction = database.transaction(["reports", "media"], "readwrite");
-    transaction.objectStore("reports").put(report);
-    const mediaStore = transaction.objectStore("media");
-    files.forEach((file) => mediaStore.put(file));
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onerror = () => {
-      database.close();
-      reject(transaction.error);
-    };
+  const { error: reportError } = await supabase.from("reports").insert({
+    id: report.id,
+    user_id: report.userId,
+    source: "senior_app",
+    category: report.riskType,
+    subcategory: report.riskDetail ?? null,
+    title: report.description || `${report.riskType} 위험요소를 발견했어요`,
+    description: report.description,
+    latitude: report.latitude,
+    longitude: report.longitude,
+    accuracy: report.accuracy,
+    place_description: report.place,
+    status: "received",
+    response: report.response,
+    observed_at: report.createdAt,
+    points: report.points,
   });
+  if (reportError) throw reportError;
+
+  const uploadedPaths: string[] = [];
+  try {
+    const mediaRows = [];
+    for (const file of files) {
+      const path = `${report.userId}/${report.id}/${crypto.randomUUID()}${fileExtension(file.name)}`;
+      const contentType = file.type.split(";")[0] || "application/octet-stream";
+      const { error: uploadError } = await supabase.storage.from("report-media").upload(path, file.blob, { contentType, upsert: false });
+      if (uploadError) throw uploadError;
+      uploadedPaths.push(path);
+      mediaRows.push({
+        report_id: report.id,
+        user_id: report.userId,
+        kind: file.kind,
+        storage_path: path,
+        original_name: file.name,
+        mime_type: contentType,
+        size_bytes: file.size,
+      });
+    }
+    if (mediaRows.length) {
+      const { error: mediaError } = await supabase.from("report_media").insert(mediaRows);
+      if (mediaError) throw mediaError;
+    }
+  } catch (error) {
+    if (uploadedPaths.length) await supabase.storage.from("report-media").remove(uploadedPaths);
+    await supabase.from("reports").delete().eq("id", report.id);
+    throw error;
+  }
 }
 
 export async function deleteReport(reportId: string) {
-  const database = await openDatabase();
-  return new Promise<void>((resolve, reject) => {
-    const transaction = database.transaction(["reports", "media"], "readwrite");
-    transaction.objectStore("reports").delete(reportId);
-    const mediaStore = transaction.objectStore("media");
-    const mediaIndex = mediaStore.index("reportId");
-    const mediaRequest = mediaIndex.getAllKeys(reportId);
-    mediaRequest.onsuccess = () => mediaRequest.result.forEach((key) => mediaStore.delete(key));
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
-    transaction.onerror = () => {
-      database.close();
-      reject(transaction.error);
-    };
-  });
+  const { data: media, error: mediaError } = await supabase.from("report_media").select("storage_path").eq("report_id", reportId);
+  if (mediaError) throw mediaError;
+  const paths = (media ?? []).map((item) => item.storage_path);
+  if (paths.length) {
+    const { error: removeError } = await supabase.storage.from("report-media").remove(paths);
+    if (removeError) throw removeError;
+  }
+  const { error } = await supabase.from("reports").delete().eq("id", reportId);
+  if (error) throw error;
 }

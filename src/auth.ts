@@ -1,85 +1,56 @@
+import { supabase } from "./supabase";
+
 export type PrototypeUser = {
   id: string;
   name: string;
   email: string;
 };
 
-type PrototypeAccount = PrototypeUser & {
-  passwordHash: string;
-  salt: string;
-  createdAt: string;
-};
-
-const ACCOUNTS_KEY = "jikeoro-senior-accounts";
-const SESSION_KEY = "jikeoro-senior-session";
-
-function bytesToHex(bytes: Uint8Array) {
-  return Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
+function authErrorMessage(message: string) {
+  const normalized = message.toLowerCase();
+  if (normalized.includes("invalid login credentials")) return "이메일 또는 비밀번호가 맞지 않습니다.";
+  if (normalized.includes("already registered") || normalized.includes("already been registered")) return "이미 가입된 이메일입니다. 로그인해주세요.";
+  if (normalized.includes("password")) return "비밀번호는 8자 이상 입력해주세요.";
+  if (normalized.includes("email")) return "이메일 주소를 확인해주세요.";
+  return "로그인 정보를 처리하지 못했습니다. 잠시 후 다시 시도해주세요.";
 }
 
-async function hashPassword(password: string, salt: string) {
-  const material = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: new TextEncoder().encode(salt), iterations: 120_000 }, material, 256);
-  return bytesToHex(new Uint8Array(bits));
+function toPrototypeUser(user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }): PrototypeUser {
+  const email = user.email ?? "";
+  const metadataName = typeof user.user_metadata?.name === "string" ? user.user_metadata.name.trim() : "";
+  return {
+    id: user.id,
+    name: metadataName || email.split("@")[0] || "지킴이",
+    email,
+  };
 }
 
-function readAccounts(): PrototypeAccount[] {
-  try {
-    return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) ?? "[]") as PrototypeAccount[];
-  } catch {
-    return [];
-  }
-}
-
-function saveSession(user: PrototypeUser) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-  sessionStorage.removeItem(SESSION_KEY);
-  return user;
-}
-
-export function readPrototypeSession(): PrototypeUser | null {
-  try {
-    const persistedSession = localStorage.getItem(SESSION_KEY);
-    const legacySession = sessionStorage.getItem(SESSION_KEY);
-    const savedSession = persistedSession ?? legacySession;
-    if (!savedSession) return null;
-    const user = JSON.parse(savedSession) as PrototypeUser;
-    if (!user?.id || !user.name || !user.email) throw new Error("invalid session");
-    if (!persistedSession) localStorage.setItem(SESSION_KEY, savedSession);
-    if (legacySession) sessionStorage.removeItem(SESSION_KEY);
-    return user;
-  } catch {
-    localStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(SESSION_KEY);
-    return null;
-  }
+export async function getPrototypeSession() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error || !data.session?.user) return null;
+  return toPrototypeUser(data.session.user);
 }
 
 export async function registerPrototypeAccount(name: string, email: string, password: string) {
-  const normalizedEmail = email.trim().toLowerCase();
-  const accounts = readAccounts();
-  if (accounts.some((account) => account.email === normalizedEmail)) throw new Error("이미 가입된 이메일입니다. 로그인해주세요.");
-  const salt = bytesToHex(crypto.getRandomValues(new Uint8Array(16)));
-  const account: PrototypeAccount = {
-    id: `member-${crypto.randomUUID()}`,
-    name: name.trim(),
-    email: normalizedEmail,
-    passwordHash: await hashPassword(password, salt),
-    salt,
-    createdAt: new Date().toISOString(),
-  };
-  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([...accounts, account]));
-  return saveSession({ id: account.id, name: account.name, email: account.email });
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim().toLowerCase(),
+    password,
+    options: { data: { name: name.trim() } },
+  });
+  if (error) throw new Error(authErrorMessage(error.message));
+  if (!data.user || !data.session) throw new Error("회원가입은 완료됐지만 바로 로그인하지 못했습니다. 관리자에게 이메일 확인 설정을 문의해주세요.");
+  return toPrototypeUser(data.user);
 }
 
 export async function loginPrototypeAccount(email: string, password: string) {
-  const normalizedEmail = email.trim().toLowerCase();
-  const account = readAccounts().find((candidate) => candidate.email === normalizedEmail);
-  if (!account || await hashPassword(password, account.salt) !== account.passwordHash) throw new Error("이메일 또는 비밀번호가 맞지 않습니다.");
-  return saveSession({ id: account.id, name: account.name, email: account.email });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
+  });
+  if (error || !data.user) throw new Error(authErrorMessage(error?.message ?? "invalid login credentials"));
+  return toPrototypeUser(data.user);
 }
 
-export function logoutPrototypeAccount() {
-  localStorage.removeItem(SESSION_KEY);
-  sessionStorage.removeItem(SESSION_KEY);
+export async function logoutPrototypeAccount() {
+  await supabase.auth.signOut();
 }
