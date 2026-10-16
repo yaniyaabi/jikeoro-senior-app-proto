@@ -185,7 +185,7 @@ const onboardingSlides: { eyebrow: string; title: [string, string]; description:
   {
     eyebrow: "정확한 위치",
     title: ["지도에서 위험한 곳을", "확인해주세요."],
-    description: "현재 위치의 핀을 옮기거나 알고 있는 장소를 직접 적을 수 있어요.",
+    description: "GPS를 사용하거나 알고 있는 장소를 직접 적을 수 있어요.",
     kind: "location",
   },
   {
