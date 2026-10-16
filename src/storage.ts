@@ -22,6 +22,12 @@ export type StoredDraftMedia = {
 
 export type ReportStatus = "received" | "review" | "action" | "completed";
 
+export type WeatherSnapshot = {
+  temperature: number;
+  code: number;
+  observedAt: string;
+};
+
 export type ReportStatusUpdate = {
   status: ReportStatus;
   note: string;
@@ -44,6 +50,7 @@ export type StoredReport = {
   status: ReportStatus;
   department: string | null;
   response: string;
+  weather: WeatherSnapshot | null;
   statusHistory: ReportStatusUpdate[];
   mediaCount: number;
   points: number;
@@ -65,6 +72,7 @@ type ReportRow = {
   status: ReportStatus;
   assigned_agency: string | null;
   response: string | null;
+  weather: WeatherSnapshot | null;
   points: number;
   report_media?: Array<{ id: string; kind: StoredMedia["kind"]; original_name: string; mime_type: string; size_bytes: number; storage_path: string }>;
   report_status_history?: Array<{ status: ReportStatus; note: string | null; created_at: string }>;
@@ -105,6 +113,7 @@ function mapReport(row: ReportRow): StoredReport {
     status: row.status,
     department: row.assigned_agency,
     response,
+    weather: row.weather ?? null,
     statusHistory: history.length ? history : [{ status: row.status, note: response, createdAt: row.updated_at, department: row.assigned_agency }],
     mediaCount: row.report_media?.length ?? 0,
     points: row.points ?? 100,
@@ -208,6 +217,7 @@ export async function saveReport(report: StoredReport, files: StoredMedia[]) {
     status: "received",
     response: report.response,
     observed_at: report.createdAt,
+    weather: report.weather,
     points: report.points,
   });
   if (reportError) throw reportError;

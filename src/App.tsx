@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, registerPrototypeAccount } from "./auth";
-import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport } from "./storage";
+import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport, WeatherSnapshot } from "./storage";
 import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
 
 type View = "home" | "report" | "history" | "rewards";
@@ -16,6 +16,7 @@ type MediaPickerKind = "image" | "video" | null;
 type OnboardingArtworkKind = "welcome" | "report" | "location" | "permissions";
 type TextSize = "normal" | "large";
 type PermissionStatus = "idle" | "requesting" | "granted" | "denied" | "unsupported";
+type WeatherStatus = "idle" | "loading" | "success" | "error";
 type ReportDraft = {
   version: 1;
   userId: string;
@@ -39,6 +40,26 @@ const permissionStatusLabel: Record<PermissionStatus, string> = {
   denied: "다시 허용",
   unsupported: "사용 시 확인",
 };
+
+async function fetchWeatherSnapshot(point: LocationPoint, signal?: AbortSignal): Promise<WeatherSnapshot> {
+  const params = new URLSearchParams({
+    latitude: String(point.latitude),
+    longitude: String(point.longitude),
+    current: "temperature_2m,weather_code",
+    timezone: "Asia/Seoul",
+  });
+  const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`, { signal });
+  if (!response.ok) throw new Error("weather request failed");
+  const data = await response.json() as { current?: { temperature_2m?: number; weather_code?: number; time?: string } };
+  if (typeof data.current?.temperature_2m !== "number" || typeof data.current?.weather_code !== "number") {
+    throw new Error("weather response invalid");
+  }
+  return {
+    temperature: data.current.temperature_2m,
+    code: data.current.weather_code,
+    observedAt: data.current.time ?? new Date().toISOString(),
+  };
+}
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -424,6 +445,8 @@ function App() {
   const [locationConfirmed, setLocationConfirmed] = useState(false);
   const [locationEditing, setLocationEditing] = useState(false);
   const [locationMessage, setLocationMessage] = useState("");
+  const [weatherSnapshot, setWeatherSnapshot] = useState<WeatherSnapshot | null>(null);
+  const [weatherStatus, setWeatherStatus] = useState<WeatherStatus>("idle");
   const [place, setPlace] = useState("");
   const [reports, setReports] = useState<StoredReport[]>([]);
   const [activityFilter, setActivityFilter] = useState<ActivityFilter>("all");
@@ -454,6 +477,27 @@ function App() {
   const attachmentsRef = useRef<Attachment[]>([]);
   const imageCameraRef = useRef<HTMLInputElement>(null);
   const imageLibraryRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (locationMode !== "gps" || !locationConfirmed || !location) {
+      setWeatherSnapshot(null);
+      setWeatherStatus("idle");
+      return;
+    }
+    const controller = new AbortController();
+    setWeatherStatus("loading");
+    fetchWeatherSnapshot(location, controller.signal)
+      .then((snapshot) => {
+        setWeatherSnapshot(snapshot);
+        setWeatherStatus("success");
+      })
+      .catch((weatherError: Error) => {
+        if (weatherError.name === "AbortError") return;
+        setWeatherSnapshot(null);
+        setWeatherStatus("error");
+      });
+    return () => controller.abort();
+  }, [location?.latitude, location?.longitude, locationConfirmed, locationMode]);
   const videoCameraRef = useRef<HTMLInputElement>(null);
   const videoLibraryRef = useRef<HTMLInputElement>(null);
   const riskDetailPanelRef = useRef<HTMLDivElement>(null);
@@ -795,6 +839,8 @@ function App() {
     setLocationConfirmed(false);
     setLocationEditing(false);
     setLocationMessage("");
+    setWeatherSnapshot(null);
+    setWeatherStatus("idle");
     setPlace("");
     setError("");
     setMediaPickerKind(null);
@@ -1027,6 +1073,10 @@ function App() {
     const reportId = crypto.randomUUID();
     const createdAt = new Date().toISOString();
     const initialResponse = reportStatus.received.defaultResponse;
+    let weather = locationMode === "gps" ? weatherSnapshot : null;
+    if (!weather && locationMode === "gps" && location) {
+      weather = await fetchWeatherSnapshot(location).catch(() => null);
+    }
     const report: StoredReport = {
       id: reportId,
       userId: currentUser!.id,
@@ -1042,6 +1092,7 @@ function App() {
       status: "received",
       department: null,
       response: initialResponse,
+      weather,
       statusHistory: [{ status: "received", note: initialResponse, createdAt, department: null }],
       mediaCount: attachments.length,
       points: 100,
@@ -1517,6 +1568,7 @@ function App() {
                       <div><dt>세부유형</dt><dd>{riskDetail}</dd></div>
                       <div><dt>위치</dt><dd>{locationMode === "gps" && location ? `지도에서 선택한 위치 (${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)})` : place}</dd></div>
                       <div><dt>첨부</dt><dd>사진 {attachments.filter((item) => item.kind === "image").length} · 영상 {attachments.filter((item) => item.kind === "video").length} · 음성 {attachments.filter((item) => item.kind === "audio").length}</dd></div>
+                      {locationMode === "gps" && <div><dt>날씨</dt><dd>{weatherStatus === "loading" ? "현재 날씨 확인 중" : weatherStatus === "success" && weatherSnapshot ? `${Math.round(weatherSnapshot.temperature)}°C · 자동 저장` : "제보할 때 다시 확인"}</dd></div>}
                     </dl>
                   </div>
                   <div className="auto-save-info">
