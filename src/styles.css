@@ -1721,5 +1721,9 @@ body:has(.onboarding-layer),
 /* Keep the step dots at the same visual distance from the actions on every slide. */
 .onboarding-screen .onboarding-dots {
   align-self:end;
-  transform:translateY(-8px);
+  transform:translateY(-18px);
+}
+
+.onboarding-screen-permissions .onboarding-dots {
+  transform:translateY(30px);
 }
