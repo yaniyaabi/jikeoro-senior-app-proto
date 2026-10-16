@@ -1,4 +1,5 @@
-const CLEANUP_MARKER = "jikeoro-legacy-local-data-cleaned-v1";
+const KEY_CLEANUP_MARKER = "jikeoro-legacy-local-keys-cleaned-v1";
+const DATABASE_CLEANUP_MARKER = "jikeoro-legacy-local-database-cleaned-v1";
 const LEGACY_DATABASE = "jikeoro-senior-prototype";
 const LEGACY_KEYS = [
   "jikeoro-senior-accounts",
@@ -17,15 +18,17 @@ function clearLegacyKeys(storage: Storage) {
 }
 
 export function clearLegacyLocalData() {
-  if (localStorage.getItem(CLEANUP_MARKER) === "complete") return Promise.resolve();
-
-  clearLegacyKeys(localStorage);
-  clearLegacyKeys(sessionStorage);
+  if (localStorage.getItem(KEY_CLEANUP_MARKER) !== "complete") {
+    clearLegacyKeys(localStorage);
+    clearLegacyKeys(sessionStorage);
+    localStorage.setItem(KEY_CLEANUP_MARKER, "complete");
+  }
+  if (localStorage.getItem(DATABASE_CLEANUP_MARKER) === "complete") return Promise.resolve();
 
   return new Promise<void>((resolve) => {
     const request = indexedDB.deleteDatabase(LEGACY_DATABASE);
     request.onsuccess = () => {
-      localStorage.setItem(CLEANUP_MARKER, "complete");
+      localStorage.setItem(DATABASE_CLEANUP_MARKER, "complete");
       resolve();
     };
     request.onerror = () => resolve();
