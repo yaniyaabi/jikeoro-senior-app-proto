@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "jikeoro-senior-";
-const CACHE = `${CACHE_PREFIX}v7`;
+const CACHE = `${CACHE_PREFIX}v8`;
 const APP_SHELL = new URL("./", self.registration.scope).href;
 
 self.addEventListener("install", () => self.skipWaiting());

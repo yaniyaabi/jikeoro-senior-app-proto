@@ -1515,20 +1515,19 @@ function App() {
                       </section>
                     </div>
                   )}
-                  {attachments.length > 0 && (
+                  {attachments.some((item) => item.kind !== "audio") && (
                     <div className="media-list">
-                      {attachments.map((item) => (
+                      {attachments.filter((item) => item.kind !== "audio").map((item) => (
                         <article key={item.id}>
                           {item.kind === "image" && <img src={item.url} alt="선택한 위험요소" />}
                           {item.kind === "video" && <video src={item.url} controls />}
-                          {item.kind === "audio" && <div className="audio-preview">🎙<CompactAudioPlayer src={item.url} /></div>}
                           <button onClick={() => removeAttachment(item.id)} aria-label="첨부파일 삭제">×</button>
                         </article>
                       ))}
                     </div>
                   )}
                   <p className="media-privacy">얼굴과 차량번호가 보이면 제출 전에 확인해주세요.</p>
-                  <button className="next-button" onClick={goNext}>{attachments.length ? "선택한 자료와 계속하기" : "위험요소 선택하기"}<span>→</span></button>
+                  <button className="next-button" onClick={goNext}>{attachments.some((item) => item.kind !== "audio") ? "선택한 자료와 계속하기" : "위험요소 선택하기"}<span>→</span></button>
                 </div>
               )}
 
