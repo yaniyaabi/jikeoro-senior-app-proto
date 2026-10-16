@@ -1717,3 +1717,9 @@ body:has(.onboarding-layer),
     font-size:calc(11px + var(--text-bump));
   }
 }
+
+/* Keep the step dots at the same visual distance from the actions on every slide. */
+.onboarding-screen .onboarding-dots {
+  align-self:end;
+  transform:translateY(-8px);
+}
