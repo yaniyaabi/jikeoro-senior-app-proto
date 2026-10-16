@@ -71,6 +71,75 @@ function describeWeather(code: number) {
   return { icon: "◌", label: "날씨" };
 }
 
+function formatPlaybackTime(value: number) {
+  if (!Number.isFinite(value) || value < 0) return "0:00";
+  const seconds = Math.floor(value);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function CompactAudioPlayer({ src, label = "현장음" }: { src: string; label?: string }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    setPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+  }, [src]);
+
+  const togglePlayback = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.paused) {
+      try {
+        await audio.play();
+      } catch {
+        setPlaying(false);
+      }
+    } else {
+      audio.pause();
+    }
+  };
+
+  const seek = (value: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = value;
+    setCurrentTime(value);
+  };
+
+  return (
+    <div className="compact-audio-player">
+      <audio
+        ref={audioRef}
+        src={src}
+        preload="metadata"
+        onLoadedMetadata={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
+        onDurationChange={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
+        onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => { setPlaying(false); setCurrentTime(0); }}
+      />
+      <button type="button" onClick={togglePlayback} aria-label={`${label} ${playing ? "일시정지" : "재생"}`}>
+        {playing ? "Ⅱ" : "▶"}
+      </button>
+      <input
+        type="range"
+        min="0"
+        max={Math.max(duration, 1)}
+        step="0.1"
+        value={Math.min(currentTime, Math.max(duration, 1))}
+        onChange={(event) => seek(Number(event.target.value))}
+        aria-label={`${label} 재생 위치`}
+      />
+      <span>{formatPlaybackTime(currentTime)} / {formatPlaybackTime(duration)}</span>
+    </div>
+  );
+}
+
 type SpeechRecognitionLike = {
   lang: string;
   interimResults: boolean;
@@ -1452,7 +1521,7 @@ function App() {
                         <article key={item.id}>
                           {item.kind === "image" && <img src={item.url} alt="선택한 위험요소" />}
                           {item.kind === "video" && <video src={item.url} controls />}
-                          {item.kind === "audio" && <div className="audio-preview">🎙<audio src={item.url} controls /></div>}
+                          {item.kind === "audio" && <div className="audio-preview">🎙<CompactAudioPlayer src={item.url} /></div>}
                           <button onClick={() => removeAttachment(item.id)} aria-label="첨부파일 삭제">×</button>
                         </article>
                       ))}
@@ -1523,7 +1592,7 @@ function App() {
                         <article key={item.id}>
                           <span>첨부한 현장음</span>
                           <button type="button" onClick={() => removeAttachment(item.id)} aria-label="현장음 삭제">×</button>
-                          <audio src={item.url} controls />
+                          <CompactAudioPlayer src={item.url} label="첨부한 현장음" />
                         </article>
                       ))}
                     </div>

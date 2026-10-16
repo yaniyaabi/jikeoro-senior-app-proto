@@ -16,16 +16,34 @@ function renderApp() {
 clearLegacyLocalData().finally(renderApp);
 
 if ("serviceWorker" in navigator) {
+  const serviceWorkerVersion = "2026-10-16-responsive-1";
+  const refreshKey = `jikeoro-sw-refreshed-${serviceWorkerVersion}`;
   let refreshing = false;
+
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (refreshing) return;
+    if (refreshing || sessionStorage.getItem(refreshKey)) return;
     refreshing = true;
+    sessionStorage.setItem(refreshKey, "1");
     window.location.reload();
   });
+
+  let registrationPromise: Promise<ServiceWorkerRegistration> | null = null;
+  const updateServiceWorker = () => {
+    registrationPromise ??= navigator.serviceWorker.register(
+      `${import.meta.env.BASE_URL}sw.js?v=${serviceWorkerVersion}`,
+      { updateViaCache: "none" },
+    );
+    return registrationPromise.then((registration) => registration.update()).catch(() => undefined);
+  };
+
   window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register(`${import.meta.env.BASE_URL}sw.js`, { updateViaCache: "none" })
-      .then((registration) => registration.update())
-      .catch(() => undefined);
+    void updateServiceWorker();
   });
+
+  window.addEventListener("pageshow", () => void updateServiceWorker());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void updateServiceWorker();
+  });
+
+  window.setInterval(() => void updateServiceWorker(), 15 * 60 * 1000);
 }
