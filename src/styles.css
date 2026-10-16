@@ -1727,3 +1727,7 @@ body:has(.onboarding-layer),
 .onboarding-screen-permissions .onboarding-dots {
   transform:translateY(30px);
 }
+
+.onboarding-screen:not(.onboarding-screen-permissions) .onboarding-header {
+  transform:translateY(clamp(19px,calc(38px - 2.6dvh),23px));
+}
