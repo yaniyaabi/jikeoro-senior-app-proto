@@ -1487,6 +1487,10 @@ body:has(.onboarding-layer),
   transform:translateY(calc(-1 * clamp(12px,2.5dvh,24px)));
 }
 
+.onboarding-screen-permissions .onboarding-actions {
+  align-self:end;
+}
+
 .onboarding-copy > span {
   margin-bottom:5px;
 }
