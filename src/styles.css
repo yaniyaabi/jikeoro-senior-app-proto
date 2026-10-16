@@ -1480,7 +1480,11 @@ body:has(.onboarding-layer),
 }
 
 .onboarding-screen:not(.onboarding-screen-permissions) .onboarding-copy {
-  transform:none;
+  transform:translateY(calc(-1 * clamp(36px,8dvh,68px)));
+}
+
+.onboarding-screen-permissions .onboarding-copy {
+  transform:translateY(calc(-1 * clamp(12px,2.5dvh,24px)));
 }
 
 .onboarding-copy > span {
