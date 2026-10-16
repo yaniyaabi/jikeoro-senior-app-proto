@@ -282,7 +282,7 @@ input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 .flow-heading>div { min-width:0; }
 .flow-heading p, .plain-heading>p { margin: 0 0 6px; color: var(--blue); font-size:calc(14px + var(--text-bump)); font-weight: 950; letter-spacing: .08em; }
 .flow-heading h1, .plain-heading h1 { max-width:100%; margin: 0; font-size:calc(30px + var(--text-bump)); line-height: 1.17; letter-spacing: -.05em; overflow-wrap:anywhere; }
-.flow-heading h1 { min-width:0; white-space:normal; word-break:keep-all; overflow-wrap:break-word; text-wrap:balance; }
+.flow-heading h1 { display:block; width:100%; min-width:0; white-space:normal!important; word-break:keep-all; overflow-wrap:normal; }
 .step-progress { height: 9px; border-radius: 99px; overflow: hidden; background: #d6e0e3; margin: 0 2px 18px; }
 .step-progress span { display: block; height: 100%; background: var(--blue); border-radius: inherit; transition: width .25s; }
 .flow-card { background: white; border: 1px solid var(--line); border-radius: 23px; padding: 19px; box-shadow: 0 12px 35px rgba(22, 61, 70, .07); }
@@ -1772,8 +1772,10 @@ body:has(.onboarding-layer),
 .report-flow,
 .flow-heading {
   width:100%;
-  overflow:hidden;
+  max-width:100%;
 }
+
+.flow-heading>div { width:100%; max-width:100%; overflow:visible; }
 
 .phone-app *,
 .onboarding-screen * {

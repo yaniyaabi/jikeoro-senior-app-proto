@@ -16,7 +16,7 @@ function renderApp() {
 clearLegacyLocalData().finally(renderApp);
 
 if ("serviceWorker" in navigator) {
-  const serviceWorkerVersion = "2026-10-16-home-grid-1";
+  const serviceWorkerVersion = "2026-10-16-network-only-1";
   const refreshKey = `jikeoro-sw-refreshed-${serviceWorkerVersion}`;
   let refreshing = false;
 
@@ -46,4 +46,10 @@ if ("serviceWorker" in navigator) {
   });
 
   window.setInterval(() => void updateServiceWorker(), 15 * 60 * 1000);
+
+  if ("caches" in window) {
+    void caches.keys().then((keys) => Promise.all(
+      keys.filter((key) => key.startsWith("jikeoro-senior-")).map((key) => caches.delete(key)),
+    ));
+  }
 }
