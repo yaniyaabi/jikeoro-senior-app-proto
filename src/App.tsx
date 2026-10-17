@@ -3,6 +3,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, registerPrototypeAccount } from "./auth";
 import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport, WeatherSnapshot } from "./storage";
 import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
+import { DEFAULT_RESIDENT_AVATAR, ResidentAvatar, ResidentAvatarPicker, type ResidentAvatarConfig } from "./residentAvatar";
 
 type View = "home" | "report" | "history" | "rewards";
 type AuthMode = "login" | "signup";
@@ -500,7 +501,7 @@ function App() {
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [currentUser, setCurrentUser] = useState<PrototypeUser | null>(() => {
     if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("design-preview") === "1") {
-      return { id: "design-preview", name: "지킴이", email: "preview@jikeoro.local" };
+      return { id: "design-preview", name: "지킴이", email: "preview@jikeoro.local", avatar: DEFAULT_RESIDENT_AVATAR };
     }
     return null;
   });
@@ -509,6 +510,7 @@ function App() {
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authPasswordConfirm, setAuthPasswordConfirm] = useState("");
+  const [authAvatar, setAuthAvatar] = useState<ResidentAvatarConfig>(DEFAULT_RESIDENT_AVATAR);
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
@@ -784,7 +786,7 @@ function App() {
     setAuthError("");
     try {
       const user = authMode === "signup"
-        ? await registerPrototypeAccount(authName, email, authPassword)
+        ? await registerPrototypeAccount(authName, email, authPassword, authAvatar)
         : await loginPrototypeAccount(email, authPassword);
       setCurrentUser(user);
       setView("home");
@@ -1378,8 +1380,9 @@ function App() {
                 <button type="button" role="tab" aria-selected={authMode === "login"} className={authMode === "login" ? "active" : ""} onClick={() => changeAuthMode("login")}>로그인</button>
                 <button type="button" role="tab" aria-selected={authMode === "signup"} className={authMode === "signup" ? "active" : ""} onClick={() => changeAuthMode("signup")}>회원가입</button>
               </div>
-              <div className="app-auth-heading"><h2>{authMode === "login" ? "다시 만나 반가워요." : "지켜路와 함께해요."}</h2><p>{authMode === "login" ? "가입한 이메일과 비밀번호를 입력해주세요." : "정보를 입력해 새 계정을 만들어보세요."}</p></div>
+              <div className="app-auth-heading"><h2>{authMode === "login" ? "다시 만나 반가워요." : "지켜路와 함께해요."}</h2><p>{authMode === "login" ? "가입한 이메일과 비밀번호를 입력해주세요." : "마음에 드는 캐릭터를 고르고 시작해보세요."}</p></div>
               <form className="app-auth-form" onSubmit={submitAuth}>
+                {authMode === "signup" && <ResidentAvatarPicker value={authAvatar} onChange={setAuthAvatar} />}
                 {authMode === "signup" && <label><span>이름</span><input value={authName} onChange={(event) => setAuthName(event.target.value)} autoComplete="name" placeholder="이름 입력" /></label>}
                 <label><span>이메일</span><input type="email" value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} autoComplete="email" placeholder="name@example.com" /></label>
                 <label><span>비밀번호</span><span className="app-password-field"><input type={showPassword ? "text" : "password"} value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} autoComplete={authMode === "signup" ? "new-password" : "current-password"} placeholder={authMode === "signup" ? "8자 이상 입력" : "비밀번호 입력"} /><button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? "숨기기" : "보기"}</button></span></label>
@@ -1416,6 +1419,7 @@ function App() {
           {view === "home" && (
             <>
               <section className="hello-card">
+                <ResidentAvatar config={currentUser.avatar} label={`${currentUser.name}님의 캐릭터`} />
                 <div>
                   <div className="hello-greeting"><p>안녕하세요, {currentUser.name}님</p><button className="logout-link" type="button" onClick={logout}>로그아웃</button></div>
                   <h1>오늘도 우리 동네를<br />안전하게 지켜요.</h1>
@@ -1678,6 +1682,7 @@ function App() {
 
           {view === "history" && (
             <section className="plain-page">
+              <section className="app-avatar-greeting" aria-label={`${currentUser.name}님의 인사`}><div><p>MY JIKEORO</p><h1>{currentUser.name}님,<br />오늘도 반가워요!</h1><span>나의 기록이 우리 동네를 더 안전하게 만들고 있어요.</span></div><ResidentAvatar config={currentUser.avatar} greeting label={`${currentUser.name}님의 인사하는 캐릭터`} /></section>
               <div className="activity-board">
                 <div className="activity-heading">
                   <div><p className="activity-eyebrow">MY REPORTS</p><h1>내가 남긴 기록과 대응 현황</h1></div>

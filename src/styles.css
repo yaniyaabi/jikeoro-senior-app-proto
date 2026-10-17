@@ -1273,6 +1273,39 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
   .location-pin-actions { grid-template-columns:minmax(0,1fr); }
 }
 
+/* 주민 계정 캐릭터: 가입 시 10개 중 하나를 고르고 홈·내 기록에 함께 표시합니다. */
+.resident-avatar { display:block; width:100%; height:auto; overflow:visible; }
+.avatar-wave { transform-box:fill-box; transform-origin:82% 82%; }
+.resident-avatar.is-greeting .avatar-wave { animation:app-avatar-wave 1.8s ease-in-out infinite; }
+@keyframes app-avatar-wave { 0%,45%,100%{transform:rotate(0)} 12%{transform:rotate(-9deg)} 25%{transform:rotate(7deg)} 36%{transform:rotate(-4deg)} }
+@media(prefers-reduced-motion:reduce){.resident-avatar.is-greeting .avatar-wave{animation:none}}
+
+.app-avatar-picker { margin:0; border:1px solid #d3ddd3; border-radius:18px; background:#f7faf4; padding:13px 11px 14px; }
+.app-avatar-picker>legend { padding:0 6px; color:var(--navy); font-size:calc(15px + var(--text-bump)); font-weight:950; }
+.app-avatar-picker>p { margin:1px 0 12px; color:var(--muted); font-size:calc(12px + var(--text-bump)); line-height:1.45; }
+.app-avatar-picker>div { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; }
+.app-avatar-picker button { position:relative; min-width:0; border:2px solid transparent; border-radius:12px; background:transparent; padding:0; cursor:pointer; }
+.app-avatar-picker button.selected { border-color:var(--navy); box-shadow:0 0 0 3px var(--lime); }
+.app-avatar-picker button .resident-avatar { border-radius:9px; }
+.app-avatar-picker button>span { position:absolute; right:-4px; bottom:-4px; width:21px; height:21px; border:2px solid #fff; border-radius:50%; background:#fff; color:#64786f; display:grid; place-items:center; font-size:10px; font-weight:950; box-shadow:0 3px 8px rgba(16,45,42,.18); }
+.app-avatar-picker button.selected>span { background:var(--navy); color:var(--lime); }
+
+.home-main .hello-card { display:grid!important; grid-template-columns:72px minmax(0,1fr); align-items:center; gap:14px; }
+.home-main .hello-card>.resident-avatar { width:72px; border-radius:20px; box-shadow:0 10px 24px rgba(16,45,42,.12); }
+.home-main .hello-card>div { min-width:0; }
+
+.app-avatar-greeting { min-height:190px; margin:0 0 18px; border-radius:26px; background:linear-gradient(135deg,#e7f3dc,#fff8df); padding:22px 17px 0 21px; display:grid; grid-template-columns:minmax(0,1fr) 142px; align-items:end; gap:8px; overflow:hidden; box-shadow:var(--soft-shadow); }
+.app-avatar-greeting>div { align-self:center; padding-bottom:18px; }
+.app-avatar-greeting p { margin:0 0 8px; color:#4f7063; font-size:calc(12px + var(--text-bump)); font-weight:950; letter-spacing:.11em; }
+.app-avatar-greeting h1 { margin:0; color:var(--navy); font-size:calc(27px + var(--text-bump)); line-height:1.14; letter-spacing:-.05em; }
+.app-avatar-greeting span { display:block; margin-top:10px; color:#5d736b; font-size:calc(13px + var(--text-bump)); line-height:1.5; font-weight:750; }
+.app-avatar-greeting>.resident-avatar { width:142px; filter:drop-shadow(0 13px 13px rgba(16,45,42,.13)); }
+
+@media(max-width:365px){
+  .home-main .hello-card { grid-template-columns:62px minmax(0,1fr); gap:10px; }.home-main .hello-card>.resident-avatar{width:62px}.home-main .hello-card h1{font-size:calc(26px + var(--text-bump))!important}
+  .app-avatar-greeting { min-height:176px; grid-template-columns:minmax(0,1fr) 112px; padding-left:16px; }.app-avatar-greeting>.resident-avatar{width:112px}.app-avatar-greeting h1{font-size:calc(24px + var(--text-bump))}
+}
+
 .report-draft-backdrop {
   position:fixed;
   z-index:80;
