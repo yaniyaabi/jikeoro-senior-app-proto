@@ -1280,16 +1280,15 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
 .home-main .hello-card>.resident-avatar { width:72px; border-radius:20px; box-shadow:0 10px 24px rgba(16,45,42,.12); }
 .home-main .hello-card>div { min-width:0; }
 
-.app-avatar-greeting { min-height:190px; margin:0 0 18px; border-radius:26px; background:linear-gradient(135deg,#e7f3dc,#fff8df); padding:22px 17px 0 21px; display:grid; grid-template-columns:minmax(0,1fr) 142px; align-items:end; gap:8px; overflow:hidden; box-shadow:var(--soft-shadow); }
-.app-avatar-greeting>div { align-self:center; padding-bottom:18px; }
+.app-avatar-greeting { min-height:190px; margin:0 0 18px; border-radius:26px; background:linear-gradient(135deg,#e7f3dc,#fff8df); padding:22px 21px; display:grid; grid-template-columns:minmax(0,1fr); align-items:center; overflow:hidden; box-shadow:var(--soft-shadow); }
+.app-avatar-greeting>div { align-self:center; }
 .app-avatar-greeting p { margin:0 0 8px; color:#4f7063; font-size:calc(12px + var(--text-bump)); font-weight:950; letter-spacing:.11em; }
 .app-avatar-greeting h1 { margin:0; color:var(--navy); font-size:calc(27px + var(--text-bump)); line-height:1.14; letter-spacing:-.05em; }
 .app-avatar-greeting span { display:block; margin-top:10px; color:#5d736b; font-size:calc(13px + var(--text-bump)); line-height:1.5; font-weight:750; }
-.app-avatar-greeting>.resident-avatar { width:142px; filter:drop-shadow(0 13px 13px rgba(16,45,42,.13)); }
 
 @media(max-width:365px){
   .home-main .hello-card { grid-template-columns:62px minmax(0,1fr); gap:10px; }.home-main .hello-card>.resident-avatar{width:62px}.home-main .hello-card h1{font-size:calc(26px + var(--text-bump))!important}
-  .app-avatar-greeting { min-height:176px; grid-template-columns:minmax(0,1fr) 112px; padding-left:16px; }.app-avatar-greeting>.resident-avatar{width:112px}.app-avatar-greeting h1{font-size:calc(24px + var(--text-bump))}
+  .app-avatar-greeting { min-height:176px; grid-template-columns:minmax(0,1fr); padding:20px 16px; }.app-avatar-greeting h1{font-size:calc(24px + var(--text-bump))}
 }
 
 .report-draft-backdrop {

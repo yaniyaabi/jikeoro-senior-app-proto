@@ -16,7 +16,7 @@ function renderApp() {
 clearLegacyLocalData().finally(renderApp);
 
 if ("serviceWorker" in navigator) {
-  const serviceWorkerVersion = "2026-10-17-resident-mascot-1";
+  const serviceWorkerVersion = "2026-10-17-compact-member-heading-1";
   const refreshKey = `jikeoro-sw-refreshed-${serviceWorkerVersion}`;
   let refreshing = false;
 
