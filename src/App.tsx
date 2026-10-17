@@ -1679,7 +1679,6 @@ function App() {
 
           {view === "history" && (
             <section className="plain-page">
-              <section className="app-avatar-greeting" aria-label={`${currentUser.name}님의 기록`}><div><p>MY JIKEORO</p><h1>{currentUser.name}님,<br />오늘도 반가워요!</h1><span>나의 기록이 우리 동네를 더 안전하게 만들고 있어요.</span></div></section>
               <div className="activity-board">
                 <div className="activity-heading">
                   <div><p className="activity-eyebrow">MY REPORTS</p><h1>내가 남긴 기록과 대응 현황</h1></div>
