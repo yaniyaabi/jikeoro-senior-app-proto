@@ -35,11 +35,11 @@ export async function getPrototypeSession() {
   return await toPrototypeUser(data.session.user);
 }
 
-export async function registerPrototypeAccount(name: string, email: string, password: string, avatar: ResidentAvatarConfig) {
+export async function registerPrototypeAccount(name: string, email: string, password: string) {
   const { data, error } = await supabase.auth.signUp({
     email: email.trim().toLowerCase(),
     password,
-    options: { data: { name: name.trim(), avatar: normalizeResidentAvatar(avatar) } },
+    options: { data: { name: name.trim(), avatar: normalizeResidentAvatar(null) } },
   });
   if (error) throw new Error(authErrorMessage(error.message));
   if (!data.user || !data.session) throw new Error("회원가입은 완료됐지만 바로 로그인하지 못했습니다. 관리자에게 이메일 확인 설정을 문의해주세요.");
