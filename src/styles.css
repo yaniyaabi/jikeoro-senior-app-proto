@@ -1283,8 +1283,8 @@ html[data-contrast="high"] .onboarding-next { background:#005f4a; }
 .app-avatar-picker { margin:0; border:1px solid #d3ddd3; border-radius:18px; background:#f7faf4; padding:13px 11px 14px; }
 .app-avatar-picker>legend { padding:0 6px; color:var(--navy); font-size:calc(15px + var(--text-bump)); font-weight:950; }
 .app-avatar-picker>p { margin:1px 0 12px; color:var(--muted); font-size:calc(12px + var(--text-bump)); line-height:1.45; }
-.app-avatar-picker>div { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; }
-.app-avatar-picker button { position:relative; min-width:0; border:2px solid transparent; border-radius:12px; background:transparent; padding:0; cursor:pointer; }
+.app-avatar-picker>div { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.app-avatar-picker button { position:relative; min-width:0; border:2px solid #e2e8e3; border-radius:12px; background:#fff; padding:0; cursor:pointer; }
 .app-avatar-picker button.selected { border-color:var(--navy); box-shadow:0 0 0 3px var(--lime); }
 .app-avatar-picker button .resident-avatar { border-radius:9px; }
 .app-avatar-picker button>span { position:absolute; right:-4px; bottom:-4px; width:21px; height:21px; border:2px solid #fff; border-radius:50%; background:#fff; color:#64786f; display:grid; place-items:center; font-size:10px; font-weight:950; box-shadow:0 3px 8px rgba(16,45,42,.18); }
