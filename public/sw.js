@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "jikeoro-senior-";
-const RELEASE_URL = new URL("./?v=14", self.registration.scope).href;
+const RELEASE_URL = new URL("./?v=15", self.registration.scope).href;
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {

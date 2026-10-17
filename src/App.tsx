@@ -3,7 +3,7 @@ import type { Map as MapLibreMap } from "maplibre-gl";
 import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, registerPrototypeAccount } from "./auth";
 import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport, WeatherSnapshot } from "./storage";
 import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
-import { DEFAULT_RESIDENT_AVATAR, ResidentAvatar } from "./residentAvatar";
+import { DEFAULT_RESIDENT_AVATAR } from "./residentAvatar";
 
 type View = "home" | "report" | "history" | "rewards";
 type AuthMode = "login" | "signup";
@@ -1417,7 +1417,6 @@ function App() {
           {view === "home" && (
             <>
               <section className="hello-card">
-                <ResidentAvatar config={currentUser.avatar} label={`${currentUser.name}님의 캐릭터`} />
                 <div>
                   <div className="hello-greeting"><p>안녕하세요, {currentUser.name}님</p><button className="logout-link" type="button" onClick={logout}>로그아웃</button></div>
                   <h1>오늘도 우리 동네를<br />안전하게 지켜요.</h1>
