@@ -98,8 +98,10 @@ export default function NotificationSettings({ open, ready, userId, onClose }: {
         : !supported ? <p className="notification-help">이 브라우저는 알림을 지원하지 않아요. 휴대폰의 최신 Chrome 또는 Safari에서 열어주세요.</p>
         : denied ? <p className="notification-help">알림이 차단되어 있어요. 휴대폰 또는 브라우저의 지켜로 알림 설정에서 허용해주세요.</p> : null}
       {error && <p className="notification-message error" role="alert">{error}</p>}
-      <button type="button" className="notification-primary" ref={primary} disabled={busy} onClick={() => void allow()}>{busy ? '확인하고 있어요…' : helpOnly ? '확인' : '알림 허용하기'}</button>
-      {!helpOnly && <button type="button" className="notification-later" disabled={busy} onClick={hide}>나중에</button>}
+      <div className="notification-actions">
+        {!helpOnly && <button type="button" className="notification-later" disabled={busy} onClick={hide}>나중에</button>}
+        <button type="button" className="notification-primary" ref={primary} disabled={busy} onClick={() => void allow()}>{busy ? '확인하고 있어요…' : helpOnly ? '확인' : '알림 허용하기'}</button>
+      </div>
       <p className="notification-caption">알림은 휴대폰 설정에서 언제든 끌 수 있어요.</p>
     </section>
   </div>;

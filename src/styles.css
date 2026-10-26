@@ -2006,11 +2006,12 @@ body:has(.onboarding-layer),
 
 /* Simple daily notification opt-in */
 .notification-backdrop { position:fixed; inset:0; z-index:10001; display:grid; place-items:center; padding:18px; background:rgba(7,31,27,.64); }
-.notification-sheet { width:min(100%,400px); max-height:calc(100dvh - 36px); overflow:auto; overscroll-behavior:contain; padding:27px 22px 20px; border-radius:23px; background:var(--canvas); color:var(--ink); }
+.notification-sheet { width:min(100%,360px); max-height:calc(100dvh - 36px); overflow:auto; overscroll-behavior:contain; padding:24px 22px 20px; border-radius:20px; background:#fff; color:var(--ink); }
 .notification-simple h2 { margin:0 0 14px; font-size:calc(23px + var(--text-bump)); line-height:1.35; letter-spacing:-.04em; }
 .notification-simple>p { margin:0 0 20px; font-size:calc(15px + var(--text-bump)); line-height:1.65; overflow-wrap:anywhere; }
-.notification-primary { width:100%; min-height:56px; padding:12px; border:0; border-radius:13px; background:var(--navy); color:white; font-size:calc(17px + var(--text-bump)); font-weight:900; cursor:pointer; }
-.notification-later { width:100%; min-height:48px; margin-top:7px; border:0; background:transparent; color:var(--muted); font-size:calc(15px + var(--text-bump)); cursor:pointer; }
+.notification-actions { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:8px; }
+.notification-primary { width:auto; min-height:44px; padding:10px 16px; border:0; border-radius:10px; background:var(--navy); color:white; font-size:calc(15px + var(--text-bump)); font-weight:800; cursor:pointer; }
+.notification-later { width:auto; min-height:44px; padding:10px 12px; border:0; background:transparent; color:var(--muted); font-size:calc(14px + var(--text-bump)); cursor:pointer; }
 .notification-sheet button:disabled { cursor:default; opacity:.6; }
 .notification-simple>.notification-help { padding:13px; border:1px solid var(--control-line); border-radius:12px; font-size:calc(14px + var(--text-bump)); }
 .notification-simple>.notification-message { padding:12px; border-radius:12px; background:#ffe8e3; color:#802a20; font-size:calc(14px + var(--text-bump)); }
