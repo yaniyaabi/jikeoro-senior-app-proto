@@ -49,3 +49,29 @@ test('morning and evening messages follow Korea time regardless of UTC date', ()
   assert.equal(app.messageAt('2026-10-26T02:00:00Z').title, '오늘도 함께 걸어볼까요?');
   assert.equal(app.messageAt('2026-10-26T10:00:00Z').title, '오늘 보행은 어땠나요?');
 });
+
+test('one-off admin test requires the dispatch secret and exactly one enabled device', async () => {
+  for (const count of [0, 1, 2]) {
+    let handle, sent = 0, subscriptionsRead = 0;
+    const row = { endpoint: subscription.endpoint, p256dh: 'B'.repeat(87), auth: 'a'.repeat(22) };
+    const admin = { from: table => ({ select: () => ({ eq: () => ({
+      single: async () => ({ data: { public_key: 'public', private_key: 'private', dispatch_secret: 'secret' } }),
+      limit: async () => { subscriptionsRead++; return { data: Array.from({ length: count }, () => row) }; },
+    }) }) }) };
+    const context = vm.createContext({
+      Deno: { env: { get: () => 'test' }, serve: callback => { handle = callback; } },
+      createClient: () => admin,
+      webpush: { sendNotification: async (_subscription, payload) => { assert.equal(JSON.parse(payload).test, true); sent++; } },
+      Response, URL, Set,
+    });
+    vm.runInContext(stripTypeScriptTypes(source), context);
+    const request = secret => handle(new Request('https://app.test/', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Reminder-Secret': secret },
+      body: JSON.stringify({ action: 'dispatch', test: true }),
+    }));
+    assert.equal((await request('wrong')).status, 401);
+    assert.equal(subscriptionsRead, 0);
+    assert.equal((await request('secret')).status, count === 1 ? 200 : 409);
+    assert.equal(sent, count === 1 ? 1 : 0);
+  }
+});

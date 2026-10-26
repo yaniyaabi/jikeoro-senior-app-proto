@@ -68,6 +68,13 @@ Deno.serve(async (request) => {
     if (body.action === 'dispatch') {
       const c = await config();
       if (request.headers.get('X-Reminder-Secret') !== c.dispatch_secret) return reply({ error: '인증이 필요합니다.' }, 401);
+      if (body.test === true) {
+        const { data: targets, error } = await admin.from('walking_push_subscriptions').select('*').eq('enabled', true).limit(2);
+        if (error) throw error;
+        if (targets?.length !== 1) return reply({ error: '테스트 대상 기기를 한 대로 확인해야 합니다.' }, 409);
+        await send(targets[0], c, true);
+        return reply({ delivered: 1, failed: 0, test: true });
+      }
       let delivered = 0, failed = 0;
       // Bound work per run; repeated cron calls pick up the remaining claimed-free rows.
       for (let batch = 0; batch < 5; batch++) {
