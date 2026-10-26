@@ -2003,3 +2003,43 @@ body:has(.onboarding-layer),
     flex-direction:column;
   }
 }
+/* Walking reminder controls */
+.home-notification-settings { width:100%; min-height:66px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 18px; padding:14px 17px; text-align:left; border:1px solid var(--line); border-radius:18px; background:var(--surface); color:var(--ink); cursor:pointer; }
+.home-notification-settings span { display:grid; gap:5px; min-width:0; }
+.home-notification-settings strong { font-size:calc(17px + var(--text-bump)); }
+.home-notification-settings small { color:var(--muted); font-size:calc(13px + var(--text-bump)); }
+.home-notification-settings b { font-size:24px; }
+.notification-backdrop { position:fixed; inset:0; z-index:10001; display:grid; place-items:center; background:rgba(7,31,27,.72); padding:14px; }
+.notification-sheet { position:relative; width:min(100%,460px); max-height:calc(100dvh - 28px); overflow:auto; overscroll-behavior:contain; border-radius:24px; background:var(--canvas); color:var(--ink); padding:28px 20px 20px; }
+.notification-close { position:absolute; top:12px; right:12px; width:44px; height:44px; border:0; border-radius:50%; background:#e7eee7; color:var(--ink); font-size:28px; cursor:pointer; }
+.notification-eyebrow { margin:2px 50px 8px 0; color:var(--muted); font-weight:800; font-size:calc(14px + var(--text-bump)); }
+.notification-sheet h2 { margin:0 0 13px; font-size:calc(29px + var(--text-bump)); }
+.notification-sheet>p { line-height:1.55; }
+.notification-example { display:grid; gap:7px; padding:16px; background:#edf3e9; border:1px solid var(--line); border-radius:15px; margin:18px 0; line-height:1.5; }
+.notification-example strong { font-size:calc(17px + var(--text-bump)); }
+.notification-example span { font-size:calc(14px + var(--text-bump)); }
+.notification-help { padding:14px; border:1px solid var(--control-line); border-radius:14px; margin:14px 0; font-size:calc(14px + var(--text-bump)); line-height:1.6; }
+.notification-help p { margin:6px 0 0; }
+.notification-sheet fieldset { border:0; padding:0; margin:20px 0; min-width:0; }
+.notification-sheet legend { margin-bottom:10px; font-size:calc(17px + var(--text-bump)); font-weight:850; }
+.notification-sheet legend small { font-size:13px; font-weight:500; margin-left:6px; }
+.notification-frequency,.notification-times,.notification-secondary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.notification-times:has(label:only-child) { grid-template-columns:1fr; }
+.notification-frequency button,.notification-secondary button { min-width:0; min-height:52px; border:1px solid var(--control-line); border-radius:13px; background:white; color:var(--ink); padding:10px 8px; font-size:calc(15px + var(--text-bump)); font-weight:800; cursor:pointer; }
+.notification-frequency button.active { border:2px solid var(--navy); background:#eaf4df; }
+.notification-times label { min-width:0; display:grid; gap:6px; }
+.notification-times label>span { font-size:calc(13px + var(--text-bump)); color:var(--muted); }
+.notification-times select { width:100%; min-width:0; min-height:54px; padding:9px; border:1px solid var(--control-line); border-radius:12px; background:white; color:var(--ink); font-size:calc(17px + var(--text-bump)); }
+.notification-primary { width:100%; min-height:56px; padding:12px; border:0; border-radius:14px; background:var(--navy); color:white; font-size:calc(17px + var(--text-bump)); font-weight:900; cursor:pointer; }
+.notification-secondary { margin-top:10px; }
+.notification-sheet button:disabled { cursor:default; opacity:.6; }
+.notification-message { padding:12px; border-radius:12px; background:#e8f3e2; font-size:calc(14px + var(--text-bump)); overflow-wrap:anywhere; }
+.notification-message.error { background:#ffe8e3; color:#802a20; }
+.notification-caption { color:var(--muted); font-size:calc(12px + var(--text-bump)); text-align:center; margin-bottom:0; }
+.onboarding-screen-permissions .onboarding-copy { transform:none; }
+.onboarding-screen-permissions .onboarding-artwork img { height:min(12dvh,100px); object-fit:contain; }
+.onboarding-screen-permissions .onboarding-permissions article { grid-template-columns:30px minmax(0,1fr) auto; gap:7px; padding:7px; }
+.onboarding-screen-permissions .onboarding-permissions article>span { width:30px; height:30px; }
+.onboarding-screen-permissions .onboarding-permissions article strong small { display:inline; font-size:11px; }
+.onboarding-screen-permissions { overflow-y:auto; }
+@media(max-width:350px) { .notification-sheet { padding:24px 15px 18px; } .notification-secondary { grid-template-columns:1fr; } }

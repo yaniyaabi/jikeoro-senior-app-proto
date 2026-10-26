@@ -4,6 +4,8 @@ import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, Pro
 import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport, WeatherSnapshot } from "./storage";
 import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
 import { DEFAULT_RESIDENT_AVATAR } from "./residentAvatar";
+import NotificationSettings from "./NotificationSettings";
+import { permissionLabel, stopRemindersOnLogout } from "./notifications";
 
 type View = "home" | "report" | "history" | "rewards";
 type AuthMode = "login" | "signup";
@@ -534,6 +536,7 @@ function App() {
   const [contrast, setContrast] = useState(() => localStorage.getItem("jikeoro-senior-contrast") === "true");
   const [textSize, setTextSize] = useState<TextSize>(() => localStorage.getItem("jikeoro-senior-text-size") === "large" ? "large" : "normal");
   const [readabilityOpen, setReadabilityOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mediaPermission, setMediaPermission] = useState<PermissionStatus>("idle");
   const [locationPermission, setLocationPermission] = useState<PermissionStatus>("idle");
   const [error, setError] = useState("");
@@ -799,6 +802,8 @@ function App() {
   };
 
   const logout = async () => {
+    // Stop delivery to a shared device before switching accounts.
+    await stopRemindersOnLogout().catch(() => undefined);
     await logoutPrototypeAccount();
     setCurrentUser(null);
     setReports([]);
@@ -948,6 +953,30 @@ function App() {
     setConfirmDraftDiscard(false);
     setPendingReportDraft({ draft, media });
   };
+
+  const openReportRef = useRef(openReport);
+  openReportRef.current = openReport;
+  useEffect(() => {
+    const handleReminder = () => {
+      if (!currentUser) return;
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("from") !== "reminder") return;
+      url.searchParams.delete("from");
+      window.history.replaceState(null, "", url);
+      void openReportRef.current();
+    };
+    handleReminder();
+    const listener = (event: MessageEvent) => {
+      if (event.data?.type === "OPEN_WALKING_REPORT") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("from", "reminder");
+        window.history.replaceState(null, "", url);
+        handleReminder();
+      }
+    };
+    navigator.serviceWorker?.addEventListener("message", listener);
+    return () => navigator.serviceWorker?.removeEventListener("message", listener);
+  }, [currentUser]);
 
   const resumeReportDraft = () => {
     if (!pendingReportDraft) return;
@@ -1273,7 +1302,7 @@ function App() {
 
   const activeOnboardingSlide = onboardingSlides[onboardingStep];
   const onboardingScreen = showOnboarding ? (
-    <div className="onboarding-layer">
+    <div className="onboarding-layer" inert={notificationsOpen} aria-hidden={notificationsOpen || undefined}>
       <section
         className={`onboarding-screen onboarding-screen-${activeOnboardingSlide.kind}`}
         role="dialog"
@@ -1305,7 +1334,13 @@ function App() {
                 <div><strong>위치</strong><small>현재 위치 확인과 지도 핀</small></div>
                 <button type="button" className={locationPermission} onClick={requestLocationPermission} disabled={locationPermission === "requesting" || locationPermission === "granted"}>{permissionStatusLabel[locationPermission]}</button>
               </article>
+              <article>
+                <span aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4M12 2V1" /></svg></span>
+                <div><strong>보행 알림 <small>(선택)</small></strong><small>하루 한두 번, 오늘 걸은 길 돌아보기</small></div>
+                <button type="button" onClick={() => setNotificationsOpen(true)}>{permissionLabel()}</button>
+              </article>
               <small>사진첩은 사용자가 직접 고른 사진과 영상만 불러옵니다.</small>
+              <small>알림은 나중에 홈의 ‘알림 설정’에서도 바꿀 수 있어요.</small>
             </div>
           )}
         </div>
@@ -1366,6 +1401,7 @@ function App() {
         {launchScreen}
         {onboardingScreen}
         {readabilitySheet}
+        <NotificationSettings open={notificationsOpen} onClose={() => setNotificationsOpen(false)} />
         <div className="phone-app auth-phone">
           <main className="app-auth-page">
             <div className="app-auth-top"><div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div><button className="app-readability-launch" type="button" onClick={() => setReadabilityOpen(true)}><span aria-hidden="true">가</span> 보기 설정</button></div>
@@ -1401,6 +1437,7 @@ function App() {
       {launchScreen}
       {onboardingScreen}
       {readabilitySheet}
+      <NotificationSettings open={notificationsOpen} userId={currentUser?.id} onClose={() => setNotificationsOpen(false)} />
       <div className="phone-app">
         <header className="app-header">
           <button className="brand-button" onClick={() => navigate("home")} aria-label="지켜로 홈">
@@ -1422,6 +1459,10 @@ function App() {
                   <h1>오늘도 우리 동네를<br />안전하게 지켜요.</h1>
                 </div>
               </section>
+
+              <button className="home-notification-settings" type="button" onClick={() => setNotificationsOpen(true)}>
+                <span><strong>알림 설정</strong><small>오늘 걸은 길, 하루 한두 번 돌아봐요</small></span><b aria-hidden="true">→</b>
+              </button>
 
               <section className="home-feature-grid" aria-label="주요 기능">
                 <button className="home-feature-card home-feature-report" type="button" onClick={openReport}>
