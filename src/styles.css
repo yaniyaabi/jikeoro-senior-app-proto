@@ -2006,7 +2006,7 @@ body:has(.onboarding-layer),
 
 /* Simple daily notification opt-in */
 .notification-backdrop { position:fixed; inset:0; z-index:10001; display:grid; place-items:center; padding:18px; background:rgba(7,31,27,.64); }
-.notification-sheet { width:min(100%,360px); max-height:calc(100dvh - 36px); overflow:auto; overscroll-behavior:contain; padding:24px 22px 20px; border-radius:20px; background:rgba(255,255,255,.90); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); color:var(--ink); }
+.notification-sheet { width:min(66.6667%,240px); max-height:calc(100dvh - 36px); overflow:auto; overscroll-behavior:contain; padding:24px 22px 20px; border-radius:20px; background:rgba(255,255,255,.5); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); color:var(--ink); }
 .notification-simple h2 { margin:0 0 14px; font-size:calc(23px + var(--text-bump)); line-height:1.35; letter-spacing:-.04em; }
 .notification-simple>p { margin:0 0 20px; font-size:calc(15px + var(--text-bump)); line-height:1.65; overflow-wrap:anywhere; }
 .notification-actions { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:8px; }

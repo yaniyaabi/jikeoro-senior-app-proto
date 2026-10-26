@@ -16,7 +16,7 @@ function renderApp() {
 clearLegacyLocalData().finally(renderApp);
 
 if ("serviceWorker" in navigator) {
-  const serviceWorkerVersion = "2026-10-26-translucent-reminders-5";
+  const serviceWorkerVersion = "2026-10-26-half-opacity-reminders-6";
   const refreshKey = `jikeoro-sw-refreshed-${serviceWorkerVersion}`;
   let refreshing = false;
 
