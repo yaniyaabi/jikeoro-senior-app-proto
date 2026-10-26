@@ -93,7 +93,6 @@ export default function NotificationSettings({ open, ready, userId, onClose }: {
   return <div className="notification-backdrop">
     <section className="notification-sheet notification-simple" role="dialog" aria-modal="true" aria-labelledby="notification-title" ref={panel}>
       <h2 id="notification-title">지켜로 알림을 받을까요?</h2>
-      <p>오전 11시에는 함께 걷기를,<br />오후 7시에는 오늘 걸은 길을 돌아봐요.</p>
       {!installed ? <p className="notification-help">아이폰은 공유 버튼 → ‘홈 화면에 추가’ 후, 홈 화면의 지켜로에서 알림을 허용해주세요.</p>
         : !supported ? <p className="notification-help">이 브라우저는 알림을 지원하지 않아요. 휴대폰의 최신 Chrome 또는 Safari에서 열어주세요.</p>
         : denied ? <p className="notification-help">알림이 차단되어 있어요. 휴대폰 또는 브라우저의 지켜로 알림 설정에서 허용해주세요.</p> : null}
