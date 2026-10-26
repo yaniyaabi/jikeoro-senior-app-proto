@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { allowNotifications, canNotify, currentSubscription, enableReminders, needsHomeScreen, pendingHours, readReminders, savePendingHours, REMINDER_HOURS } from './notifications';
+import { allowNotifications, canNotify, currentSubscription, enableReminders, needsHomeScreen, pendingHours, readReminders } from './notifications';
 import { shouldShowReminderPrompt } from './reminderPrompt';
 
 export default function NotificationSettings({ open, ready, userId, onClose }: { open: boolean; ready: boolean; userId?: string; onClose: () => void }) {
@@ -10,7 +10,7 @@ export default function NotificationSettings({ open, ready, userId, onClose }: {
   const dismissed = useRef<number | null>(null);
   const panel = useRef<HTMLElement>(null);
   const primary = useRef<HTMLButtonElement>(null);
-  const visible = open || automaticOpen;
+  const visible = Boolean(userId) && (open || automaticOpen);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   const hide = () => {
@@ -79,12 +79,12 @@ export default function NotificationSettings({ open, ready, userId, onClose }: {
   const denied = supported && Notification.permission === 'denied';
   const helpOnly = !installed || !supported || denied;
   async function allow() {
+    if (!userId) return;
     if (helpOnly) { hide(); return; }
     setBusy(true); setError('');
     try {
       await allowNotifications();
-      if (userId) await enableReminders();
-      else savePendingHours(REMINDER_HOURS);
+      await enableReminders();
       hide();
     } catch (e) {
       setError(e instanceof Error ? e.message : '알림을 허용하지 못했어요. 다시 시도해주세요.');

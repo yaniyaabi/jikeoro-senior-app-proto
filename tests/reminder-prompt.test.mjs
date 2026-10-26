@@ -26,6 +26,16 @@ test('permission alone is insufficient when the server subscription is disabled'
 test('existing browser subscription avoids a popup before login', async () => {
   assert.equal(await shouldShowReminderPrompt({ ...configured(), signedIn: false }), false);
 });
+
+test('signed-out users never see a prompt or register a subscription', async () => {
+  for (const permission of ['default', 'denied', 'granted']) {
+    const unexpected = async () => { throw new Error('must not access subscriptions before login'); };
+    assert.equal(await shouldShowReminderPrompt({
+      ...configured(), signedIn: false, permission, pendingOptIn: true,
+      enable: unexpected, readState: unexpected, getSubscription: unexpected,
+    }), false);
+  }
+});
 test('explicit opt-in before login is completed silently after login', async () => {
   let enabled = false;
   assert.equal(await shouldShowReminderPrompt({ ...configured(), pendingOptIn: true, dismissed: true, enable: async () => { enabled = true; } }), false);

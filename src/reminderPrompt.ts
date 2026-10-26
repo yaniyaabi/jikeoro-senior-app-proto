@@ -10,6 +10,7 @@ export async function shouldShowReminderPrompt(options: {
   readState: () => Promise<{ enabled: boolean }>;
   getSubscription: () => Promise<unknown>;
 }) {
+  if (!options.signedIn) return false;
   try {
     if (options.signedIn && options.permission === 'granted' && options.pendingOptIn) {
       await options.enable();

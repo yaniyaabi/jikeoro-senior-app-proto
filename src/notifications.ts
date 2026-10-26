@@ -57,6 +57,8 @@ export function pendingHours(): number[] | null {
   } catch { return null; }
 }
 export async function enableReminders() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('로그인 후 알림을 설정해주세요.');
   const response = await fetch(FUNCTION_URL, { signal: AbortSignal.timeout(15000) });
   if (!response.ok) throw new Error('알림 서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요.');
   const { publicKey } = await response.json();

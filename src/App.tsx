@@ -598,7 +598,10 @@ function App() {
     if (import.meta.env.DEV && new URLSearchParams(window.location.search).get("design-preview") === "1") return;
     let active = true;
     getPrototypeSession().then((user) => {
-      if (active) setCurrentUser(user);
+      if (active) {
+        setCurrentUser(user);
+        if (!user) void stopRemindersOnLogout().catch(() => undefined);
+      }
     });
     return () => { active = false; };
   }, []);
@@ -1337,10 +1340,10 @@ function App() {
               <article>
                 <span aria-hidden="true"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4M12 2V1" /></svg></span>
                 <div><strong>보행 알림 <small>(선택)</small></strong><small>오전 11시 · 오후 7시, 지켜로와 함께해요</small></div>
-                <button type="button" disabled={permissionLabel() === "허용됨"} onClick={() => setNotificationsOpen(true)}>{permissionLabel()}</button>
+                <button type="button" disabled={!currentUser || permissionLabel() === "허용됨"} onClick={() => setNotificationsOpen(true)}>{currentUser ? permissionLabel() : "로그인 후 설정"}</button>
               </article>
               <small>사진첩은 사용자가 직접 고른 사진과 영상만 불러옵니다.</small>
-              <small>알림을 허용하지 않으면 앱을 열 때 다시 안내해드려요.</small>
+              <small>보행 알림은 로그인 후 설정하며, 로그인한 상태에서만 받을 수 있어요.</small>
             </div>
           )}
         </div>
@@ -1401,7 +1404,6 @@ function App() {
         {launchScreen}
         {onboardingScreen}
         {readabilitySheet}
-        <NotificationSettings open={notificationsOpen} ready={!showLaunch && !showOnboarding && !readabilityOpen} onClose={() => setNotificationsOpen(false)} />
         <div className="phone-app auth-phone">
           <main className="app-auth-page">
             <div className="app-auth-top"><div className="app-auth-brand"><img src={appIconPath} alt="" /><div><strong><BrandName /></strong><small>우리 동네 쉬운 제보</small></div></div><button className="app-readability-launch" type="button" onClick={() => setReadabilityOpen(true)}><span aria-hidden="true">가</span> 보기 설정</button></div>
