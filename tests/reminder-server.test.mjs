@@ -12,13 +12,14 @@ function server(valid = true) {
     from: table => ({ upsert: async data => { written = { table, data }; return { error: null }; } }),
   };
   const js = stripTypeScriptTypes(source);
-  vm.runInNewContext(js, {
+  const context = vm.createContext({
     Deno: { env: { get: () => 'test' }, serve: callback => { handle = callback; } },
     createClient: () => admin, webpush: {}, Response, URL, Set,
   });
+  vm.runInContext(js, context);
   return { request: async (body, token = 'valid') => handle(new Request('https://app.test/functions/v1/walking-reminders', {
     method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body),
-  })), written: () => written };
+  })), written: () => written, messageAt: iso => vm.runInContext(`walkingMessage(new Date('${iso}'))`, context) };
 }
 const subscription = { action: 'subscribe', endpoint: 'https://fcm.googleapis.com/test-subscription', hours: [19], keys: { p256dh: 'B'.repeat(87), auth: 'a'.repeat(22) } };
 test('settings require a signed-in user', async () => {
@@ -30,14 +31,21 @@ test('arbitrary network targets and credentialed endpoints are rejected', async 
     assert.equal((await server().request({ ...subscription, endpoint })).status, 400);
   }
 });
-test('only one or two distinct daytime hours are accepted', async () => {
+test('delivery hours are fixed even if an old client submits other hours', async () => {
   for (const hours of [[], [19,19], [1], [22], [8,13,19], ['19']]) {
-    assert.equal((await server().request({ ...subscription, hours })).status, 400);
+    const app = server();
+    assert.equal((await app.request({ ...subscription, hours })).status, 200);
+    assert.equal(JSON.stringify(app.written().data.hours), '[11,19]');
   }
 });
 test('subscription owner always comes from verified JWT, never request body', async () => {
   const app = server();
   assert.equal((await app.request({ ...subscription, user_id: 'resident-b', hours: [19,13] })).status, 200);
   assert.equal(app.written().data.user_id, 'resident-a');
-  assert.equal(JSON.stringify(app.written().data.hours), '[13,19]');
+  assert.equal(JSON.stringify(app.written().data.hours), '[11,19]');
+});
+test('morning and evening messages follow Korea time regardless of UTC date', () => {
+  const app = server();
+  assert.equal(app.messageAt('2026-10-26T02:00:00Z').title, '오늘도 함께 걸어볼까요?');
+  assert.equal(app.messageAt('2026-10-26T10:00:00Z').title, '오늘 보행은 어땠나요?');
 });

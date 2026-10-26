@@ -13,10 +13,12 @@ const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE
   auth: { persistSession: false, autoRefreshToken: false },
 });
 const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers });
-const message = {
-  title: '지켜로와 함께해요!',
-  body: '오늘 걸으신 길은 어땠나요? 위험한 곳이 있었다면 지켜로에 알려주세요.',
-};
+function walkingMessage(now: Date = new Date()) {
+  const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', hour: 'numeric', hourCycle: 'h23' }).format(now));
+  return hour === 11
+    ? { title: '오늘도 함께 걸어볼까요?', body: '지켜로와 함께 안전한 하루를 시작해요. 걸으면서 발견한 위험을 알려주세요.' }
+    : { title: '오늘 보행은 어땠나요?', body: '하루를 마무리하며 오늘 걸으신 길을 돌아봐요. 위험한 곳이 있었다면 지켜로에 알려주세요.' };
+}
 function safeEndpoint(value: unknown): value is string {
   if (typeof value !== 'string' || value.length > 4096) return false;
   try {
@@ -44,7 +46,7 @@ async function config() {
 async function send(row: { endpoint: string; p256dh: string; auth: string }, keys: { public_key: string; private_key: string }, test = false) {
   if (!safeEndpoint(row.endpoint)) throw new Error('invalid push endpoint');
   return await webpush.sendNotification({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } },
-    JSON.stringify(test ? { title: '지켜로 알림이 준비됐어요', body: '이렇게 알림을 받아요. 오늘도 안전하게 걸으세요!', test: true } : message), {
+    JSON.stringify(test ? { title: '지켜로 알림이 준비됐어요', body: '이렇게 알림을 받아요. 오늘도 안전하게 걸으세요!', test: true } : walkingMessage()), {
       TTL: 3600, urgency: 'normal',
       vapidDetails: { subject: 'https://yaniyaabi.github.io/jikeoro-senior-app-proto/', publicKey: keys.public_key, privateKey: keys.private_key },
       timeout: 10000,
@@ -91,7 +93,7 @@ Deno.serve(async (request) => {
     if (body.action === 'status') {
       const { data, error } = await owner();
       if (error) throw error;
-      return reply({ enabled: data?.enabled ?? false, hours: data?.hours ?? [19] });
+      return reply({ enabled: data?.enabled ?? false, hours: [11, 19] });
     }
     if (body.action === 'disable') {
       const { error } = await admin.from('walking_push_subscriptions').update({ enabled: false, updated_at: new Date().toISOString() }).eq('endpoint', body.endpoint).eq('user_id', auth.user.id);
@@ -99,10 +101,9 @@ Deno.serve(async (request) => {
       return reply({ enabled: false });
     }
     if (body.action === 'subscribe') {
-      const hours = body.hours;
+      const hours = [11, 19];
       const k = body.keys;
-      if (!Array.isArray(hours) || hours.length < 1 || hours.length > 2 || new Set(hours).size !== hours.length || hours.some(h => !Number.isInteger(h) || h < 8 || h > 21) ||
-          typeof k?.p256dh !== 'string' || !/^[A-Za-z0-9_-]{87}$/.test(k.p256dh) || typeof k?.auth !== 'string' || !/^[A-Za-z0-9_-]{22}$/.test(k.auth)) return reply({ error: '알림 시간과 기기 정보를 확인해주세요.' }, 400);
+      if (typeof k?.p256dh !== 'string' || !/^[A-Za-z0-9_-]{87}$/.test(k.p256dh) || typeof k?.auth !== 'string' || !/^[A-Za-z0-9_-]{22}$/.test(k.auth)) return reply({ error: '알림 기기 정보를 확인해주세요.' }, 400);
       const { error } = await admin.from('walking_push_subscriptions').upsert({
         user_id: auth.user.id, endpoint: body.endpoint, p256dh: k.p256dh, auth: k.auth,
         hours: [...hours].sort((a, b) => a - b), enabled: true, updated_at: new Date().toISOString(),

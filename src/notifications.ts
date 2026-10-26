@@ -1,6 +1,7 @@
 import { supabase, SUPABASE_URL } from './supabase';
 
 export type ReminderState = { enabled: boolean; hours: number[] };
+export const REMINDER_HOURS = [11, 19];
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/walking-reminders`;
 const PENDING_KEY = 'jikeoro-reminder-pending';
 export function needsHomeScreen() {
@@ -13,7 +14,7 @@ export function canNotify() {
 export function permissionLabel() {
   if (needsHomeScreen()) return '설치 안내';
   if (!canNotify()) return '사용 안내';
-  return Notification.permission === 'granted' ? '설정하기' : Notification.permission === 'denied' ? '설정 안내' : '허용하기';
+  return Notification.permission === 'granted' ? '허용됨' : Notification.permission === 'denied' ? '설정 안내' : '허용하기';
 }
 async function registration() {
   return await Promise.race([
@@ -38,7 +39,7 @@ async function call(action: string, data: object = {}) {
 }
 export async function readReminders(): Promise<ReminderState> {
   const subscription = await currentSubscription();
-  if (!subscription) return { enabled: false, hours: [19] };
+  if (!subscription) return { enabled: false, hours: REMINDER_HOURS };
   return await call('status', { endpoint: subscription.endpoint });
 }
 export async function allowNotifications() {
@@ -55,7 +56,7 @@ export function pendingHours(): number[] | null {
     return Array.isArray(value) && value.length >= 1 && value.length <= 2 && new Set(value).size === value.length && value.every(h => Number.isInteger(h) && h >= 8 && h <= 21) ? value : null;
   } catch { return null; }
 }
-export async function enableReminders(hours: number[]) {
+export async function enableReminders() {
   const response = await fetch(FUNCTION_URL, { signal: AbortSignal.timeout(15000) });
   if (!response.ok) throw new Error('알림 서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요.');
   const { publicKey } = await response.json();
@@ -65,7 +66,7 @@ export async function enableReminders(hours: number[]) {
   const existing = await worker.pushManager.getSubscription();
   const subscription = existing ?? await worker.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
   try {
-    const result = await call('subscribe', { ...subscription.toJSON(), hours });
+    const result = await call('subscribe', { ...subscription.toJSON(), hours: REMINDER_HOURS });
     localStorage.removeItem(PENDING_KEY);
     return result as ReminderState;
   } catch (e) {
