@@ -203,7 +203,7 @@ const riskDetails: Record<string, { name: string; help: string }[]> = {
 };
 
 const iconPath = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
-const appIconPath = `${import.meta.env.BASE_URL}icon-192.png?v=5`;
+const appIconPath = `${import.meta.env.BASE_URL}icon-192.png?v=25`;
 const ONBOARDING_STORAGE_KEY = "jikeoro-senior-onboarding-v1";
 const REPORT_DRAFT_KEY_PREFIX = "jikeoro-senior-report-draft-v1:";
 const REPORT_DRAFT_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
@@ -1293,7 +1293,7 @@ function App() {
     <div className="launch-screen" role="status" aria-label="지켜로 앱을 시작합니다">
       <div className="launch-brand">
         <div className="launch-character" aria-hidden="true">
-          <img src={`${import.meta.env.BASE_URL}splash-app-icon.png`} alt="" />
+          <img src={`${import.meta.env.BASE_URL}splash-app-icon.png?v=25`} alt="" />
         </div>
         <div className="launch-name"><strong><BrandName /></strong><span>JIKEORO</span></div>
         <i aria-hidden="true" />

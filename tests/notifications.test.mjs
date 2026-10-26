@@ -24,7 +24,11 @@ test('background push shows supplied Korean text with only app-owned assets', as
   await event(w.handlers.push, { data: { json: () => ({ title: '함께해요', body: '오늘 걸은 길은 어땠나요?', url: 'https://attacker.test/' }) } });
   assert.equal(w.shown[0][0], '함께해요');
   assert.equal(w.shown[0][1].body, '오늘 걸은 길은 어땠나요?');
-  assert.equal(w.shown[0][1].icon, 'https://example.com/jikeoro/icon-192.png');
+  for (const asset of [w.shown[0][1].icon, w.shown[0][1].badge]) {
+    const url = new URL(asset);
+    assert.equal(url.origin, 'https://example.com');
+    assert.equal(url.pathname, '/jikeoro/icon-192.png');
+  }
   assert.equal(w.shown[0][1].tag, 'jikeoro-walking-reminder');
 });
 test('invalid push payload still displays a notification', async () => {

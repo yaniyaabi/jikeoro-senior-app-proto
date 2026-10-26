@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "jikeoro-senior-";
-const RELEASE_URL = new URL("./?v=24", self.registration.scope).href;
+const RELEASE_URL = new URL("./?v=25", self.registration.scope).href;
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
@@ -21,8 +21,8 @@ self.addEventListener("push", (event) => {
     payload.title || "지켜로와 함께해요!",
     {
       body: payload.body || "오늘 걸으신 길은 어땠나요?",
-      icon: new URL("icon-192.png", self.registration.scope).href,
-      badge: new URL("icon-192.png", self.registration.scope).href,
+      icon: new URL("icon-192.png?v=25", self.registration.scope).href,
+      badge: new URL("icon-192.png?v=25", self.registration.scope).href,
       tag: payload.test ? "jikeoro-reminder-test" : "jikeoro-walking-reminder",
       data: { test: Boolean(payload.test) },
     },

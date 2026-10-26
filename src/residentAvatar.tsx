@@ -45,5 +45,5 @@ export function ResidentAvatar({
   greeting?: boolean;
   label?: string;
 }) {
-  return <img className="resident-avatar" src={`${import.meta.env.BASE_URL}icon-192.png?v=5`} alt={label} />;
+  return <img className="resident-avatar" src={`${import.meta.env.BASE_URL}icon-192.png?v=25`} alt={label} />;
 }
