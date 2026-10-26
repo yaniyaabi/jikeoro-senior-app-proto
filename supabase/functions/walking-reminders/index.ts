@@ -69,11 +69,18 @@ Deno.serve(async (request) => {
       const c = await config();
       if (request.headers.get('X-Reminder-Secret') !== c.dispatch_secret) return reply({ error: '인증이 필요합니다.' }, 401);
       if (body.test === true) {
-        const { data: targets, error } = await admin.from('walking_push_subscriptions').select('*').eq('enabled', true).limit(2);
+        const { data: targets, error } = await admin.from('walking_push_subscriptions').select('*').eq('enabled', true).limit(3);
         if (error) throw error;
-        if (targets?.length !== 1) return reply({ error: '테스트 대상 기기를 한 대로 확인해야 합니다.' }, 409);
-        await send(targets[0], c, true);
-        return reply({ delivered: 1, failed: 0, test: true });
+        if (!targets?.length || targets.length > 2) return reply({ error: '테스트 대상 기기를 확인해야 합니다.' }, 409);
+        let delivered = 0, failed = 0;
+        for (const row of targets) {
+          try { await send(row, c, true); delivered++; }
+          catch (e) {
+            failed++;
+            if ([404, 410].includes(e.statusCode)) await admin.from('walking_push_subscriptions').update({ enabled: false }).eq('id', row.id);
+          }
+        }
+        return reply({ delivered, failed, test: true });
       }
       let delivered = 0, failed = 0;
       // Bound work per run; repeated cron calls pick up the remaining claimed-free rows.
