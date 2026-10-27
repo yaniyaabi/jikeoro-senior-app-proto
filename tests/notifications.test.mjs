@@ -24,10 +24,10 @@ test('background push shows supplied Korean text with only app-owned assets', as
   await event(w.handlers.push, { data: { json: () => ({ title: '함께해요', body: '오늘 걸은 길은 어땠나요?', url: 'https://attacker.test/' }) } });
   assert.equal(w.shown[0][0], '함께해요');
   assert.equal(w.shown[0][1].body, '오늘 걸은 길은 어땠나요?');
-  for (const asset of [w.shown[0][1].icon, w.shown[0][1].badge]) {
+  for (const [asset, path] of [[w.shown[0][1].icon, '/jikeoro/icon-192.png'], [w.shown[0][1].badge, '/jikeoro/notification-badge-96.png']]) {
     const url = new URL(asset);
     assert.equal(url.origin, 'https://example.com');
-    assert.equal(url.pathname, '/jikeoro/icon-192.png');
+    assert.equal(url.pathname, path);
   }
   assert.equal(w.shown[0][1].tag, 'jikeoro-walking-reminder');
 });

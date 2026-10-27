@@ -16,7 +16,7 @@ function renderApp() {
 clearLegacyLocalData().finally(renderApp);
 
 if ("serviceWorker" in navigator) {
-  const serviceWorkerVersion = "2026-10-26-eyes-logo-9";
+  const serviceWorkerVersion = "2026-10-27-notification-badge-10";
   const refreshKey = `jikeoro-sw-refreshed-${serviceWorkerVersion}`;
   let refreshing = false;
 
