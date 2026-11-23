@@ -1,2 +1,0 @@
-[functions.walking-reminders]
-verify_jwt = false # Public key endpoint + cron secret; user actions verify JWT with auth.getUser.

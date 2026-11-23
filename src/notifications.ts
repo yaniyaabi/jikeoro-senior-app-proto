@@ -1,8 +1,8 @@
-import { supabase, SUPABASE_URL } from './supabase';
+import { apiFetch, apiJson, jsonBody } from './api-client';
 
 export type ReminderState = { enabled: boolean; hours: number[] };
 export const REMINDER_HOURS = [11, 19];
-const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/walking-reminders`;
+const FUNCTION_URL = '/api/reminders';
 const PENDING_KEY = 'jikeoro-reminder-pending';
 export function needsHomeScreen() {
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -27,12 +27,7 @@ export async function currentSubscription() {
   return await (await registration()).pushManager.getSubscription();
 }
 async function call(action: string, data: object = {}) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('로그인 후 알림을 설정해주세요.');
-  const response = await fetch(FUNCTION_URL, {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-    body: JSON.stringify({ action, ...data }), signal: AbortSignal.timeout(15000),
-  });
+  const response = await apiFetch(FUNCTION_URL, { ...jsonBody({ action, ...data }), signal: AbortSignal.timeout(15000) });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error ?? '연결을 확인하고 다시 시도해주세요.');
   return result;
@@ -57,15 +52,22 @@ export function pendingHours(): number[] | null {
   } catch { return null; }
 }
 export async function enableReminders() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('로그인 후 알림을 설정해주세요.');
-  const response = await fetch(FUNCTION_URL, { signal: AbortSignal.timeout(15000) });
+  const state = await apiJson<{authenticated:boolean}>('/api/auth/session');
+  if (!state.authenticated) throw new Error('로그인 후 알림을 설정해주세요.');
+  const response = await apiFetch(FUNCTION_URL, { signal: AbortSignal.timeout(15000) });
   if (!response.ok) throw new Error('알림 서버에 연결하지 못했어요. 잠시 후 다시 시도해주세요.');
   const { publicKey } = await response.json();
   const decoded = atob(publicKey.replace(/-/g, '+').replace(/_/g, '/'));
   const key = Uint8Array.from(decoded, c => c.charCodeAt(0));
   const worker = await registration();
-  const existing = await worker.pushManager.getSubscription();
+  let existing = await worker.pushManager.getSubscription();
+  if (existing) {
+    const oldKey=existing.options.applicationServerKey;
+    if (!oldKey || Array.from(new Uint8Array(oldKey)).join(',')!==Array.from(key).join(',')) {
+      await existing.unsubscribe();
+      existing=null;
+    }
+  }
   const subscription = existing ?? await worker.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
   try {
     const result = await call('subscribe', { ...subscription.toJSON(), hours: REMINDER_HOURS });

@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "re
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, registerPrototypeAccount } from "./auth";
 import { deleteDraftMedia, deleteReport, getDraftMedia, getReportMedia, getReports, replaceDraftMedia, ReportStatus, saveReport, StoredDraftMedia, StoredMedia, StoredReport, WeatherSnapshot } from "./storage";
-import { REWARD_EXCHANGE_MINIMUM, readRewardRequests, RewardRequest, writeRewardRequests } from "./rewardRequests";
+import { REWARD_EXCHANGE_MINIMUM, createRewardRequest, refreshRewardRequests, RewardRequest } from "./rewardRequests";
 import { DEFAULT_RESIDENT_AVATAR } from "./residentAvatar";
 import NotificationSettings from "./NotificationSettings";
 import { permissionLabel, stopRemindersOnLogout } from "./notifications";
@@ -547,6 +547,7 @@ function App() {
   const [speaking, setSpeaking] = useState(false);
   const [mediaPickerKind, setMediaPickerKind] = useState<MediaPickerKind>(null);
   const [rewardFormOpen, setRewardFormOpen] = useState(false);
+  const [rewardSubmitting, setRewardSubmitting] = useState(false);
   const [rewardPhone, setRewardPhone] = useState("");
   const [rewardFormError, setRewardFormError] = useState("");
   const [rewardRequests, setRewardRequests] = useState<RewardRequest[]>([]);
@@ -732,11 +733,14 @@ function App() {
   }, [rewardFormOpen]);
 
   useEffect(() => {
-    const refresh = () => setRewardRequests(readRewardRequests());
+    if (!currentUser) { setRewardRequests([]); return; }
+    let active=true;
+    const refresh=()=>{ void refreshRewardRequests().then(items=>{if(active)setRewardRequests(items);}).catch(()=>{if(active)setRewardRequests([]);}); };
     refresh();
-    window.addEventListener("storage", refresh);
-    return () => window.removeEventListener("storage", refresh);
-  }, []);
+    const timer=window.setInterval(refresh,30000);
+    window.addEventListener('jikeoro-session-change',refresh);
+    return ()=>{active=false;window.clearInterval(timer);window.removeEventListener('jikeoro-session-change',refresh);};
+  }, [currentUser?.id]);
 
   const participation = useMemo(() => calculateParticipation(reports), [reports]);
   const progress = Math.min(100, (participation.missionProgress / 3) * 100);
@@ -821,37 +825,21 @@ function App() {
     setRewardFormOpen(true);
   };
 
-  const submitRewardForm = (event: FormEvent) => {
+  const submitRewardForm = async (event: FormEvent) => {
     event.preventDefault();
-    if (!currentUser) return;
-    const normalizedPhone = rewardPhone.replace(/\D/g, "");
-    if (normalizedPhone.length < 10 || normalizedPhone.length > 11) {
-      setRewardFormError("휴대전화 번호를 정확히 입력해주세요.");
-      return;
-    }
-    if (participation.points - myRewardRequests.length * REWARD_EXCHANGE_MINIMUM < REWARD_EXCHANGE_MINIMUM) {
-      setRewardFormError("교환 가능한 마일리지를 다시 확인해주세요.");
-      return;
-    }
-    const nextRequest: RewardRequest = {
-      id: `reward-${crypto.randomUUID()}`,
-      applicantId: currentUser.id,
-      name: currentUser.name,
-      email: currentUser.email,
-      phone: normalizedPhone,
-      points: participation.points,
-      exchangePoints: REWARD_EXCHANGE_MINIMUM,
-      source: "app",
-      status: "pending",
-      requestedAt: new Date().toISOString(),
-      sentAt: null,
-    };
-    const nextRequests = [nextRequest, ...readRewardRequests()];
-    writeRewardRequests(nextRequests);
-    setRewardRequests(nextRequests);
-    localStorage.setItem("jikeoro-reward-phone", rewardPhone.trim());
-    setRewardRequestNotice("상품권 교환 신청이 접수됐어요. 담당자가 확인 후 휴대전화로 발송합니다.");
-    setRewardFormOpen(false);
+    if (!currentUser || rewardSubmitting) return;
+    const phone=rewardPhone.replace(/\D/g,'');
+    if(phone.length<10 || phone.length>11) {setRewardFormError('휴대전화 번호를 확인해주세요.');return;}
+    setRewardSubmitting(true);
+    setRewardFormError('');
+    try {
+      setRewardRequests(await createRewardRequest(phone,'app'));
+      localStorage.setItem('jikeoro-reward-phone',rewardPhone.trim());
+      setRewardRequestNotice('상품권 교환 신청이 접수됐어요. 담당자가 확인 후 휴대전화로 발송합니다.');
+      setRewardFormOpen(false);
+    } catch(error) {
+      setRewardFormError(error instanceof Error?error.message:'교환 신청을 처리하지 못했습니다.');
+    } finally {setRewardSubmitting(false);}
   };
 
   const removeReport = async (report: StoredReport) => {
@@ -1018,9 +1006,9 @@ function App() {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
     if (!files.length) return;
-    const oversized = files.find((file) => file.size > 80 * 1024 * 1024);
+    const oversized = files.find((file) => file.size > 50 * 1024 * 1024);
     if (oversized) {
-      setError("파일 한 개는 80MB보다 작아야 합니다.");
+      setError("파일 한 개는 50MB 이하여야 합니다.");
       return;
     }
     setError("");
@@ -1180,6 +1168,7 @@ function App() {
 
   const submitReport = async (event: FormEvent) => {
     event.preventDefault();
+    if (saving) return;
     setSaving(true);
     setError("");
     const reportId = crypto.randomUUID();
@@ -1224,8 +1213,8 @@ function App() {
       localStorage.removeItem(reportDraftKey(currentUser!.id));
       await deleteDraftMedia(currentUser!.id).catch(() => undefined);
       setStep(5);
-    } catch {
-      setError("서버에 기록을 저장하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "서버에 기록을 저장하지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요.");
     } finally {
       setSaving(false);
     }

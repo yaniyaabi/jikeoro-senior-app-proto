@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "jikeoro-senior-";
-const RELEASE_URL = new URL("./?v=27", self.registration.scope).href;
+const RELEASE_URL = new URL("./?v=local-20261123-2", self.registration.scope).href;
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => {
@@ -9,7 +9,7 @@ self.addEventListener("activate", (event) => {
       await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key)));
       await self.clients.claim();
       const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-      await Promise.all(windows.map((client) => client.navigate(RELEASE_URL).catch(() => undefined)));
+      await Promise.all(windows.filter((client) => client.url.startsWith(self.registration.scope)).map((client) => client.navigate(RELEASE_URL).catch(() => undefined)));
     })(),
   );
 });
