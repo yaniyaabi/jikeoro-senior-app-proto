@@ -1,4 +1,5 @@
-import { supabase } from "./supabase";
+import { apiJson, jsonBody, uploadMedia } from "./api-client";
+import { createSubmissionState, submitWithAttachments, type SubmissionState } from "./report-submission";
 
 export type StoredMedia = {
   id: string;
@@ -169,97 +170,33 @@ export async function deleteDraftMedia(userId: string) {
   return replaceDraftMedia(userId, []);
 }
 
-export async function getReports(userId: string): Promise<StoredReport[]> {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*, report_media(id,kind,original_name,mime_type,size_bytes,storage_path), report_status_history(status,note,created_at)")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data as ReportRow[]).map(mapReport);
+export async function getReports(_userId: string): Promise<StoredReport[]> {
+  const result=await apiJson<{reports:ReportRow[]}>("/api/app/reports");
+  return result.reports.map(mapReport);
 }
-
-export async function getReportMedia(reportId: string): Promise<StoredMedia[]> {
-  const { data, error } = await supabase
-    .from("report_media")
-    .select("id,report_id,kind,original_name,mime_type,size_bytes")
-    .eq("report_id", reportId);
-  if (error) throw error;
-  return (data ?? []).map((item) => ({
-    id: item.id,
-    reportId: item.report_id,
-    kind: item.kind as StoredMedia["kind"],
-    name: item.original_name,
-    type: item.mime_type,
-    size: item.size_bytes,
-    blob: new Blob([], { type: item.mime_type }),
-  }));
+export async function getReportMedia(reportId:string):Promise<StoredMedia[]> {
+  const result=await apiJson<{media:Array<{id:string;report_id:string;kind:StoredMedia["kind"];original_name:string;mime_type:string;size_bytes:number}>}>(`/api/reports/${encodeURIComponent(reportId)}/media`);
+  return result.media.map(item=>({id:item.id,reportId:item.report_id,kind:item.kind,name:item.original_name,type:item.mime_type,size:item.size_bytes,blob:new Blob([],{type:item.mime_type})}));
 }
-
-function fileExtension(name: string) {
-  const match = name.match(/\.[a-z0-9]{1,8}$/i);
-  return match?.[0].toLowerCase() ?? "";
-}
-
-export async function saveReport(report: StoredReport, files: StoredMedia[]) {
-  const { error: reportError } = await supabase.from("reports").insert({
-    id: report.id,
-    user_id: report.userId,
-    source: "senior_app",
-    category: report.riskType,
-    subcategory: report.riskDetail ?? null,
-    title: report.description || `${report.riskType} 위험요소를 발견했어요`,
-    description: report.description,
-    latitude: report.latitude,
-    longitude: report.longitude,
-    accuracy: report.accuracy,
-    place_description: report.place,
-    status: "received",
-    response: report.response,
-    observed_at: report.createdAt,
-    weather: report.weather,
-    points: report.points,
+const submissionStates = new Map<string, SubmissionState>();
+export async function saveReport(report:StoredReport,files:StoredMedia[]) {
+  const state = submissionStates.get(report.userId) ?? createSubmissionState();
+  submissionStates.set(report.userId, state);
+  await submitWithAttachments(state, {
+    source: "senior_app", category: report.riskType, subcategory: report.riskDetail,
+    title: report.description.slice(0,150) || `${report.riskType} 위험요소를 발견했어요`,
+    description: report.description, latitude: report.latitude, longitude: report.longitude,
+    accuracy: report.accuracy, placeDescription: report.place, observedAt: report.createdAt, weather: report.weather,
+  }, files.map(file => ({id: file.id, kind: file.kind, file: file.blob})), {
+    createId: () => report.id,
+    save: payload => apiJson<{id:string}>("/api/reports", jsonBody(payload)),
+    upload: (id, attachment) => {
+      const file = files.find(item => item.id === attachment.id)!;
+      return uploadMedia(id, file.blob, file.name, file.kind);
+    },
+    remove: deleteReport,
   });
-  if (reportError) throw reportError;
-
-  const uploadedPaths: string[] = [];
-  try {
-    const mediaRows = [];
-    for (const file of files) {
-      const path = `${report.userId}/${report.id}/${crypto.randomUUID()}${fileExtension(file.name)}`;
-      const contentType = file.type.split(";")[0] || "application/octet-stream";
-      const { error: uploadError } = await supabase.storage.from("report-media").upload(path, file.blob, { contentType, upsert: false });
-      if (uploadError) throw uploadError;
-      uploadedPaths.push(path);
-      mediaRows.push({
-        report_id: report.id,
-        user_id: report.userId,
-        kind: file.kind,
-        storage_path: path,
-        original_name: file.name,
-        mime_type: contentType,
-        size_bytes: file.size,
-      });
-    }
-    if (mediaRows.length) {
-      const { error: mediaError } = await supabase.from("report_media").insert(mediaRows);
-      if (mediaError) throw mediaError;
-    }
-  } catch (error) {
-    if (uploadedPaths.length) await supabase.storage.from("report-media").remove(uploadedPaths);
-    await supabase.from("reports").delete().eq("id", report.id);
-    throw error;
-  }
 }
-
-export async function deleteReport(reportId: string) {
-  const { data: media, error: mediaError } = await supabase.from("report_media").select("storage_path").eq("report_id", reportId);
-  if (mediaError) throw mediaError;
-  const paths = (media ?? []).map((item) => item.storage_path);
-  if (paths.length) {
-    const { error: removeError } = await supabase.storage.from("report-media").remove(paths);
-    if (removeError) throw removeError;
-  }
-  const { error } = await supabase.from("reports").delete().eq("id", reportId);
-  if (error) throw error;
+export async function deleteReport(reportId:string) {
+  await apiJson("/api/reports",{...jsonBody({id:reportId}),method:"DELETE"});
 }

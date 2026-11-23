@@ -10,8 +10,9 @@ function client(session) {
   let unsubscribed = false, networkCalls = 0;
   const subscription = { endpoint: 'https://fcm.googleapis.com/test', unsubscribe: async () => { unsubscribed = true; } };
   const context = vm.createContext({
-    SUPABASE_URL: 'https://example.test',
-    supabase: { auth: { getSession: async () => ({ data: { session } }) } },
+    apiJson: async () => ({ authenticated: Boolean(session) }),
+    jsonBody: body => ({ method: 'POST', body: JSON.stringify(body) }),
+    apiFetch: async () => { networkCalls++; throw new Error('offline'); },
     window: { isSecureContext: true, Notification: {}, PushManager: {}, setTimeout: () => 0 },
     navigator: { serviceWorker: { ready: Promise.resolve({ pushManager: { getSubscription: async () => subscription } }) } },
     localStorage: { removeItem() {} },
