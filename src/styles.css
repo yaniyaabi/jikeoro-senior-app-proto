@@ -448,9 +448,10 @@ input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 
 .success-card { min-height: 620px; border-radius: 24px; background: white; border: 1px solid var(--line); padding: 36px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; box-shadow: 0 15px 45px rgba(16, 55, 63, .08); }
 .success-icon { width: 90px; height: 90px; border-radius: 50%; background: var(--lime); color: var(--navy); display: grid; place-items: center; font-size:calc(47px + var(--text-bump)); font-weight: 950; box-shadow: 0 0 0 13px #edf8d9; }
+.success-icon svg { display: block; width: 50px; height: 50px; }
 .success-card>p:first-of-type { margin: 35px 0 8px; color: var(--blue); font-size:calc(15px + var(--text-bump)); font-weight: 950; }
 .success-card h1 { margin: 0; font-size:calc(38px + var(--text-bump)); line-height: 1.17; letter-spacing: -.055em; }
-.reward-earned { width: 100%; margin: 27px 0 12px; border-radius: 17px; background: #eef8db; padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+.reward-earned { width: 100%; margin: 27px 0 12px; border-radius: 17px; background: #eef8db; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; }
 .reward-earned span { font-size:calc(16px + var(--text-bump)); font-weight: 850; }
 .reward-earned strong { color: #39771c; font-size:calc(26px + var(--text-bump)); }
 .success-copy { margin: 5px 0 10px; color: var(--muted); font-size:calc(16px + var(--text-bump)); line-height: 1.6; }
@@ -1996,7 +1997,6 @@ body:has(.onboarding-layer),
   }
 
   .auto-save-info,
-  .reward-earned,
   .app-reward-status,
   .large-mission>div:first-child {
     align-items:flex-start;

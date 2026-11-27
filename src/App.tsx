@@ -1629,7 +1629,7 @@ function App() {
 
               {step === 5 && (
                 <div className="success-card">
-                  <span className="success-icon">✓</span>
+                  <span className="success-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m5 12 4.5 4.5L19 6.5" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
                   <p>안전한 동네를 만드는 기록</p>
                   <h1>제보가 잘<br />접수됐습니다!</h1>
                   <div className="reward-earned"><span>참여 마일리지</span><strong>+100P</strong></div>
