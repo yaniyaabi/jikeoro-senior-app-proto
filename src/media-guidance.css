@@ -1,0 +1,5 @@
+.jk-native-capture{position:fixed;left:-9999px;width:1px;height:1px;opacity:0;overflow:hidden}
+.jk-video-open{border:1px solid #aac0ad;border-radius:12px;min-height:48px;padding:10px 20px;background:#edf6e6;color:#123d30;font:inherit;font-weight:700;margin:12px 0}
+.jk-media-note{font-size:15px;color:var(--ink,#123d30);line-height:1.6}
+.jk-video-guidance{margin:12px 0;padding:14px;border:1px solid var(--control-line,#cfdbce);border-radius:12px;background:var(--card,#f2f6ee);color:var(--ink,#123d30);font-size:16px;line-height:1.6;overflow-wrap:anywhere}
+.jk-video-guidance strong{font-size:inherit}.jk-video-guidance p{margin:6px 0 0;font-size:15px;line-height:1.6}

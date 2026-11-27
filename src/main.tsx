@@ -16,16 +16,8 @@ function renderApp() {
 clearLegacyLocalData().finally(renderApp);
 
 if ("serviceWorker" in navigator) {
-  const serviceWorkerVersion = "2026-11-27-video100-v3";
-  const refreshKey = `jikeoro-sw-refreshed-${serviceWorkerVersion}`;
-  let refreshing = false;
-
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (refreshing || sessionStorage.getItem(refreshKey) || document.querySelector('[data-jikeoro-video-capture]')) return;
-    refreshing = true;
-    sessionStorage.setItem(refreshKey, "1");
-    window.location.reload();
-  });
+  const serviceWorkerVersion = "2026-11-27-native-camera-v1";
+  // Network-only pages update on next open; never reload an active camera/file picker or draft.
 
   let registrationPromise: Promise<ServiceWorkerRegistration> | null = null;
   const updateServiceWorker = () => {
