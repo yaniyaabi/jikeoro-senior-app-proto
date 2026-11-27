@@ -1,3 +1,4 @@
+import { MAX_FILE_BYTES, uploadLimitMessage } from './media-policy.ts';
 export type SubmissionState = { pendingId: string | null; busy: boolean };
 export type SubmissionAttachment = { id: string; kind: string; file: Blob };
 type SubmissionServices = {
@@ -9,7 +10,7 @@ type SubmissionServices = {
 export function createSubmissionState(): SubmissionState { return { pendingId: null, busy: false }; }
 export async function submitWithAttachments(state: SubmissionState, payload: Record<string, unknown>, attachments: SubmissionAttachment[], services: SubmissionServices) {
   if (state.busy) throw new Error("이미 저장하고 있어요. 잠시만 기다려주세요.");
-  if (attachments.some(item => item.file.size > 50 * 1024 * 1024)) throw new Error("파일 한 개의 크기는 50MB 이하로 선택해주세요.");
+  if (attachments.some(item => item.file.size > MAX_FILE_BYTES)) throw new Error(uploadLimitMessage({}, attachments.find(item => item.file.size > MAX_FILE_BYTES)?.kind));
   state.busy = true;
   try {
     // Finish any uncertain cleanup before starting another submission.

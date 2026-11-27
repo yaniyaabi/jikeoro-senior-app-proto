@@ -1,3 +1,5 @@
+import { VideoCapture } from './VideoCapture';
+import { MAX_FILE_BYTES, uploadLimitMessage } from './media-policy';
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, registerPrototypeAccount } from "./auth";
@@ -545,6 +547,8 @@ function App() {
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [videoCaptureOpen,setVideoCaptureOpen]=useState(false);
+  const [mediaNotice,setMediaNotice]=useState("");
   const [mediaPickerKind, setMediaPickerKind] = useState<MediaPickerKind>(null);
   const [rewardFormOpen, setRewardFormOpen] = useState(false);
   const [rewardSubmitting, setRewardSubmitting] = useState(false);
@@ -582,7 +586,6 @@ function App() {
       });
     return () => controller.abort();
   }, [location?.latitude, location?.longitude, locationConfirmed, locationMode]);
-  const videoCameraRef = useRef<HTMLInputElement>(null);
   const videoLibraryRef = useRef<HTMLInputElement>(null);
   const riskDetailPanelRef = useRef<HTMLDivElement>(null);
   const mainContentRef = useRef<HTMLElement>(null);
@@ -668,8 +671,9 @@ function App() {
     else localStorage.removeItem(reportDraftKey(currentUser.id));
   }, [attachments.length, currentUser, description, location, locationConfirmed, locationMode, place, riskDetail, riskType, step, view]);
 
+  const saveDraftMediaActive = Boolean(currentUser && view === "report" && step < 5);
   useEffect(() => {
-    if (!currentUser || view !== "report" || step >= 5) return;
+    if (!currentUser || !saveDraftMediaActive) return;
     const media: StoredDraftMedia[] = attachments.map((item) => ({
       id: item.id,
       userId: currentUser.id,
@@ -680,7 +684,7 @@ function App() {
       blob: item.file,
     }));
     void replaceDraftMedia(currentUser.id, media).catch(() => undefined);
-  }, [attachments, currentUser, step, view]);
+  }, [attachments, currentUser?.id, saveDraftMediaActive]);
 
   useEffect(() => {
     if (!riskType || step !== 2 || view !== "report") return;
@@ -1006,9 +1010,9 @@ function App() {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
     if (!files.length) return;
-    const oversized = files.find((file) => file.size > 50 * 1024 * 1024);
+    const oversized = files.find((file) => file.size > MAX_FILE_BYTES);
     if (oversized) {
-      setError("파일 한 개는 50MB 이하여야 합니다.");
+      setError(uploadLimitMessage(oversized));
       return;
     }
     setError("");
@@ -1025,10 +1029,14 @@ function App() {
   };
 
   const openNativeMediaPicker = (source: "image-camera" | "image-library" | "video-camera" | "video-library") => {
+    if(source === "video-camera") {
+      setMediaPickerKind(null);
+      if(attachments.length>=5){setError("첨부파일은 모두 합쳐 5개까지 넣을 수 있습니다.");return;}
+      setMediaNotice("");setError("");setVideoCaptureOpen(true);return;
+    }
     const input = {
       "image-camera": imageCameraRef,
       "image-library": imageLibraryRef,
-      "video-camera": videoCameraRef,
       "video-library": videoLibraryRef,
     }[source];
     setMediaPickerKind(null);
@@ -1519,7 +1527,6 @@ function App() {
                   </div>
                   <input ref={imageCameraRef} className="capture-file-input" type="file" accept="image/*" capture="environment" onChange={addFiles} />
                   <input ref={imageLibraryRef} className="capture-file-input" type="file" accept="image/*" multiple onChange={addFiles} />
-                  <input ref={videoCameraRef} className="capture-file-input" type="file" accept="video/*" capture="environment" onChange={addFiles} />
                   <input ref={videoLibraryRef} className="capture-file-input" type="file" accept="video/*" multiple onChange={addFiles} />
                   {mediaPickerKind && (
                     <div className="media-source-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setMediaPickerKind(null)}>
@@ -1549,12 +1556,14 @@ function App() {
                       {attachments.filter((item) => item.kind !== "audio").map((item) => (
                         <article key={item.id}>
                           {item.kind === "image" && <img src={item.url} alt="선택한 위험요소" />}
-                          {item.kind === "video" && <video src={item.url} controls />}
+                          {item.kind === "video" && <video src={item.url} controls preload="none" playsInline />}
                           <button onClick={() => removeAttachment(item.id)} aria-label="첨부파일 삭제">×</button>
                         </article>
                       ))}
                     </div>
                   )}
+                  <p className="jk-media-note">사진·영상·음성은 파일 한 개당 최대 100MB까지 첨부할 수 있어요.</p>
+                  {mediaNotice && <p className="jk-media-note" role="status">{mediaNotice}</p>}
                   <p className="media-privacy">얼굴과 차량번호가 보이면 제출 전에 확인해주세요.</p>
                   <button className="next-button" onClick={goNext}>{attachments.some((item) => item.kind !== "audio") ? "선택한 자료와 계속하기" : "위험요소 선택하기"}<span>→</span></button>
                 </div>
@@ -1838,6 +1847,11 @@ function App() {
           </div>
         )}
 
+        {videoCaptureOpen && view === "report" && step === 1 && <VideoCapture onClose={()=>setVideoCaptureOpen(false)} onCapture={(file,automatic)=>{
+          setVideoCaptureOpen(false);
+          setAttachments(current=>current.length>=5?current:[...current,{id:crypto.randomUUID(),kind:"video",file,url:URL.createObjectURL(file)}]);
+          setMediaNotice(automatic?"100MB를 넘지 않도록 촬영을 자동 종료하고 영상을 첨부했어요.":"촬영한 영상을 첨부했어요.");
+        }} />}
         <nav className="bottom-nav" aria-label="앱 주요 메뉴">
           <button className={view === "home" ? "active" : ""} onClick={() => navigate("home")}><span><NavIcon name="home" /></span><strong>홈</strong></button>
           <button aria-label="새로운 위험요소 제보하기" className={view === "report" ? "active" : ""} onClick={() => navigate("report")}><span><NavIcon name="report" /></span><strong>제보</strong></button>

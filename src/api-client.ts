@@ -1,3 +1,4 @@
+import { MAX_FILE_BYTES, uploadLimitMessage } from './media-policy';
 const networkFetch=globalThis.fetch.bind(globalThis);
 const TOKEN_KEY='jikeoro-local-session-v1';
 const API_BASE=(import.meta.env.VITE_API_BASE_URL??'').replace(/\/$/,'');
@@ -28,6 +29,6 @@ export async function apiJson<T=Record<string,unknown>>(path:string,init:Request
 }
 export function jsonBody(body:unknown):RequestInit {return {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)};}
 export async function uploadMedia(reportId:string,file:Blob,name:string,kind:string) {
-  if(file.size>50*1024*1024)throw new Error('파일은 한 개당 50MB까지 올릴 수 있습니다.');
+  if(file.size>MAX_FILE_BYTES)throw new Error(uploadLimitMessage(file,kind));
   return await apiJson(`/api/reports/${encodeURIComponent(reportId)}/media`,{method:'POST',headers:{'Content-Type':file.type||'application/octet-stream','X-File-Name':encodeURIComponent(name),'X-Media-Kind':kind},body:file});
 }
