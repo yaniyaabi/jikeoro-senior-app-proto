@@ -34,6 +34,6 @@ test('uncertain cleanup blocks another report until the previous attempt is reso
 });
 test('oversized files are rejected before any report is created',async()=>{
   let saves=0;const state=createSubmissionState();
-  await assert.rejects(()=>submitWithAttachments(state,{},[{id:'big',kind:'video',file:{size:51*1024*1024}}],{createId:()=> 'report',save:async()=>{saves++;return {id:'report'};},upload:async()=>{},remove:async()=>{}}),/50MB/);
+  await assert.rejects(()=>submitWithAttachments(state,{},[{id:'big',kind:'video',file:{size:100_000_001}}],{createId:()=> 'report',save:async()=>{saves++;return {id:'report'};},upload:async()=>{},remove:async()=>{}}),/100MB/);
   assert.equal(saves,0);assert.equal(state.busy,false);
 });

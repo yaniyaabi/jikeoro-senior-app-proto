@@ -61,14 +61,12 @@ test('test notifications open the app without starting a report', async () => {
   assert.equal(new URL(w.opened[0]).searchParams.has('from'), false);
 });
 
-test('updating the installed app reloads its tabs and leaves the website open', async () => {
+test('updating the worker never navigates away from active app captures or website tabs', async () => {
   const moved = [];
   const w = worker([
     {url: 'https://example.com/jikeoro/', navigate: async url => moved.push(['app', url])},
     {url: 'https://example.com/jikeoro-web-proto/map/', navigate: async url => moved.push(['web', url])},
   ]);
   await event(w.handlers.activate);
-  assert.equal(moved.length, 1);
-  assert.equal(moved[0][0], 'app');
-  assert.equal(new URL(moved[0][1]).pathname, '/jikeoro/');
+  assert.equal(moved.length, 0);
 });
