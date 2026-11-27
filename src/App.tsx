@@ -1,5 +1,5 @@
-import { VideoCapture } from './VideoCapture';
-import { MAX_FILE_BYTES, uploadLimitMessage } from './media-policy';
+import './media-guidance.css';
+import { MAX_FILE_BYTES, uploadLimitMessage, VIDEO_RECORDING_GUIDANCE, VIDEO_SIZE_GUIDANCE } from './media-policy';
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { getPrototypeSession, loginPrototypeAccount, logoutPrototypeAccount, PrototypeUser, registerPrototypeAccount } from "./auth";
@@ -543,12 +543,8 @@ function App() {
   const [locationPermission, setLocationPermission] = useState<PermissionStatus>("idle");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-  const [recording, setRecording] = useState(false);
-  const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
-  const [videoCaptureOpen,setVideoCaptureOpen]=useState(false);
-  const [mediaNotice,setMediaNotice]=useState("");
   const [mediaPickerKind, setMediaPickerKind] = useState<MediaPickerKind>(null);
   const [rewardFormOpen, setRewardFormOpen] = useState(false);
   const [rewardSubmitting, setRewardSubmitting] = useState(false);
@@ -558,13 +554,11 @@ function App() {
   const [rewardRequestNotice, setRewardRequestNotice] = useState("");
   const [pendingReportDraft, setPendingReportDraft] = useState<PendingReportDraft | null>(null);
   const [confirmDraftDiscard, setConfirmDraftDiscard] = useState(false);
-  const recorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const attachmentsRef = useRef<Attachment[]>([]);
   const imageCameraRef = useRef<HTMLInputElement>(null);
   const imageLibraryRef = useRef<HTMLInputElement>(null);
+  const videoCameraRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (locationMode !== "gps" || !locationConfirmed || !location) {
@@ -642,12 +636,6 @@ function App() {
   }, [view, step]);
 
   useEffect(() => {
-    if (!recording) return;
-    const timer = window.setInterval(() => setRecordingSeconds((value) => value + 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [recording]);
-
-  useEffect(() => {
     attachmentsRef.current = attachments;
   }, [attachments]);
 
@@ -699,8 +687,6 @@ function App() {
 
   useEffect(() => () => {
     attachmentsRef.current.forEach((item) => URL.revokeObjectURL(item.url));
-    recorderRef.current?.stop();
-    streamRef.current?.getTracks().forEach((track) => track.stop());
     recognitionRef.current?.stop();
     speechRunRef.current += 1;
     window.speechSynthesis?.cancel();
@@ -1018,7 +1004,7 @@ function App() {
     setError("");
     setAttachments((current) => {
       const available = Math.max(0, 5 - current.length);
-      if (files.length > available) setError("사진·영상·음성은 모두 합쳐 5개까지 넣을 수 있습니다.");
+      if (files.length > available) setError("사진·영상은 모두 합쳐 5개까지 넣을 수 있습니다.");
       return [...current, ...files.slice(0, available).map((file) => ({
         id: crypto.randomUUID(),
         kind: file.type.startsWith("video/") ? "video" as const : file.type.startsWith("audio/") ? "audio" as const : "image" as const,
@@ -1029,15 +1015,13 @@ function App() {
   };
 
   const openNativeMediaPicker = (source: "image-camera" | "image-library" | "video-camera" | "video-library") => {
-    if(source === "video-camera") {
-      setMediaPickerKind(null);
-      if(attachments.length>=5){setError("첨부파일은 모두 합쳐 5개까지 넣을 수 있습니다.");return;}
-      setMediaNotice("");setError("");setVideoCaptureOpen(true);return;
-    }
+    if(attachments.length>=5){setError("첨부파일은 모두 합쳐 5개까지 넣을 수 있습니다.");return;}
+    setError("");
     const input = {
       "image-camera": imageCameraRef,
       "image-library": imageLibraryRef,
       "video-library": videoLibraryRef,
+      "video-camera": videoCameraRef,
     }[source];
     setMediaPickerKind(null);
     input.current?.click();
@@ -1083,7 +1067,7 @@ function App() {
     };
     const Recognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
     if (!Recognition) {
-      setError("이 브라우저에서는 말로 글쓰기를 지원하지 않습니다. 음성 녹음이나 글쓰기를 이용해주세요.");
+      setError("이 브라우저에서는 말로 글쓰기를 지원하지 않습니다. 설명 칸에 직접 입력해주세요.");
       return;
     }
     const recognition = new Recognition();
@@ -1101,50 +1085,6 @@ function App() {
     setListening(true);
     recognition.start();
   };
-
-  const startAudioRecording = async () => {
-    if (!navigator.mediaDevices?.getUserMedia || !("MediaRecorder" in window)) {
-      setError("이 기기에서는 음성 녹음을 사용할 수 없습니다.");
-      return;
-    }
-    if (attachments.length >= 5) {
-      setError("첨부파일은 모두 합쳐 5개까지 넣을 수 있습니다.");
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      streamRef.current = stream;
-      recorderRef.current = recorder;
-      audioChunksRef.current = [];
-      recorder.ondataavailable = (event) => {
-        if (event.data.size) audioChunksRef.current.push(event.data);
-      };
-      recorder.onstop = () => {
-        const type = recorder.mimeType || "audio/webm";
-        const blob = new Blob(audioChunksRef.current, { type });
-        const file = new File([blob], `현장음성-${Date.now()}.webm`, { type });
-        setAttachments((current) => [...current, {
-          id: crypto.randomUUID(),
-          kind: "audio" as const,
-          file,
-          url: URL.createObjectURL(file),
-        }].slice(0, 5));
-        stream.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-        recorderRef.current = null;
-        setRecording(false);
-      };
-      setError("");
-      setRecordingSeconds(0);
-      setRecording(true);
-      recorder.start();
-    } catch {
-      setError("마이크 권한을 허용해주세요.");
-    }
-  };
-
-  const stopAudioRecording = () => recorderRef.current?.stop();
 
   const goNext = () => {
     setError("");
@@ -1326,7 +1266,7 @@ function App() {
             <div className="onboarding-permissions">
               <article>
                 <span aria-hidden="true">●</span>
-                <div><strong>카메라·마이크</strong><small>사진·영상 촬영과 음성 녹음</small></div>
+                <div><strong>카메라·마이크</strong><small>사진·영상 촬영과 말로 글쓰기</small></div>
                 <button type="button" className={mediaPermission} onClick={requestMediaPermission} disabled={mediaPermission === "requesting" || mediaPermission === "granted"}>{permissionStatusLabel[mediaPermission]}</button>
               </article>
               <article>
@@ -1527,6 +1467,7 @@ function App() {
                   </div>
                   <input ref={imageCameraRef} className="capture-file-input" type="file" accept="image/*" capture="environment" onChange={addFiles} />
                   <input ref={imageLibraryRef} className="capture-file-input" type="file" accept="image/*" multiple onChange={addFiles} />
+                  <input ref={videoCameraRef} className="capture-file-input" type="file" accept="video/*" capture="environment" onChange={addFiles} />
                   <input ref={videoLibraryRef} className="capture-file-input" type="file" accept="video/*" multiple onChange={addFiles} />
                   {mediaPickerKind && (
                     <div className="media-source-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setMediaPickerKind(null)}>
@@ -1535,6 +1476,7 @@ function App() {
                         <img className="media-source-icon provided-source-icon" src={iconPath(mediaPickerKind === "image" ? "camera.png" : "video.png")} alt="" />
                         <h2 id="media-source-title">{mediaPickerKind === "image" ? "사진" : "영상"}을 어떻게 추가할까요?</h2>
                         <p>원하는 방법을 하나 골라주세요.</p>
+                        {mediaPickerKind === "video" && <div className="jk-video-guidance"><strong>{VIDEO_RECORDING_GUIDANCE}</strong><p>{VIDEO_SIZE_GUIDANCE}</p></div>}
                         <div className="media-source-actions">
                           <button type="button" onClick={() => openNativeMediaPicker(mediaPickerKind === "image" ? "image-camera" : "video-camera")}>
                             <img className="media-source-action-icon" src={iconPath("source-capture.png")} alt="" />
@@ -1562,8 +1504,8 @@ function App() {
                       ))}
                     </div>
                   )}
-                  <p className="jk-media-note">사진·영상·음성은 파일 한 개당 최대 100MB까지 첨부할 수 있어요.</p>
-                  {mediaNotice && <p className="jk-media-note" role="status">{mediaNotice}</p>}
+                  <p className="jk-media-note">사진·영상은 파일 한 개당 최대 100MB까지 첨부할 수 있어요.</p>
+                  <div className="jk-video-guidance"><strong>{VIDEO_RECORDING_GUIDANCE}</strong><p>{VIDEO_SIZE_GUIDANCE}</p></div>
                   <p className="media-privacy">얼굴과 차량번호가 보이면 제출 전에 확인해주세요.</p>
                   <button className="next-button" onClick={goNext}>{attachments.some((item) => item.kind !== "audio") ? "선택한 자료와 계속하기" : "위험요소 선택하기"}<span>→</span></button>
                 </div>
@@ -1608,20 +1550,6 @@ function App() {
                       </button>
                     </div>
                     <textarea id="report-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="예: 보도 턱이 높아서 보행기가 걸려요." rows={5} />
-                  </div>
-                  <div className="voice-recorder">
-                    <div>
-                      <strong>현장음 녹음</strong>
-                      <small>{recording ? `${recordingSeconds}초 녹음 중` : "현장의 소리를 별도 파일로 남길 수 있어요."}</small>
-                    </div>
-                    <button type="button" className={`report-audio-action${recording ? " recording" : ""}`} onClick={recording ? stopAudioRecording : startAudioRecording}>
-                      <span className="record-action-icon" aria-hidden="true">{recording ? "■" : "●"}</span>
-                      <span className="audio-action-label">{recording ? "녹음 끝내기" : "현장음 녹음"}</span>
-                    </button>
-                    <label className="audio-file-button report-audio-action">
-                      <input type="file" accept="audio/*" onChange={addFiles} />
-                      <span className="audio-action-label">녹음 파일 선택</span>
-                    </label>
                   </div>
                   {attachments.some((item) => item.kind === "audio") && (
                     <div className="audio-attachment-list" aria-label="녹음한 현장음">
@@ -1687,7 +1615,7 @@ function App() {
                       <div><dt>위험유형</dt><dd>{riskType}</dd></div>
                       <div><dt>세부유형</dt><dd>{riskDetail}</dd></div>
                       <div><dt>위치</dt><dd>{locationMode === "gps" && location ? `지도에서 선택한 위치 (${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)})` : place}</dd></div>
-                      <div><dt>첨부</dt><dd>사진 {attachments.filter((item) => item.kind === "image").length} · 영상 {attachments.filter((item) => item.kind === "video").length} · 음성 {attachments.filter((item) => item.kind === "audio").length}</dd></div>
+                      <div><dt>첨부</dt><dd>사진 {attachments.filter((item) => item.kind === "image").length} · 영상 {attachments.filter((item) => item.kind === "video").length}{attachments.some((item) => item.kind === "audio") && <> · 음성 {attachments.filter((item) => item.kind === "audio").length}</>}</dd></div>
                     </dl>
                   </div>
                   <div className="auto-save-info">
@@ -1737,7 +1665,7 @@ function App() {
                           <div className="report-media-summary" aria-label={`사진 ${counts.image}개, 영상 ${counts.video}개, 음성 ${counts.audio}개`}>
                             <span>사진 <b>{counts.image}</b></span>
                             <span>영상 <b>{counts.video}</b></span>
-                            <span>음성 <b>{counts.audio}</b></span>
+                            {counts.audio > 0 && <span>음성 <b>{counts.audio}</b></span>}
                           </div>
                         </div>
                         <div className="response-box"><small>{reportDepartment(report)} 답변</small><p>{reportResponse(report)}</p></div>
@@ -1847,11 +1775,6 @@ function App() {
           </div>
         )}
 
-        {videoCaptureOpen && view === "report" && step === 1 && <VideoCapture onClose={()=>setVideoCaptureOpen(false)} onCapture={(file,automatic)=>{
-          setVideoCaptureOpen(false);
-          setAttachments(current=>current.length>=5?current:[...current,{id:crypto.randomUUID(),kind:"video",file,url:URL.createObjectURL(file)}]);
-          setMediaNotice(automatic?"100MB를 넘지 않도록 촬영을 자동 종료하고 영상을 첨부했어요.":"촬영한 영상을 첨부했어요.");
-        }} />}
         <nav className="bottom-nav" aria-label="앱 주요 메뉴">
           <button className={view === "home" ? "active" : ""} onClick={() => navigate("home")}><span><NavIcon name="home" /></span><strong>홈</strong></button>
           <button aria-label="새로운 위험요소 제보하기" className={view === "report" ? "active" : ""} onClick={() => navigate("report")}><span><NavIcon name="report" /></span><strong>제보</strong></button>
